@@ -18,6 +18,7 @@ return [
     'E2002' => 'NIK/Paspor sudah terdaftar',
     'E2003' => 'Data registrasi tidak lengkap',
     'E2004' => 'Format ID tidak valid',
+    'E2005' => 'Format Paspor tidak valid',
 
     'E3001' => 'Link verifikasi tidak valid atau kadaluarsa',
     'E3002' => 'Link verifikasi sudah digunakan',

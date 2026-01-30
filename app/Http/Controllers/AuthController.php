@@ -12,32 +12,64 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 
-use function Laravel\Prompts\error;
-
 class AuthController extends Controller
 {
+    private function isValidNik($nik)
+    {
+        if (!preg_match('/^\d{16}$/', $nik)) {
+            return false;
+        }
+
+        $day = (int) substr($nik, 6, 2);
+        $month = (int) substr($nik, 8, 2);
+        $year = (int) substr($nik, 10, 2);
+        $currentYear = (int) date('y');
+        $year += ($year <= $currentYear) ? 2000 : 1900;
+
+        if ($day > 40) {
+            $day -= 40;
+        }
+
+        return checkdate($month, $day, $year);
+    }
+
+    private function isValidPassport($passport)
+    {
+        return preg_match('/^[A-Z0-9]{7,9}$/i', $passport);
+    }
+
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'max:255'],
             'identity_type' => ['required', 'in:id,passport'],
-            'identity_number' => [
-                'required',
-                'unique:users,identity_number',
-                $request->identity_type === 'id' ? 'digits:16' : 'alpha_num'
-            ],
+            'identity_number' => ['required', 'unique:users,identity_number'],
             'email' => ['required', 'email', 'unique:users'],
             'password' => ['required', 'confirmed']
         ], [
             'email.unique' => 'E2001',
             'identity_number.unique' => 'E2002',
             '*.required' => 'E2003',
-            'identity_number.digits' => 'E2004',
         ]);
+
+        $identityType = $request->identity_type;
+        $identityNumber = $request->identity_number;
 
         if ($validator->fails()) {
             $errorCode = $validator->errors()->first();
             return $this->errorResponse($errorCode, 422);
+        }
+
+        if ($identityType === 'id' && !$this->isValidNik($request->identity_number)) {
+            if (!$this->isValidNik($identityNumber)) {
+                return $this->errorResponse('E2004', 422);
+            }
+        }
+
+        if ($identityType === 'passport' && !$this->isValidPassport($request->identity_number)) {
+            if (!$this->isValidPassport($identityNumber)) {
+                return $this->errorResponse('E2005', 422);
+            }
         }
 
         $validated = $validator->validated();
