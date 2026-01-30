@@ -1894,6 +1894,20 @@
       }
     }
   }
+  .navbar {
+    @layer daisyui.l1.l2.l3 {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      padding: 0.5rem;
+      min-height: 4rem;
+    }
+    :where(&) {
+      @layer daisyui.l1.l2 {
+        position: relative;
+      }
+    }
+  }
   .progress {
     @layer daisyui.l1.l2.l3 {
       position: relative;
@@ -2340,6 +2354,14 @@
   .mr-6 {
     margin-right: calc(var(--spacing) * 6);
   }
+  .footer-title {
+    @layer daisyui.l1.l2.l3 {
+      margin-bottom: calc(0.25rem * 2);
+      text-transform: uppercase;
+      opacity: 60%;
+      font-weight: 600;
+    }
+  }
   .-mb-px {
     margin-bottom: -1px;
   }
@@ -2396,6 +2418,31 @@
       --size: calc(var(--size-selector, 0.25rem) * 6);
       height: var(--size);
       padding-inline: calc(var(--size) / 2 - var(--border));
+    }
+  }
+  .footer {
+    @layer daisyui.l1.l2.l3 {
+      display: grid;
+      width: 100%;
+      grid-auto-flow: row;
+      place-items: start;
+      column-gap: calc(0.25rem * 4);
+      row-gap: calc(0.25rem * 10);
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      & > * {
+        display: grid;
+        place-items: start;
+        gap: calc(0.25rem * 2);
+      }
+      &.footer-center {
+        grid-auto-flow: column dense;
+        place-items: center;
+        text-align: center;
+        & > * {
+          place-items: center;
+        }
+      }
     }
   }
   .alert {
@@ -2933,6 +2980,9 @@
   .bg-amber-600 {
     background-color: var(--color-amber-600);
   }
+  .bg-base-200 {
+    background-color: var(--color-base-200);
+  }
   .bg-black {
     background-color: var(--color-black);
   }
@@ -3005,6 +3055,9 @@
       background-color: color-mix(in oklab, var(--color-white) 2%, transparent);
     }
   }
+  .fill-current {
+    fill: currentcolor;
+  }
   .object-cover {
     object-fit: cover;
   }
@@ -3034,6 +3087,9 @@
   }
   .p-8 {
     padding: calc(var(--spacing) * 8);
+  }
+  .p-10 {
+    padding: calc(var(--spacing) * 10);
   }
   .p-12 {
     padding: calc(var(--spacing) * 12);
@@ -3240,6 +3296,9 @@
   }
   .text-amber-900 {
     color: var(--color-amber-900);
+  }
+  .text-base-content {
+    color: var(--color-base-content);
   }
   .text-black {
     color: var(--color-black);
@@ -3672,6 +3731,16 @@
   .sm\:flex-1 {
     @media (width >= 40rem) {
       flex: 1;
+    }
+  }
+  .sm\:footer-horizontal {
+    @media (width >= 40rem) {
+      @layer daisyui.l1.l2 {
+        grid-auto-flow: column;
+        &.footer-center {
+          grid-auto-flow: row dense;
+        }
+      }
     }
   }
   .sm\:items-center {

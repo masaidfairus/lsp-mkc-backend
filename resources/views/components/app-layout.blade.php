@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="light">
 <head>
     <title>@yield('title')</title>
      @vite(['resources/css/app.css', 'resources/css/output.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-100">
-    <x-navbar />
+<body>
 
-    <main class="p-6">
-        {{ $slot }}
+    @include('partials.navbar')
+
+    <main>
+        {{$slot}}
     </main>
+
+    @include('partials.footer')
+    
 </body>
 </html>

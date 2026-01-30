@@ -52,7 +52,7 @@
                 {{-- Form --}}
                 <div class="flex flex-col gap-4 text-white">
                     <div class="gap-2 flex flex-col">
-                        <label for="name" class="label text-white text-xl lg:text-sm">Nama Pengguna / Email</label>
+                        <label for="name" class="label text-white text-xl lg:text-sm">Email</label>
                         <x-input name="name" type="text" placeholder="Masukkan nama pengguna atau email..." />
                     </div>
 
