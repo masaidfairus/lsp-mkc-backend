@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
