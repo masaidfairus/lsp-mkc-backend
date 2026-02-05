@@ -107,7 +107,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'email' => [
                 'required',
                 'exists:users',
@@ -119,6 +119,16 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
+
+        // ADA TIGA ROLE NANTI : admin, asesor, asesi (user)
+        if ($user?->role === 'admin' || $user?->role === 'asesor') {
+            if (Auth::attempt($validated)) {
+                $request->session()->regenerate();
+                return redirect()->route('admin');
+            }
+
+            return $this->errorResponse('E1004', 401);
+        }
 
         if (!$user) {
             return $this->errorResponse('E1001', 401);
@@ -138,9 +148,18 @@ class AuthController extends Controller
         ]);
     }
 
+    // protected function auth
+
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
-        return $this->successResponse([], 'Kamu telah keluar dari akun');
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'asesor') {
+            Auth::logout();
+            $request->session()->invalidate();
+        } else {
+            $request->user()->tokens()->delete();
+            return $this->successResponse([], 'Kamu telah keluar dari akun');
+        }
+
+        return redirect()->route('/');
     }
 }

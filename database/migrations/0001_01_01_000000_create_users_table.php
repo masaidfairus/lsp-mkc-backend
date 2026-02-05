@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('identity_number', 20)->unique();
+            $table->string('role')->default('asesi');
+            $table->string('identity_type')->nullable();
+            $table->string('identity_number', 20)->nullable()->unique();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
