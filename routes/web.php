@@ -20,7 +20,12 @@ Route::get('/signin', function () {
 
 Route::get('/dashboard', function () {
     return view('pages.dashboard');
+<<<<<<< Updated upstream
 })->name('dashboard');
 
 Route::post('/login', [AuthController::class, 'webLogin'])->name('login');
+=======
+})->name('dashboard'); 
+
+>>>>>>> Stashed changes
 
