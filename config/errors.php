@@ -13,6 +13,7 @@ return [
     'E1001' => 'User tidak ditemukan',
     'E1002' => 'Password salah',
     'E1003' => 'Akun belum diaktivasi',
+    'E1004' => 'Akun admin tidak terdaftar',
 
     'E2001' => 'Email sudah terdaftar',
     'E2002' => 'NIK/Paspor sudah terdaftar',
@@ -30,5 +31,5 @@ return [
     'E5001' => 'Kesalahan database',
     'E5002' => 'Gagal mengirim email',
     'E5003' => 'Kesalahan internal server',
-    
+
 ];

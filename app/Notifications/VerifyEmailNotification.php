@@ -38,9 +38,13 @@ class VerifyEmailNotification extends Notification
     {
         return (new MailMessage)
             ->subject('Aktivasi Akun LSP MKC')
-            ->line('Terima kasih telah mendaftar. Silakan klik tombol di bawah untuk memverifikasi email Anda.')
+            // ->line('Terima kasih telah mendaftar. Silakan klik tombol di bawah untuk memverifikasi email Anda.')
             ->action('Verifikasi Email', $this->url)
-            ->line('Link ini hanya berlaku selama 10 menit.');
+            // ->line('Link ini hanya berlaku selama 10 menit.');
+            ->markdown('vendor.notifications.email', [
+                'url' => $this->url,
+                'user' => $notifiable
+            ]);
     }
 
     /**
