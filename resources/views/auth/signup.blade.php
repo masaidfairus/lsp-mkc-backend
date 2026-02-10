@@ -33,6 +33,8 @@
             <x-input-container
                 class="bg-[#4D9242] h-full w-full max-h-[calc(100vh-4rem)]
                        rounded-xl flex flex-col justify-center gap-2 p-12 lg:px-18"
+                id="signupForm"
+                action="/api/register"
             >
 
             <div class="absolute right-12 top-[20.5%] lg:right-8 lg:top-8 w-36">
@@ -57,6 +59,20 @@
                     </div>
 
                     <div class="gap-2 flex flex-col">
+                        <label for="identity_type" class="label text-white text-xl lg:text-sm">Tipe Identitas</label>
+                        <select name="identity_type" class="select bg-[#4D9242] border border-[#ACCD3A] focus:ring-0 focus:outline-none w-full">
+                            <option disabled selected>Pilih identitas yang ingin kamu daftarkan</option>
+                            <option value="id">NIK / KTP</option>
+                            <option value="passport">Passpor</option>
+                        </select>
+                    </div>
+
+                    <div class="gap-2 flex flex-col">
+                        <label for="identity_number" class="label text-white text-xl lg:text-sm">No Identitas</label>
+                        <x-input name="identity_number" type="number" placeholder="Masukkan no identitas..." />
+                    </div>
+
+                    <div class="gap-2 flex flex-col">
                         <label for="email" class="label text-white text-xl lg:text-sm">Email</label>
                         <x-input name="email" type="email" placeholder="Masukkan email..." />
                     </div>
@@ -65,9 +81,17 @@
                         <label for="password" class="label text-white text-xl lg:text-sm">Kata Sandi</label>
                         <x-password name="password" placeholder="Masukkan sandi..." />
                     </div>
+
+                    <div class="gap-2 flex flex-col">
+                        <label for="password_confirmation" class="label text-white text-xl lg:text-sm">Konfirmasi Kata Sandi</label>
+                        <x-password name="password_confirmation" placeholder="Konfirmasi sandi..." :showShow="true" />
+                    </div>
                 </div>
 
-                <x-button class="mt-10">
+                <x-button 
+                class="mt-10"
+                type="submit"
+                >
                     Daftar
                 </x-button>
 

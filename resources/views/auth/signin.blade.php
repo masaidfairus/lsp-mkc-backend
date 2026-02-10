@@ -33,6 +33,9 @@
             <x-input-container
                 class="bg-[#4D9242] h-full w-full max-h-[calc(100vh-4rem)]
                        rounded-xl flex flex-col justify-center gap-2 p-12 lg:px-18"
+                id="signinForm"
+                action="/api/login"
+
             >
 
             <div class="absolute right-12 top-[20.5%] lg:right-8 lg:top-8 w-36">
@@ -52,18 +55,21 @@
                 {{-- Form --}}
                 <div class="flex flex-col gap-4 text-white">
                     <div class="gap-2 flex flex-col">
-                        <label for="name" class="label text-white text-xl lg:text-sm">Email</label>
-                        <x-input name="name" type="text" placeholder="Masukkan nama pengguna atau email..." />
+                        <label for="email" class="label text-white text-xl lg:text-sm">Email</label>
+                        <x-input name="email" type="text" placeholder="Masukkan email..." />
                     </div>
 
                     <div class="gap-2 flex flex-col">
                         <label for="password" class="label text-white text-xl lg:text-sm">Kata Sandi</label>
-                        <x-password name="password" placeholder="Masukkan sandi..." />
+                        <x-password name="password" placeholder="Masukkan sandi..." :showForget="true" />
                     </div>
                 </div>
 
-                <x-button class="mt-10">
-                    Daftar
+                <x-button 
+                class="mt-10"
+                type="submit"
+                >
+                    Masuk
                 </x-button>
 
                   <div class="divider text-xl lg:text-sm text-white">Atau Masuk Dengan</div>

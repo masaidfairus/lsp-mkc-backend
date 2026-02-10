@@ -17,3 +17,10 @@ Route::get('/signup', function () {
 Route::get('/signin', function () {
     return view('auth.signin');
 })->name('signin'); 
+
+Route::get('/dashboard', function () {
+    return view('pages.dashboard');
+})->name('dashboard');
+
+Route::post('/login', [AuthController::class, 'webLogin'])->name('login');
+

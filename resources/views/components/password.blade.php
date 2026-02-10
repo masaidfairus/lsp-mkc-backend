@@ -2,6 +2,7 @@
     'label' => null,
     'name',
     'showForget' => false,
+    'showShow' => false,
 ])
 
 <div class="form-control w-full" x-data="{ show: false }">
@@ -22,7 +23,9 @@
     />
 
    <div class="flex justify-between">
-     <!-- Checkbox toggle -->
+    
+    @if ($showShow)
+         <!-- Checkbox toggle -->
     <label class="label cursor-pointer justify-start gap-2 mt-4">
         <input
             type="checkbox"
@@ -31,6 +34,7 @@
         />
         <span class="label-text text-xl lg:text-sm text-white">Lihat kata sandi</span>
     </label>
+    @endif
     
     {{-- Forgot --}}
                 @if ($showForget)

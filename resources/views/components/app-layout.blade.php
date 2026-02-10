@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html class="overflow-hidden-x">
 <head>
     <title>@yield('title')</title>
-     @vite(['resources/css/app.css', 'resources/css/output.css', 'resources/js/app.js'])
+     @vite(['resources/css/app.css', 'resources/css/output.css', 'resources/js/app.js', 'resource/js/auth.js'])
 </head>
-<body>
+<body class="bg-white">
+    <header>
+        @include('partials.navbar')
+    </header>
 
-    @include('partials.navbar')
-
-    <main>
+    <main >
         {{$slot}}
     </main>
-
-    @include('partials.footer')
     
 </body>
 </html>
