@@ -6,10 +6,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('pages.dashboard');
-})->name('dashboard');
-
 Route::get('/signup', function () {
     return view('auth.signup');
 })->name('signup');
@@ -20,12 +16,6 @@ Route::get('/signin', function () {
 
 Route::get('/dashboard', function () {
     return view('pages.dashboard');
-<<<<<<< Updated upstream
-})->name('dashboard');
-
-Route::post('/login', [AuthController::class, 'webLogin'])->name('login');
-=======
 })->name('dashboard'); 
 
->>>>>>> Stashed changes
 
