@@ -7,6 +7,6 @@
     <img 
         src="{{ $src }}" 
         alt="{{ $alt }}"
-        class="aspect-square w-24 h-24 rounded-full"
+        class="aspect-square w-24 h-24 lg:h-12 lg:w-12 rounded-full"
         >
 </div>
