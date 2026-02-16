@@ -1,14 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html class="overflow-hidden-x">
 <head>
     <title>@yield('title')</title>
-     @vite(['resources/css/app.css', 'resources/css/output.css', 'resources/js/app.js'])
+     @vite(['resources/css/app.css', 'resources/css/output.css', 'resources/js/app.js', 'resource/js/auth.js'])
 </head>
-<body class="bg-gray-100">
-    <x-navbar />
+<body class="bg-white">
 
-    <main class="p-6">
-        {{ $slot }}
-    </main>
+   <div class="flex">
+        <div class="hidden lg:pl-8 lg:pr-4 lg:py-4 lg:block">
+            @include('partials.sidebar')
+        </div>
+
+        <div class="p-0 lg:pr-8" >
+        @include('partials.navbar')
+            {{$slot}}
+        </div>
+   </div>
+    
 </body>
 </html>

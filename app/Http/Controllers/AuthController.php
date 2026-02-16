@@ -148,6 +148,15 @@ class AuthController extends Controller
         ]);
     }
 
+    public function webLogin(Request $request)
+{
+    if (Auth::attempt($request->only('email', 'password'))) {
+        return redirect('/pages/dashboard');
+    }
+
+    return back()->withErrors(['email' => 'Login gagal']);
+}
+
     // protected function auth
 
     public function logout(Request $request)
