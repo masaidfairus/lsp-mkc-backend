@@ -108,7 +108,7 @@
                         Sudah memiliki akun?
                     </p>
                     <x-hyperlink
-                        route="signin"
+                        route="login"
                         class="link link-hover ml-2 text-white"
                     >
                         Masuk Disini

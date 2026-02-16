@@ -85,7 +85,7 @@
                         Belum memiliki akun?
                     </p>
                     <x-hyperlink
-                        route="signup"
+                        route="login"
                         class="link link-hover ml-1 text-white"
                     >
                         Daftar Disini
