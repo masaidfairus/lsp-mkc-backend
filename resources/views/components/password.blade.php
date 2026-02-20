@@ -40,7 +40,7 @@
                 @if ($showForget)
                     <div class="flex justify-center items-center text-white text-sm mt-4">
                     <x-hyperlink
-                        route="signin"
+                        route="login"
                         class="link link-hover ml-2 text-white"
                     >
                         Lupa Kata Sandi?

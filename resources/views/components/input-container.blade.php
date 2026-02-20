@@ -15,3 +15,5 @@
     @csrf
     {{ $slot }}
 </form>
+
+{{-- Ganti property action jadi dynamic --}}
