@@ -38,7 +38,7 @@
                         </div>
 
                         <div 
-                            class="relative w-full h-[25vh] lg:w-[18vw] lg:h-fit bg-cover bg-center rounded-4xl lg:rounded-xl"
+                            class="relative w-full h-[25vh] lg:w-[16vw] lg:h-fit bg-cover bg-center rounded-4xl lg:rounded-xl"
                             style="background-image: url('{{ asset('images/calendar_bg.png') }}');">
 
                             <div class="absolute inset-0 bg-black/30 rounded-4xl"></div>

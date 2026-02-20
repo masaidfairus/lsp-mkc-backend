@@ -7,11 +7,11 @@
 <body class="bg-white">
 
    <div class="flex">
-        <div class="hidden lg:pl-8 lg:pr-4 lg:py-4 lg:block">
+        <div class="hidden lg:pl-4 lg:pr-4 lg:py-4 lg:block">
             @include('partials.sidebar')
         </div>
 
-        <div class="p-0 lg:pr-8" >
+        {{-- <div class="p-0 lg:pr-4" > --}}
         @include('partials.navbar')
             {{$slot}}
         </div>
