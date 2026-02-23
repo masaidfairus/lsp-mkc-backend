@@ -34,7 +34,7 @@
                 class="bg-[#4D9242] h-full w-full max-h-[calc(100vh-4rem)]
                        rounded-xl flex flex-col justify-center gap-2 p-12 lg:px-18"
                 id="signinForm"
-                action="/api/login"
+                action="/login"
 
             >
 
