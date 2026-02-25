@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Profile extends Model
+class Apl01Data extends Model
 {
     protected $fillable = [
         'user_id',
@@ -13,6 +13,10 @@ class Profile extends Model
         'address',
         'phone_number',
         'latest_education',
+        'company_name',
+        'job_title',
+        'company_address',
+        'company_contact',
     ];
 
     protected $casts = [

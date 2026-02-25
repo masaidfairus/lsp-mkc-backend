@@ -54,14 +54,9 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function profiles()
+    public function aplData()
     {
-        return $this->hasOne(Profile::class);
-    }
-
-    public function workData()
-    {
-        return $this->hasOne(WorkData::class);
+        return $this->hasMany(Apl01Data::class);
     }
 
     public function activationTokens()
