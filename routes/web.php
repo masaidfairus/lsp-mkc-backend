@@ -9,6 +9,10 @@ Route::get('/', function () {
 
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::get('/', function () {
+    return 'HIDUP BRO 🔥';
+});
+
 // Route Grup ini buat semua yang hanya bisa diakses sama asesor maupun admin
 // Route::middleware(['auth', 'is_admin:admin,asesor'])->group(function () {
 //     // Route::get('/admin', function () {
