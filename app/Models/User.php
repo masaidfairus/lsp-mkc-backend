@@ -21,11 +21,6 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var list<string>
      */
 
-    public function activationTokens()
-    {
-        return $this->hasMany(ActivationTokens::class);
-    }
-    
     protected $fillable = [
         'role',
         'name',
@@ -33,6 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'identity_number',
         'email',
         'password',
+        'status',
     ];
 
     /**
@@ -56,5 +52,45 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function profiles()
+    {
+        return $this->hasOne(Profile::class);
+    }
+
+    public function workData()
+    {
+        return $this->hasOne(WorkData::class);
+    }
+
+    public function activationTokens()
+    {
+        return $this->hasMany(ActivationTokens::class);
+    }
+
+    public function registrations()
+    {
+        return $this->hasMany(AssessmentRegistration::class, 'user_id', 'id');
+    }
+
+    public function assignments()
+    {
+        return $this->hasMany(AssessmentRegistration::class, 'assessor_id', 'id');
+    }
+
+    public function mainAssessorValidations()
+    {
+        return $this->hasMany(PeerValidation::class, 'main_assessor_id', 'id');
+    }
+
+    public function peerAssessorValidations()
+    {
+        return $this->hasMany(PeerValidation::class, 'peer_assessor_id', 'id');
+    }
+
+    public function evidence()
+    {
+        return $this->hasMany(Apl01Evidence::class);
     }
 }

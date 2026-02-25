@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class CompetencyUnit extends Model
+{
+    protected $fillable = [
+        'scheme_id',
+        'unit_code',
+        'unit_title',
+    ];
+    
+    public function scheme()
+    {
+        return $this->belongsTo(Scheme::class);
+    }
+
+    public function competencyElements()
+    {
+        return $this->hasMany(CompetencyElement::class);
+    }
+}
