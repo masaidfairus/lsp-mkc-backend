@@ -44,7 +44,7 @@ class AuthController extends Controller
             'name' => ['required', 'max:255'],
             'identity_type' => ['required', 'in:id,passport'],
             'identity_number' => ['required', 'unique:users,identity_number'],
-            'email' => ['required', 'email', 'unique:users'],
+            'email' => ['required', 'email:rfc', 'unique:users'],
             'password' => ['required', 'confirmed']
         ], [
             'email.unique' => 'E2001',
@@ -105,6 +105,27 @@ class AuthController extends Controller
         return $this->successResponse([], 'Email berhasil diverifikasi.');
     }
 
+    public function resend(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email:rfc',
+        ]);
+
+        $user = User::where('email', $request->email)->firstOrFail();
+
+        if ($user->hasVerifiedEmail()) {
+            return $this->successResponse([], 'Email sudah terverifikasi');
+        }
+
+        $verificationUrl = URL::temporarySignedRoute(
+            'api.verify',
+            now()->addMinutes(10),
+            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
+        );
+
+        $user->notify(new VerifyEmailNotification($verificationUrl));
+    }
+
     public function login(Request $request)
     {
         $validated = $request->validate([
@@ -148,17 +169,6 @@ class AuthController extends Controller
         ]);
     }
 
-    public function webLogin(Request $request)
-{
-    if (Auth::attempt($request->only('email', 'password'))) {
-        return redirect('/pages/dashboard');
-    }
-
-    return back()->withErrors(['email' => 'Login gagal']);
-}
-
-    // protected function auth
-
     public function logout(Request $request)
     {
         if (Auth::user()->role == 'admin' || Auth::user()->role == 'asesor') {
@@ -169,6 +179,6 @@ class AuthController extends Controller
             return $this->successResponse([], 'Kamu telah keluar dari akun');
         }
 
-        return redirect()->route('/');
+        return redirect()->route('login');
     }
 }
