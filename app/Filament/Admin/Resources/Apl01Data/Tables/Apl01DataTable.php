@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Apl01s\Tables;
+namespace App\Filament\Admin\Resources\Apl01Data\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 
-class Apl01sTable
+class Apl01DataTable
 {
     public static function configure(Table $table): Table
     {
