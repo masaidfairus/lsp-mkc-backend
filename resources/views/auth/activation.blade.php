@@ -24,7 +24,7 @@
                             <h1>Email Successfully <br> Verified</h1>
                         </div>
                         {{-- Desc --}}
-                        <div class="text-[1.8rem] lg:text-xs text-center font-light text-white">
+                        <div class="text-[1.8rem] lg:text-sm text-center font-light text-white">
                             <p>
                                 Mari bersiap untuk masuk, mulailah dengan <br> menyiapkan lingkungan kerja anda!🎊📝
                             </p>
