@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\CertificationPurpose;
 use App\Enums\Result;
 use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
@@ -17,8 +18,9 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('scheme_id')->constrained('schemes')->onDelete('restrict');
             $table->foreignId('assessor_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->string('status_apl01')->default(Status::PENDING)->index();
-            $table->string('status_apl02')->default(Status::PENDING)->index();
+            $table->string('certification_purpose')->default(CertificationPurpose::SERTIFIKASI);
+            $table->string('status_apl01')->default(Status::NOT_STARTED)->index();
+            $table->string('status_apl02')->default(Status::NOT_STARTED)->index();
             $table->string('final_result')->default(Result::BELUM_KOMPETEN)->nullable();
             $table->timestamp('assessed_at')->nullable();
             $table->timestamps();

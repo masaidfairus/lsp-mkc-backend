@@ -124,6 +124,7 @@ class AuthController extends Controller
         );
 
         $user->notify(new VerifyEmailNotification($verificationUrl));
+        return $this->successResponse([], 'Link verifikasi telah dikirim ke email anda.');
     }
 
     public function login(Request $request)

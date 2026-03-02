@@ -12,7 +12,7 @@ class Apl01Data extends Model
         'date_of_birth',
         'address',
         'phone_number',
-        'latest_education',
+        'education_qualifications',
         'company_name',
         'job_title',
         'company_address',
@@ -22,7 +22,7 @@ class Apl01Data extends Model
     protected $casts = [
         'date_of_birth' => 'date',
     ];
-    
+
     public function user()
     {
         return $this->belongsTo(User::class);

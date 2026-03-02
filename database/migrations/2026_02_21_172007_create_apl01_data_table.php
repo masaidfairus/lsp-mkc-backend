@@ -16,14 +16,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('gender')->default(Gender::MALE);
-            $table->date('date_of_birth')->nullable();
-            $table->text('address')->nullable();
-            $table->string('phone_number')->nullable()->index();
-            $table->string('latest_education')->nullable();
+            $table->date('date_of_birth');
+            $table->text('address');
+            $table->string('phone_number')->index();
+            $table->string('education_qualifications');
             $table->string('company_name');
             $table->string('job_title');
-            $table->text('company_address')->nullable();
-            $table->string('company_contact')->nullable();
+            $table->text('company_address');
+            $table->string('company_contact');
             $table->timestamps();
         });
     }

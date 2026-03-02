@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('apl01_evidence', function (Blueprint $table) {
             $table->id();
             $table->foreignId('registration_id')->constrained('assessment_registrations')->cascadeOnDelete();
-            $table->foreignId('requirement_id')->constrained('schema_requirements')->cascadeOnDelete();
+            $table->foreignId('requirement_id')->constrained('scheme_requirements')->cascadeOnDelete();
             
             $table->string('file_path');
             $table->boolean('is_valid_admin')->default(false);
