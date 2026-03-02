@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+use function Symfony\Component\Clock\now;
+
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
@@ -20,10 +22,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
         ]);
 
-        User::factory()->create([
+        User::create([
             'role' => 'admin',
             'name' => 'BUDIMAN',
             'email' => 'admin@admin.com',
+            'email_verified_at' => now(),
             'password' => 'admin123',
         ]);
     }

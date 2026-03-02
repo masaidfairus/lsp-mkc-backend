@@ -16,7 +16,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn() => '/admin/login');
         $middleware->group('api', [
             'throttle:5,1',
-            EnsureApiKeyIsValid::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

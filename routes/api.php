@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AssessmentRegistrationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Middleware\EnsureApiKeyIsValid;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -11,9 +12,12 @@ use Illuminate\Support\Facades\Route;
 // })->middleware('auth:sanctum');
 
 Route::get('/verify-email/{id}/{hash}', [AuthController::class, 'verify'])->name('api.verify');
-Route::post('/verify-email/resend', [AuthController::class, 'resend']);
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+
+Route::group(['middleware' => EnsureApiKeyIsValid::class], function () {
+    Route::post('/verify-email/resend', [AuthController::class, 'resend']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
