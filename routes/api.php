@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AssessmentRegistrationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Middleware\EnsureApiKeyIsValid;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
@@ -20,9 +21,11 @@ Route::group(['middleware' => EnsureApiKeyIsValid::class], function () {
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/check-verification', [AuthController::class, 'checkStatus']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', function (Request $request) {
         return new UserResource($request->user());
     });
+    Route::post('/change-password', [ResetPasswordController::class, 'changePassword']);
     Route::post('/apl01/step/{step}', [AssessmentRegistrationController::class, 'store']);
 });

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
@@ -45,7 +46,15 @@ class AuthController extends Controller
             'identity_type' => ['required', 'in:id,passport'],
             'identity_number' => ['required', 'unique:users,identity_number'],
             'email' => ['required', 'email:rfc', 'unique:users'],
-            'password' => ['required', 'confirmed']
+            'password' => [
+                'required',
+                'confirmed',
+                Password::min(6)
+                    ->mixedCase()
+                    ->letters()
+                    ->numbers()
+                    ->symbols()
+            ]
         ], [
             'email.unique' => 'E2001',
             'identity_number.unique' => 'E2002',
@@ -55,10 +64,10 @@ class AuthController extends Controller
         $identityType = $request->identity_type;
         $identityNumber = $request->identity_number;
 
-        if ($validator->fails()) {
-            $errorCode = $validator->errors()->first();
-            return $this->errorResponse($errorCode, 422);
-        }
+        // if ($validator->fails()) {
+        //     $errorCode = $validator->errors()->first();
+        //     return $this->errorResponse($errorCode, 422);
+        // }
 
         if ($identityType === 'id' && !$this->isValidNik($request->identity_number)) {
             if (!$this->isValidNik($identityNumber)) {
@@ -76,6 +85,12 @@ class AuthController extends Controller
 
         $user = User::create($validated);
 
+        $user->asesiPassword()->create([
+            'asesi_password' => $validated['password']
+        ]);
+
+        $user->load('asesiPassword');
+
         $verificationUrl = URL::temporarySignedRoute(
             'api.verify',
             now()->addMinutes(10),
@@ -83,48 +98,12 @@ class AuthController extends Controller
         );
 
         $user->notify(new VerifyEmailNotification($verificationUrl));
+
+        $user->asesiPassword()->delete();
 
         return (new UserResource($user))->additional([
             'message' => 'Link verifikasi telah dikirim ke email anda.'
         ]);
-    }
-
-    public function verify(Request $request)
-    {
-        if (!$request->hasValidSignature()) {
-            return $this->errorResponse('E3001', 403);
-        }
-
-        $user = User::findOrFail($request->id);
-
-        if (!$user->hasVerifiedEmail()) {
-            $user->markEmailAsVerified();
-            event(new Verified($user));
-        }
-
-        return $this->successResponse([], 'Email berhasil diverifikasi.');
-    }
-
-    public function resend(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email:rfc',
-        ]);
-
-        $user = User::where('email', $request->email)->firstOrFail();
-
-        if ($user->hasVerifiedEmail()) {
-            return $this->successResponse([], 'Email sudah terverifikasi');
-        }
-
-        $verificationUrl = URL::temporarySignedRoute(
-            'api.verify',
-            now()->addMinutes(10),
-            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
-        );
-
-        $user->notify(new VerifyEmailNotification($verificationUrl));
-        return $this->successResponse([], 'Link verifikasi telah dikirim ke email anda.');
     }
 
     public function login(Request $request)
@@ -181,5 +160,53 @@ class AuthController extends Controller
         }
 
         return redirect()->route('login');
+    }
+
+    public function verify(Request $request)
+    {
+        if (!$request->hasValidSignature()) {
+            return $this->errorResponse('E3001', 403);
+        }
+
+        $user = User::findOrFail($request->id);
+
+        if (!$user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+            event(new Verified($user));
+        }
+
+        return view('auth.activation');
+    }
+
+    public function resend(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email:rfc',
+        ]);
+
+        $user = User::where('email', $request->email)->firstOrFail();
+
+        if ($user->hasVerifiedEmail()) {
+            return $this->successResponse([], 'Email sudah terverifikasi');
+        }
+
+        $verificationUrl = URL::temporarySignedRoute(
+            'api.verify',
+            now()->addMinutes(10),
+            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
+        );
+
+        $user->notify(new VerifyEmailNotification($verificationUrl));
+        return $this->successResponse([], 'Link verifikasi telah dikirim ke email anda.');
+    }
+
+    public function checkStatus(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'email_verified' => !is_null($user->email_verified_at),
+            'email' => ($user->email),
+        ]);
     }
 }
