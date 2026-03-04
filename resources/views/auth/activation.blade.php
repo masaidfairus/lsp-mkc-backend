@@ -8,11 +8,11 @@
         >
     </div>
     {{-- Card Land --}}
-    <div class="w-[100vw] h-[100vh] flex justify-center lg:items-center pt-[20vh] lg:pt-0">
+    <div class="h-[100vh] flex justify-center items-center ">
         {{-- Card Wrap --}}
             <div class="w-[80vw] h-[40vh] lg:h-[] lg:w-[25vw]">
             <!-- Card -->
-                <div class="relative z-10 bg-black shadow-2xl lg:shadow-lg shadow-white w-full h-full lg:h-fit flex flex-col justify-center items-center rounded-lg space-y-14 pt-12 lg:pt-20 px-16 lg:px-6 lg:pb-8">
+                <div class="relative z-10 bg-black shadow-2xl lg:shadow-sm shadow-white w-full h-full lg:h-fit flex flex-col justify-center items-center rounded-lg py-12 lg:py-20 px-16 lg:px-6">
                     {{-- Layout Wrap --}}
                     <div class="flex flex-col justify-center items-center space-y-8 lg:space-y-2 w-full">
                         {{-- Icon --}}
@@ -29,10 +29,6 @@
                                 Mari bersiap untuk masuk, mulailah dengan <br> menyiapkan lingkungan kerja anda!🎊📝
                             </p>
                         </div>
-                    </div>
-                    {{-- Button --}}
-                    <div class="bg-white border border-white hover:bg-transparent hover:text-white transition w-full flex justify-center items-center rounded-lg font-medium py-4 lg:py-2 text-5xl lg:text-base">
-                        <a href="">Lanjut</a>
                     </div>
                 </div>
             </div>
