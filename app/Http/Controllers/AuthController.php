@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserStatus;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
@@ -174,6 +175,8 @@ class AuthController extends Controller
             $user->markEmailAsVerified();
             event(new Verified($user));
         }
+
+        $user->update(['status' => UserStatus::ACTIVE]);
 
         return view('auth.activation');
     }
