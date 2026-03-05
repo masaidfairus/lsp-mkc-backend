@@ -65,10 +65,10 @@ class AuthController extends Controller
         $identityType = $request->identity_type;
         $identityNumber = $request->identity_number;
 
-        // if ($validator->fails()) {
-        //     $errorCode = $validator->errors()->first();
-        //     return $this->errorResponse($errorCode, 422);
-        // }
+        if ($validator->fails()) {
+            $errorCode = $validator->errors()->first();
+            return $this->errorResponse($errorCode, 422);
+        }
 
         if ($identityType === 'id' && !$this->isValidNik($request->identity_number)) {
             if (!$this->isValidNik($identityNumber)) {
