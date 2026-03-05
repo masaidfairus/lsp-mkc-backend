@@ -18,10 +18,14 @@ Route::group(['middleware' => EnsureApiKeyIsValid::class], function () {
     Route::post('/verify-email/resend', [AuthController::class, 'resend']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/check-verification', [AuthController::class, 'checkStatus']);
+
+    Route::post('/forgot-password', [ResetPasswordController::class, 'forgotPassword']);
+    Route::post('/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
+    Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword']);
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/check-verification', [AuthController::class, 'checkStatus']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', function (Request $request) {
         return new UserResource($request->user());

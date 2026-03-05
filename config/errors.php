@@ -25,6 +25,8 @@ return [
 
     'E3001' => 'Link verifikasi tidak valid atau kadaluarsa',
     'E3002' => 'Link verifikasi sudah digunakan',
+    'E3003' => 'Kode OTP tidak valid atau kadaluarsa',
+    'E3004' => 'Token tidak valid atau kadaluarsa',
 
     'E4001' => 'Method tidak diizinkan',
     'E4002' => 'Payload tidak valid',
