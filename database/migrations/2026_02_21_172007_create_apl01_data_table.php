@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('apl01_data', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('registration_id')->constrained('assessment_registrations')->cascadeOnDelete();
             $table->string('gender')->default(Gender::MALE);
             $table->date('date_of_birth');
             $table->text('address');
