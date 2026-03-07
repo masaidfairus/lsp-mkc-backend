@@ -32,12 +32,12 @@ class AssessmentRegistration extends Model
 
     public function scheme()
     {
-        return $this->belongsTo(Scheme::class);
+        return $this->belongsTo(Scheme::class, 'scheme_id');
     }
 
     public function evidence()
     {
-        return $this->hasMany(Apl01Evidence::class);
+        return $this->hasMany(Apl01Evidence::class, 'registration_id');
     }
 
     public function evaluations()
@@ -53,5 +53,15 @@ class AssessmentRegistration extends Model
     public function plannings()
     {
         return $this->hasMany(AssessmentPlanning::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasOne(Payment::class, 'registration_id');
+    }
+
+    public function aplData()
+    {
+        return $this->hasOne(Apl01Data::class, 'registration_id');
     }
 }

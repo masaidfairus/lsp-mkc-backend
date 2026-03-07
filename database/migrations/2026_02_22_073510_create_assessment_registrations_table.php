@@ -16,7 +16,7 @@ return new class extends Migration {
         Schema::create('assessment_registrations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('scheme_id')->constrained('schemes')->onDelete('restrict');
+            $table->foreignId('scheme_id')->nullable()->constrained('schemes')->onDelete('restrict');
             $table->foreignId('assessor_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('certification_purpose')->default(CertificationPurpose::SERTIFIKASI);
             $table->string('status_apl01')->default(Status::NOT_STARTED)->index();

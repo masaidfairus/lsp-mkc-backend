@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Apl01Status;
 use App\Enums\CertificationPurpose;
 use App\Enums\Gender;
-use App\Enums\Status;
+use App\Enums\PaymentStatus;
 use App\Models\Apl01Evidence;
 use App\Models\AssessmentRegistration;
+use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -27,12 +29,6 @@ class AssessmentRegistrationController extends Controller implements HasMiddlewa
         $user = $request->user();
 
         if ($step == 1) {
-            $profile = $user->profile;
-            if ($profile) {
-                $user->aplData()->create(['user_id' => $user->id], $profile);
-                return $this->successResponse(['next_step' => 2], 'Step 1 saved. Proceed to next step details.');
-            }
-
             $validated = $request->validate([
                 'gender' => ['required', new Enum(Gender::class)],
                 'date_of_birth' => ['required', 'date', 'before:today'],
@@ -45,22 +41,40 @@ class AssessmentRegistrationController extends Controller implements HasMiddlewa
                 'company_contact' => ['required', 'string', 'max:20'],
             ]);
 
-            $user->aplData()->create($validated);
-            return $this->successResponse(['next_step' => 2], 'Step 1 saved. Proceed to next step details.');
+            $user->profile()->updateOrCreate([], $validated);
+
+            $registration = $user->registrations()->create();
+
+            $registration->aplData()->create($validated);
+
+            return $this->successResponse([
+                'next_step' => 2,
+                'registration_id' => $registration->id
+            ], 'Bagian 1 tersimpan. Lanjutkan ke bagian berikutnya.');
         }
 
         if ($step == 2) {
-            if (!$user->aplData()->exists()) {
+            $validated = $request->validate([
+                'registration_id' => ['required', 'exists:assessment_registrations,id'],
+                'certification_purpose' => ['required', new Enum(CertificationPurpose::class)],
+                'scheme_id' => ['required', 'exists:schemes,id'],
+            ]);
+
+            $registration = $user->registrations()->findOrFail($validated['registration_id']);
+
+            if (!$registration->aplData()->exists()) {
                 return $this->errorResponse('E2006', 403);
             }
 
-            $validated = $request->validate([
-                'certification_purpose' => ['required', new Enum(CertificationPurpose::class)],
-                'scheme_id' => ['required', 'exists:\App\Models\Scheme,id']
+            $registration->update([
+                'certification_purpose' => $validated['certification_purpose'],
+                'scheme_id' => $validated['scheme_id'],
             ]);
 
-            $registration = $user->registrations()->create($validated);
-            return $this->successResponse(['next_step' => 3, 'registration_id' => $registration->id], 'Step 2 saved. Proceed to next step details.');
+            return $this->successResponse([
+                'next_step' => 3,
+                'registration_id' => $registration->id
+            ], 'Bagian 2 tersimpan. Lanjutkan ke bagian berikutnya.');
         }
 
         if ($step == 3) {
@@ -71,18 +85,20 @@ class AssessmentRegistrationController extends Controller implements HasMiddlewa
                 'evidence.*.file' => ['required', 'file', 'mimes:pdf,jpg,png', 'max:2048'],
             ]);
 
-            $registrationId = $validated['registration_id'];
+            $registration = $user->registrations()->findOrFail($validated['registration_id']);
+
+            if (!$registration->scheme_id) {
+                return $this->errorResponse('E2008', 403);
+            }
+
             $uploadedRecords = [];
 
             foreach ($validated['evidence'] as $item) {
                 $file = $item['file'];
-
                 $filename = "user_{$user->id}_req_{$item['requirement_id']}_" . time() . "." . $file->getClientOriginalExtension();
+                $path = $file->storeAs("evidence/{$registration->id}", $filename, 'public');
 
-                $path = $file->storeAs("evidence/{$registrationId}", $filename, 'public');
-
-                $uploadedRecords[] = Apl01Evidence::create([
-                    'registration_id' => $registrationId,
+                $uploadedRecords[] = $registration->evidence()->create([
                     'requirement_id' => $item['requirement_id'],
                     'file_path' => $path,
                     'status' => 'pending',
@@ -90,11 +106,23 @@ class AssessmentRegistrationController extends Controller implements HasMiddlewa
                 ]);
             }
 
-            $user->registrations()->where('id', $registrationId)->update([
-                'status_apl01' => Status::PENDING,
+            $registration->update([
+                'status_apl01' => Apl01Status::PENDING,
             ]);
 
-            return $this->successResponse(['files_uploaded' => count($uploadedRecords)], 'Bukti sukses di unggah');
+            $registration->payments()->firstOrCreate(
+                ['registration_id' => $registration->id],
+                [
+                    'invoice_number' => InvoiceService::generateNumber('LSP-INV'),
+                    'amount' => $registration->scheme->certification_fee,
+                    'status' => PaymentStatus::UNPAID,
+                ]
+            );
+
+            return $this->successResponse(
+                ['files_uploaded' => count($uploadedRecords)],
+                'Pendaftaran APL-01 berhasil dikirim.'
+            );
         }
 
         abort(404);

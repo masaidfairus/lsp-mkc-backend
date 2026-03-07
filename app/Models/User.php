@@ -63,11 +63,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(AsesiPassword::class, 'user_id', 'id');
     }
 
-    public function aplData()
-    {
-        return $this->hasMany(Apl01Data::class);
-    }
-
     public function activationTokens()
     {
         return $this->hasMany(ActivationTokens::class);

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AsesiController;
 use App\Http\Controllers\AssessmentRegistrationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ResetPasswordController;
@@ -26,6 +27,8 @@ Route::group(['middleware' => EnsureApiKeyIsValid::class], function () {
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/store-profile', [AsesiController::class, 'storeProfile']);
+    Route::get('/profile', [AsesiController::class, 'showProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', function (Request $request) {
         return new UserResource($request->user());

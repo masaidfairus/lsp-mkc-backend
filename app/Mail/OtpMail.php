@@ -29,7 +29,7 @@ class OtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'LSPMKC - Reset Password OTP',
+            subject: 'Reset Password OTP',
         );
     }
 
