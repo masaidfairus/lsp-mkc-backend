@@ -20,6 +20,8 @@ return [
     'E2003' => 'Data registrasi tidak lengkap',
     'E2004' => 'Format ID tidak valid',
     'E2005' => 'Format Paspor tidak valid',
+    'E2006' => 'Data Pemohon belum dicantumkan',
+    'E2007' => 'Data sertifikasi belum dicantumkan',
 
     'E3001' => 'Link verifikasi tidak valid atau kadaluarsa',
     'E3002' => 'Link verifikasi sudah digunakan',

@@ -9,6 +9,7 @@ Route::get('/active', function () {
     return view('auth.activation');
 })->name('verif');
 
+<<<<<<< HEAD
 Route::get('/reset', function () {
     return view('auth.reset');
 })->name('reset');
@@ -16,19 +17,25 @@ Route::get('/reset', function () {
 Route::get('/', function () {
     return view('auth.signin');
 })->name('login');
+=======
+// Route::get('/', function () {
+//     return view('auth.signin');
+// })->name('login');
+>>>>>>> 692184048eb4660e38fef9e4ac75db985eb9575c
 
-Route::post('/login', [AuthController::class, 'login']);
+// Route::post('/login', [AuthController::class, 'login']);
 
-// Route Grup ini buat semua yang hanya bisa diakses sama asesor maupun admin
-Route::middleware(['auth', 'is_admin:admin,asesor'])->group(function () {
-    Route::get('/admin', function () {
-        return view('welcome'); // Ganti ke admin dashboard
-    })->name('admin');
+// // Route Grup ini buat semua yang hanya bisa diakses sama asesor maupun admin
+// Route::middleware(['auth', 'is_admin:admin,asesor'])->group(function () {
+//     Route::get('/admin', function () {
+//         return view('pages.dashboard'); // Ganti ke admin dashboard
+//     })->name('admin');
 
-    Route::get('/dashboard', function () {
-        return view('pages.dashboard');
-    })->name('dashboard');
+//     // Route::get('/dashboard', function () {
+//     //     return view('pages.dashboard');
+//     // })->name('dashboard');
 
+<<<<<<< HEAD
     Route::get('/logout', [AuthController::class, 'logout']);
 });
 
@@ -532,3 +539,7 @@ Route::get('/apl02/preview', function () {
 });
 
 // Generate dari form (POST)
+=======
+//     Route::get('/logout', [AuthController::class, 'logout']);
+// });
+>>>>>>> 692184048eb4660e38fef9e4ac75db985eb9575c

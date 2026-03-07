@@ -17,15 +17,15 @@
     Untuk dapat menggunakan akun tersebut, silakan klik link berikut untuk mengaktifkan akun Anda:
     {{-- Action Button --}}
     @isset($actionText)
-            <?php
-            $color = match ($level) {
-                'success', 'error' => $level,
-                default => 'primary',
-            };
-        ?>
-            <x-mail::button :url="$actionUrl" :color="$color">
-                {{ $actionText }}
-            </x-mail::button>
+        <?php
+        $color = match ($level) {
+            'success', 'error' => $level,
+            default => 'primary',
+        };
+            ?>
+        <x-mail::button :url="$actionUrl" :color="$color">
+            {{ $actionText }}
+        </x-mail::button>
     @endisset
 
     @isset($actionText)
@@ -39,21 +39,21 @@
             ) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
         </x-slot:subcopy>
     @endisset
-    
-Jika tombol di atas tidak berfungsi, silakan salin dan tempel link berikut ke browser Anda: {{ $actionUrl }}
-    
+
+    Jika tombol di atas tidak berfungsi, silakan salin dan tempel link berikut ke browser Anda: {{ $actionUrl }}
+
     <br><br>
     PENTING:
     <br>
     - Link aktivasi hanya berlaku selama 1x24 jam.
     <br>
     - Disarankan agar pemohon mengganti password setelah login.
-<br><br><br>
-    
+    <br><br><br>
+
     Salam,
     <br>
     LSP MKC
     <br><br>
     ===========================================<br>
-Ini adalah email otomatis. Mohon tidak membalas email ini.
+    Ini adalah email otomatis. Mohon tidak membalas email ini.
 </div>

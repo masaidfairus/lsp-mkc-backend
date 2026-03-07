@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Scheme;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+
+use function Symfony\Component\Clock\now;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,12 +18,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
-        User::factory()->create([
+        $this->call([
+        ]);
+
+        User::create([
             'role' => 'admin',
             'name' => 'BUDIMAN',
             'email' => 'admin@admin.com',
+            'email_verified_at' => now(),
             'password' => 'admin123',
         ]);
     }
