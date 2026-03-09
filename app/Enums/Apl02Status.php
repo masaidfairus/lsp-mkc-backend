@@ -2,18 +2,20 @@
 
 namespace App\Enums;
 
-enum Status: string
+enum Apl02Status: string
 {
     case NOT_STARTED = 'not_started';
-    case PENDING = 'pending';
+    case SUBMITTED = 'submitted';
     case APPROVED = 'approved';
+    case REJECTED = 'rejected';
 
     public function getLabel(): ?string
     {
         return match ($this) {
             self::NOT_STARTED => 'Not Started',
-            self::PENDING => 'Pending',
+            self::SUBMITTED => 'Sumbitted',
             self::APPROVED => 'Approved',
+            self::REJECTED => 'Rejected',
         };
     }
 

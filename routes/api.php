@@ -4,14 +4,11 @@ use App\Http\Controllers\AsesiController;
 use App\Http\Controllers\AssessmentRegistrationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\SchemeController;
 use App\Http\Middleware\EnsureApiKeyIsValid;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
 
 Route::get('/verify-email/{id}/{hash}', [AuthController::class, 'verify'])->name('api.verify');
 
@@ -27,12 +24,27 @@ Route::group(['middleware' => EnsureApiKeyIsValid::class], function () {
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/store-profile', [AsesiController::class, 'storeProfile']);
-    Route::get('/profile', [AsesiController::class, 'showProfile']);
-    Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', function (Request $request) {
         return new UserResource($request->user());
     });
+    Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/change-password', [ResetPasswordController::class, 'changePassword']);
-    Route::post('/apl01/step/{step}', [AssessmentRegistrationController::class, 'store']);
+
+    Route::apiResource('profile', AsesiController::class)->only([
+        'show',
+        'store',
+        'update'
+    ]);
+
+    route::apiResource('schemes', SchemeController::class)->only([
+        'index',
+        'show'
+    ]);
+
+    Route::post('apl01/{step}', [AssessmentRegistrationController::class, 'storeApl01']);
+    Route::get('registrations/{registration}/apl01', [AssessmentRegistrationController::class, 'showApl01']);
+
+    Route::get('registrations/{registration}/apl02-form', [AssessmentRegistrationController::class, 'form']);
+    Route::post('registrations/{registration}/apl02-evidence', [AssessmentRegistrationController::class, 'uploadBuktiRelevan']);
+    Route::post('registrations/{registration}/self-assessments', [AssessmentRegistrationController::class, 'submitAnswers']);
 });

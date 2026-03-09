@@ -14,14 +14,16 @@ return new class extends Migration
         Schema::create('self_assessments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('registration_id')->constrained('assessment_registrations')->cascadeOnDelete();
-            $table->foreignId('criteria_id')->constrained('performance_criteria')->cascadeOnDelete();
+            $table->foreignId('element_id')->constrained('competency_elements')->cascadeOnDelete();
             $table->boolean('is_competent')->default(false);
             $table->foreignId('evidence_id')->nullable()->constrained('apl01_evidence')->nullOnDelete();
 
             $table->boolean('is_verified_by_assessor')->default(false);
             $table->text('assessor_notes')->nullable();
+            $table->string('file_path')->nullable()->after('evidence_id');
+            $table->string('file_url')->nullable()->after('file_path');
             $table->timestamps();
-            $table->unique(['registration_id', 'criteria_id'], 'unique_kuk_response');
+            $table->unique(['registration_id', 'element_id'], 'unique_kuk_response');
         });
     }
 
