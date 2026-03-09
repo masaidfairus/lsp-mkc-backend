@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Apl01Status;
 use App\Enums\CertificationPurpose;
 use App\Enums\Result;
 use App\Enums\Status;
@@ -19,8 +20,8 @@ return new class extends Migration {
             $table->foreignId('scheme_id')->nullable()->constrained('schemes')->onDelete('restrict');
             $table->foreignId('assessor_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('certification_purpose')->default(CertificationPurpose::SERTIFIKASI);
-            $table->string('status_apl01')->default(Status::NOT_STARTED)->index();
-            $table->string('status_apl02')->default(Status::NOT_STARTED)->index();
+            $table->string('status_apl01')->default(Apl01Status::NOT_STARTED)->index();
+            $table->string('status_apl02')->default(Apl02Status::NOT_STARTED)->index();
             $table->string('final_result')->default(Result::BELUM_KOMPETEN)->nullable();
             $table->timestamp('assessed_at')->nullable();
             $table->timestamps();

@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('performance_criteria', function (Blueprint $table) {
             $table->id();
             $table->foreignId('element_id')->constrained('competency_elements')->cascadeOnDelete();
+            $table->string('name');
             $table->text('description');
             $table->timestamps();
         });

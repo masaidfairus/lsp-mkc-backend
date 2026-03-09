@@ -8,13 +8,13 @@ use Illuminate\Validation\Rules\Enum;
 
 class AsesiController extends Controller
 {
-    public function showProfile(Request $request)
+    public function show(Request $request)
     {
         $user = $request->user();
         return $user->profile;
     }
 
-    public function storeProfile(Request $request)
+    public function store(Request $request)
     {
         $user = $request->user();
 
@@ -35,6 +35,6 @@ class AsesiController extends Controller
         return $this->successResponse([$user->profile], 'Data profile anda telah disimpan');
     }
 
-    public function updateProfile(Request $request)
+    public function update(Request $request)
     {}
 }

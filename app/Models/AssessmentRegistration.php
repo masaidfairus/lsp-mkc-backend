@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Apl01Status;
+use App\Enums\Apl02Status;
 use Illuminate\Database\Eloquent\Model;
 
 class AssessmentRegistration extends Model
@@ -17,6 +19,8 @@ class AssessmentRegistration extends Model
     ];
 
     protected $casts = [
+        'status_apl01' => Apl01Status::class,
+        'status_apl02' => Apl02Status::class,
         'assessed_at' => 'datetime',
     ];
 
@@ -47,7 +51,7 @@ class AssessmentRegistration extends Model
 
     public function selfAssessment()
     {
-        return $this->hasMany(SelfAssessment::class);
+        return $this->hasMany(SelfAssessment::class, 'registration_id');
     }
 
     public function plannings()
