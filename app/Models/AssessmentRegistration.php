@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Apl01Status;
+use App\Enums\Apl02Status;
 use Illuminate\Database\Eloquent\Model;
 
 class AssessmentRegistration extends Model
@@ -17,6 +19,8 @@ class AssessmentRegistration extends Model
     ];
 
     protected $casts = [
+        'status_apl01' => Apl01Status::class,
+        'status_apl02' => Apl02Status::class,
         'assessed_at' => 'datetime',
     ];
 
@@ -32,12 +36,12 @@ class AssessmentRegistration extends Model
 
     public function scheme()
     {
-        return $this->belongsTo(Scheme::class);
+        return $this->belongsTo(Scheme::class, 'scheme_id');
     }
 
     public function evidence()
     {
-        return $this->hasMany(Apl01Evidence::class);
+        return $this->hasMany(Apl01Evidence::class, 'registration_id');
     }
 
     public function evaluations()
@@ -47,11 +51,21 @@ class AssessmentRegistration extends Model
 
     public function selfAssessment()
     {
-        return $this->hasMany(SelfAssessment::class);
+        return $this->hasMany(SelfAssessment::class, 'registration_id');
     }
 
     public function plannings()
     {
         return $this->hasMany(AssessmentPlanning::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasOne(Payment::class, 'registration_id');
+    }
+
+    public function aplData()
+    {
+        return $this->hasOne(Apl01Data::class, 'registration_id');
     }
 }

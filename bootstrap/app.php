@@ -14,9 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->redirectGuestsTo(fn() => '/admin/login');
-        $middleware->group('api', [
-            'throttle:5,1',
-        ]);
+        // $middleware->group('api', [
+        //     'throttle:10,1',
+        // ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

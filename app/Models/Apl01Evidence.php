@@ -35,7 +35,7 @@ class Apl01Evidence extends Model
 
     public function registration()
     {
-        return $this->belongsTo(AssessmentRegistration::class);
+        return $this->belongsTo(AssessmentRegistration::class, 'registration_id');
     }
 
     public function requirement()

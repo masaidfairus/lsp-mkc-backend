@@ -8,6 +8,7 @@ class Apl01Data extends Model
 {
     protected $fillable = [
         'user_id',
+        'registration_id',
         'gender',
         'date_of_birth',
         'address',
@@ -23,8 +24,8 @@ class Apl01Data extends Model
         'date_of_birth' => 'date',
     ];
 
-    public function user()
+    public function registration()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(AssessmentRegistration::class);
     }
 }

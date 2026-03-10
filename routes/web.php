@@ -5,12 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\APL01Controller;
 use App\Http\Controllers\APL02Controller;
 
-Route::get('/active', function () {
-    return view('auth.activation');
-})->name('verif');
+// Route::get('/active', function () {
+//     return view('auth.activation');
+// })->name('verif');
 
 // Route::get('/', function () {
-//     return view('auth.signin');
+//     return view('welcome');
 // })->name('login');
 
 // Route::post('/login', [AuthController::class, 'login']);
@@ -32,32 +32,32 @@ Route::post('/apl01/generate', [APL01Controller::class, 'generate'])->name('apl0
 
 Route::get('/apl01/preview', function () {
     $data = [
-        'no_registrasi'      => '',
-        'tanggal'            => '',
-        'nama'               => '',
-        'nik'                => '',
-        'tempat_lahir'       => '',
-        'tanggal_lahir'      => '',
-        'jenis_kelamin'      => '',
-        'agama'              => '',
-        'kebangsaan'         => '',
-        'no_telp'            => '',
-        'email'              => '',
-        'alamat'             => '',
-        'rt_rw'              => '',
-        'kelurahan'          => '',
-        'kecamatan'          => '',
-        'kabupaten'          => '',
-        'provinsi'           => '',
-        'kode_pos'           => '',
-        'pendidikan'         => '',
-        'pekerjaan'          => '',
-        'instansi'           => '',
-        'alamat_instansi'    => '',
-        'nama_skema'         => '',
-        'kode_skema'         => '',
-        'tujuan_asesmen'     => '',
-        'unit_kompetensi'    => [
+        'no_registrasi' => '',
+        'tanggal' => '',
+        'nama' => '',
+        'nik' => '',
+        'tempat_lahir' => '',
+        'tanggal_lahir' => '',
+        'jenis_kelamin' => '',
+        'agama' => '',
+        'kebangsaan' => '',
+        'no_telp' => '',
+        'email' => '',
+        'alamat' => '',
+        'rt_rw' => '',
+        'kelurahan' => '',
+        'kecamatan' => '',
+        'kabupaten' => '',
+        'provinsi' => '',
+        'kode_pos' => '',
+        'pendidikan' => '',
+        'pekerjaan' => '',
+        'instansi' => '',
+        'alamat_instansi' => '',
+        'nama_skema' => '',
+        'kode_skema' => '',
+        'tujuan_asesmen' => '',
+        'unit_kompetensi' => [
             ['kode' => 'M.741000.004.01', 'judul' => 'Melakukan survey sumber bahan baku'],
             ['kode' => 'M.741000.006.01', 'judul' => 'Menentukan jenis produk'],
             ['kode' => 'M.741000.008.01', 'judul' => 'Melakukan pengurusan perijinan usaha industri'],
