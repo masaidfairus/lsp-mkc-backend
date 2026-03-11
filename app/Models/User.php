@@ -92,4 +92,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Apl01Evidence::class);
     }
+
+    public function portfolios()
+    {
+        return $this->hasMany(Portfolio::class);
+    }
+
+    public function portfolioTypes()
+    {
+        return $this->hasMany(PortfolioType::class);
+    }
 }

@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Asesi;
 
+use App\Http\Controllers\Controller;
 use App\Enums\Gender;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
 
-class AsesiController extends Controller
+class ProfileController extends Controller
 {
     public function show(Request $request)
     {

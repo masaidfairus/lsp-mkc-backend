@@ -12,12 +12,20 @@ class AssessmentPlanning extends Model
         'is_ak01_confirmed',
         'confirmed_at',
         'version',
+        'mapa_context_json',
+        'ak01_agreed_asesi',
+        'ak01_agreed_assessor',
+        'ak01_agreed_at',
+        'reasonable_adjustments_notes',
     ];
 
     protected $casts = [
         'is_ak01_confirmed' => 'boolean',
+        'ak01_agreed_asesi' => 'boolean',
+        'ak01_agreed_assessor' => 'boolean',
         'confirmed_at' => 'datetime',
         'methods' => 'array',
+        'mapa_context_json' => 'array',
     ];
 
     public function registration()

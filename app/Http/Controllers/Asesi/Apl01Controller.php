@@ -1,26 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Asesi;
 
+use App\Http\Controllers\Controller;
 use App\Enums\Apl01Status;
-use App\Enums\Apl02Status;
 use App\Enums\CertificationPurpose;
 use App\Enums\Gender;
 use App\Enums\PaymentStatus;
 use App\Models\AssessmentRegistration;
-use App\Models\SelfAssessment;
 use App\Services\InvoiceService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Enum;
 
-class AssessmentRegistrationController extends Controller
+class Apl01Controller extends Controller
 {
     use AuthorizesRequests;
 
-    public function storeApl01(Request $request, $step)
+    public function store(Request $request, $step)
     {
         $user = $request->user();
 
@@ -126,7 +124,7 @@ class AssessmentRegistrationController extends Controller
         abort(404);
     }
 
-    public function showApl01(AssessmentRegistration $registration)
+    public function show(AssessmentRegistration $registration)
     {
         $this->authorize('view', $registration);
 
@@ -149,110 +147,5 @@ class AssessmentRegistrationController extends Controller
                 'status'
             ),
         ], 'Data APL01 berhasil ditampilkan');
-    }
-
-    public function form(AssessmentRegistration $registration)
-    {
-        $this->authorize('view', $registration);
-
-        $payment = $registration->payments()->first();
-        if (!$payment || $payment->status !== PaymentStatus::PAID) {
-            return $this->errorResponse('E2010', 403);
-        }
-
-        if ($registration->status_apl01 !== Apl01Status::APPROVED) {
-            return $this->errorResponse('E2009', 403);
-        }
-
-        $scheme = $registration->scheme->load([
-            'competencyUnits.competencyElements.performanceCriteria'
-        ]);
-
-        return $this->successResponse([
-            'registration_id' => $registration->id,
-            'scheme' => [
-                'id' => $scheme->id,
-                'code' => $scheme->code,
-                'name' => $scheme->name,
-                'units' => $scheme->competencyUnits->map(fn($unit) => [
-                    'id' => $unit->id,
-                    'unit_code' => $unit->unit_code,
-                    'unit_title' => $unit->unit_title,
-                    'elements' => $unit->competencyElements->map(fn($element) => [
-                        'id' => $element->id,
-                        'title' => $element->title,
-                        'criteria' => $element->performanceCriteria->map(fn($criterion) => [
-                            'id' => $criterion->id,
-                            'name' => $criterion->name,
-                            'description' => $criterion->description,
-                        ]),
-                    ]),
-                ]),
-            ]
-        ]);
-    }
-
-    public function uploadBuktiRelevan(Request $request, AssessmentRegistration $registration)
-    {
-        $this->authorize('view', $registration);
-
-        $request->validate([
-            'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
-        ]);
-
-        $user = $request->user();
-        $file = $request->file('file');
-        $filename = "user_{$user->id}_" . uniqid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs("apl02/{$registration->id}", $filename, 'public');
-        $url = Storage::url($path);
-
-        return $this->successResponse([
-            'file_path' => $path,
-            'file_url' => $url,
-        ], 'File berhasil diupload.');
-    }
-
-    public function submitAnswers(Request $request, AssessmentRegistration $registration)
-    {
-        $this->authorize('view', $registration);
-
-        $validated = $request->validate([
-            'is_declared' => ['required', 'accepted'],
-            'answers' => ['required', 'array', 'min:1'],
-            'answers.*.element_id' => ['required', 'exists:competency_elements,id'],
-            'answers.*.is_competent' => ['required', 'boolean'],
-            
-            'answers.*.evidence_id' => ['nullable', 'exists:apl01_evidence,id'],
-            'answers.*.file_path' => ['nullable', 'string'],
-            'answers.*.file_url' => ['nullable', 'string'],
-        ]);
-
-        DB::transaction(function () use ($validated, $registration) {
-            $rows = array_map(fn($answer) => [
-                'registration_id' => $registration->id,
-                'element_id' => $answer['element_id'],
-                'is_competent' => $answer['is_competent'],
-                'evidence_id' => $answer['evidence_id'] ?? null,
-                'file_path' => $answer['file_path'] ?? null,
-                'file_url' => $answer['file_url'] ?? null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ], $validated['answers']);
-
-            SelfAssessment::upsert(
-                $rows,
-                ['registration_id', 'element_id'],
-                ['is_competent', 'updated_at'],
-            );
-
-            $registration->update([
-                'status_apl02' => Apl02Status::SUBMITTED,
-            ]);
-        });
-
-        return $this->successResponse(
-            ['total_answers' => count($validated['answers'])],
-            'APL.02 berhasil disubmit.'
-        );
     }
 }
