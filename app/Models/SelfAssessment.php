@@ -8,7 +8,7 @@ class SelfAssessment extends Model
 {
     protected $fillable = [
         'registration_id',
-        'element_id',
+        'portfolio_id',
         'is_competent',
         'evidence_id',
         'is_verified_by_assessor',
@@ -35,8 +35,8 @@ class SelfAssessment extends Model
         return $this->belongsTo(AssessmentRegistration::class);
     }
 
-    public function evidence()
+    public function portfolio()
     {
-        return $this->belongsTo(Apl01Evidence::class);
+        return $this->belongsTo(Portfolio::class);
     }
 }

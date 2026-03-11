@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\PDF;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-class APL02Controller extends Controller
+class PdfApl02Controller extends Controller
 {
     public function generate(Request $request)
     {

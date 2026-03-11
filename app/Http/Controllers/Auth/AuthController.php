@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Enums\UserStatus;
 use App\Http\Resources\UserResource;
 use App\Models\User;

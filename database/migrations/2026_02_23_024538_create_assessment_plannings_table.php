@@ -17,8 +17,12 @@ return new class extends Migration
             $table->json('methods');
             $table->boolean('is_ak01_confirmed')->default(false);
             $table->timestamp('confirmed_at')->nullable();
-
             $table->string('version')->default('1.0');
+            $table->json('mapa_context_json')->nullable()->after('methods');
+            $table->boolean('ak01_agreed_asesi')->default(false)->after('is_ak01_confirmed');
+            $table->boolean('ak01_agreed_assessor')->default(false)->after('ak01_agreed_asesi');
+            $table->timestamp('ak01_agreed_at')->nullable()->after('ak01_agreed_assessor');
+            $table->text('reasonable_adjustments_notes')->nullable()->after('ak01_agreed_at');
             $table->timestamps();
         });
     }

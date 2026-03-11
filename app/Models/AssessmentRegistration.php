@@ -59,6 +59,16 @@ class AssessmentRegistration extends Model
         return $this->hasMany(AssessmentPlanning::class);
     }
 
+    public function feedback()
+    {
+        return $this->hasMany(AssessmentFeedback::class);
+    }
+
+    public function appeals()
+    {
+        return $this->hasMany(Appeal::class);
+    }
+
     public function payments()
     {
         return $this->hasOne(Payment::class, 'registration_id');

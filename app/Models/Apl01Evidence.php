@@ -42,9 +42,4 @@ class Apl01Evidence extends Model
     {
         return $this->belongsTo(SchemeRequirement::class);
     }
-
-    public function selfAssessment()
-    {
-        return $this->hasMany(SelfAssessment::class);
-    }
 }
