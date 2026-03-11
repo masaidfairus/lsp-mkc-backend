@@ -16,7 +16,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Columns\TextColumn;
 
-class Apl01Resource extends Resource
+class Apl01DataResource extends Resource
 {
     protected static ?string $model = Apl01::class;
     protected static ?string $navigationLabel = 'APL 01';

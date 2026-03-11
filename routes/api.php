@@ -9,6 +9,7 @@ use App\Http\Middleware\EnsureApiKeyIsValid;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Apl01Controller;
 
 Route::get('/verify-email/{id}/{hash}', [AuthController::class, 'verify'])->name('api.verify');
 
@@ -43,6 +44,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post('apl01/{step}', [AssessmentRegistrationController::class, 'storeApl01']);
     Route::get('registrations/{registration}/apl01', [AssessmentRegistrationController::class, 'showApl01']);
+
+    Route::prefix('apl01')->group(function () {
+    Route::get('/',     [Apl01Controller::class, 'index']);
+    Route::get('/{id}', [Apl01Controller::class, 'show']);
+});
 
     Route::get('registrations/{registration}/apl02-form', [AssessmentRegistrationController::class, 'form']);
     Route::post('registrations/{registration}/apl02-evidence', [AssessmentRegistrationController::class, 'uploadBuktiRelevan']);

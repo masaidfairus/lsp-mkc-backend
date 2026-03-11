@@ -253,9 +253,9 @@
 {{-- HEADER LSP --}}
 <table class="header-table">
     <tr>
-        <td class="logo-cell">
-            <div class="logo-box">LOGO</div>
-        </td>
+        <div>
+            <img src="{{ public_path('images/logo_lsp.png') }}" height="50" alt="">
+        </div>
         <td class="lsp-info">
             <div class="lsp-name">{{ strtoupper($lsp_nama) }}</div>
             <div class="lsp-sub">Lembaga Sertifikasi Profesi</div>
@@ -265,9 +265,9 @@
                 @if($lsp_email) &nbsp;|&nbsp; {{ $lsp_email }} @endif
             </div>
         </td>
-        <td class="logo-cell">
-            <div class="logo-box">BNSP</div>
-        </td>
+        <div>
+            <img src="{{ public_path('images/logo_bnsp.png') }}" height="40" alt="">
+        </div>
     </tr>
 </table>
 <hr class="divider">

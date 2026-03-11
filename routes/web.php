@@ -27,14 +27,14 @@ Route::get('/logout', [AuthController::class, 'logout']);
 // ============================================================
 // APL01
 // ============================================================
-Route::prefix('preview')->name('preview.')->group(function () {
-    Route::get('/apl01/{apl01}', [PdfPreviewController::class, 'apl01'])->name('apl01');
-    // nanti tambah form lain di sini
-});
+// Route::prefix('preview')->name('preview.')->group(function () {
+//     Route::get('/apl01/{apl01}', [PdfPreviewController::class, 'apl01'])->name('apl01');
+//     // nanti tambah form lain di sini
+// });
 
-Route::prefix('download')->name('download.')->group(function () {
-    Route::get('/apl01/{apl01}', [PdfPreviewController::class, 'apl01Download'])->name('apl01');
-    // nanti tambah form lain di sini
+// Route::prefix('download')->name('download.')->group(function () {
+//     Route::get('/apl01/{apl01}', [PdfPreviewController::class, 'apl01Download'])->name('apl01');
+// });
 Route::get('/apl01', [APL01Controller::class, 'index'])->name('apl01.form');
 
 Route::post('/apl01/generate', [APL01Controller::class, 'generate'])->name('apl01.generate');
@@ -255,28 +255,10 @@ Route::get('/invoice/preview', function () {
 
         'items' => [
             [
-                'uraian'      => 'Biaya Pendaftaran Sertifikasi',
+                'uraian'      => 'Biaya Sertifikasi',
                 'keterangan'  => '',
                 'qty'         => 1,
                 'harga'       => 150000,
-            ],
-            [
-                'uraian'      => 'Biaya Asesmen Kompetensi',
-                'keterangan'  => 'Skema Ahli Desain Grafis (13 Unit Kompetensi)',
-                'qty'         => 1,
-                'harga'       => 1500000,
-            ],
-            [
-                'uraian'      => 'Biaya Penerbitan Sertifikat',
-                'keterangan'  => '',
-                'qty'         => 1,
-                'harga'       => 200000,
-            ],
-            [
-                'uraian'      => 'Biaya Administrasi',
-                'keterangan'  => '',
-                'qty'         => 1,
-                'harga'       => 100000,
             ],
         ],
 
