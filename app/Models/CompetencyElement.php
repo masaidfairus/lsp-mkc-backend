@@ -18,6 +18,11 @@ class CompetencyElement extends Model
 
     public function performanceCriteria()
     {
-        return $this->hasMany(PerformanceCriterion::class);
+        return $this->hasMany(PerformanceCriterion::class, 'element_id');
+    }
+
+    public function selfAssessments()
+    {
+        return $this->hasMany(SelfAssessment::class);
     }
 }

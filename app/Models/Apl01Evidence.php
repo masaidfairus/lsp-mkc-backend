@@ -21,7 +21,17 @@ class Apl01Evidence extends Model
 
     public function apl01Data()
     {
-        return $this->belongsTo(Apl01Data::class, 'registration_id');
+        return $this->file_path ? Storage::url($this->file_path) : null;
+    }
+
+    public function verifier()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function registration()
+    {
+        return $this->belongsTo(AssessmentRegistration::class, 'registration_id');
     }
 
     public function requirement()

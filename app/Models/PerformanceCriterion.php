@@ -21,9 +21,4 @@ class PerformanceCriterion extends Model
     {
         return $this->hasMany(AssessorEvaluation::class);
     }
-
-    public function selfAssessments()
-    {
-        return $this->hasMany(SelfAssessment::class);
-    }
 }

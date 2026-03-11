@@ -14,6 +14,7 @@ return [
     'E1002' => 'Password salah',
     'E1003' => 'Akun belum diaktivasi',
     'E1004' => 'Akun admin tidak terdaftar',
+    'E1005' => 'Akun tidak terdaftar',
 
     'E2001' => 'Email sudah terdaftar',
     'E2002' => 'NIK/Paspor sudah terdaftar',
@@ -22,9 +23,14 @@ return [
     'E2005' => 'Format Paspor tidak valid',
     'E2006' => 'Data Pemohon belum dicantumkan',
     'E2007' => 'Data sertifikasi belum dicantumkan',
+    'E2008' => 'Skema tidak tercantum di data anda',
+    'E2009' => 'APL-01 belum disetujui.',
+    'E2010' => 'Pembayaran belum lunas.',
 
     'E3001' => 'Link verifikasi tidak valid atau kadaluarsa',
     'E3002' => 'Link verifikasi sudah digunakan',
+    'E3003' => 'Kode OTP tidak valid atau kadaluarsa',
+    'E3004' => 'Token tidak valid atau kadaluarsa',
 
     'E4001' => 'Method tidak diizinkan',
     'E4002' => 'Payload tidak valid',

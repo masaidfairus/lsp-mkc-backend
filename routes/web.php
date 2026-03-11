@@ -5,12 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\APL01Controller;
 use App\Http\Controllers\APL02Controller;
 
-Route::get('/active', function () {
-    return view('auth.activation');
-})->name('verif');
+// Route::get('/active', function () {
+//     return view('auth.activation');
+// })->name('verif');
 
 // Route::get('/', function () {
-//     return view('auth.signin');
+//     return view('welcome');
 // })->name('login');
 
 // Route::post('/login', [AuthController::class, 'login']);
@@ -35,6 +35,55 @@ Route::prefix('preview')->name('preview.')->group(function () {
 Route::prefix('download')->name('download.')->group(function () {
     Route::get('/apl01/{apl01}', [PdfPreviewController::class, 'apl01Download'])->name('apl01');
     // nanti tambah form lain di sini
+Route::get('/apl01', [APL01Controller::class, 'index'])->name('apl01.form');
+
+Route::post('/apl01/generate', [APL01Controller::class, 'generate'])->name('apl01.generate');
+
+Route::get('/apl01/preview', function () {
+    $data = [
+        'no_registrasi' => '',
+        'tanggal' => '',
+        'nama' => '',
+        'nik' => '',
+        'tempat_lahir' => '',
+        'tanggal_lahir' => '',
+        'jenis_kelamin' => '',
+        'agama' => '',
+        'kebangsaan' => '',
+        'no_telp' => '',
+        'email' => '',
+        'alamat' => '',
+        'rt_rw' => '',
+        'kelurahan' => '',
+        'kecamatan' => '',
+        'kabupaten' => '',
+        'provinsi' => '',
+        'kode_pos' => '',
+        'pendidikan' => '',
+        'pekerjaan' => '',
+        'instansi' => '',
+        'alamat_instansi' => '',
+        'nama_skema' => '',
+        'kode_skema' => '',
+        'tujuan_asesmen' => '',
+        'unit_kompetensi' => [
+            ['kode' => 'M.741000.004.01', 'judul' => 'Melakukan survey sumber bahan baku'],
+            ['kode' => 'M.741000.006.01', 'judul' => 'Menentukan jenis produk'],
+            ['kode' => 'M.741000.008.01', 'judul' => 'Melakukan pengurusan perijinan usaha industri'],
+            ['kode' => 'M.741000.014.01', 'judul' => 'Membuat jadwal kerja personil bagian produksi'],
+            ['kode' => 'M.741000.019.01', 'judul' => 'Melakukan pengaturan penyimpanan bahan baku'],
+            ['kode' => 'M.741000.026.01', 'judul' => 'Menjalin hubungan dengan pelanggan'],
+            ['kode' => 'M.741000.027.01', 'judul' => 'Melakukan pembukan keuangan untuk setiap transaksi'],
+            ['kode' => 'N.821100.001.02', 'judul' => 'Menangani Penerimaan dan Pengiriman Dokumen/Surat'],
+            ['kode' => 'N.821100.067.01', 'judul' => 'Melakukan Transaksi Perbankan Sederhana'],
+        ],
+        'persyaratan_dasar'   => [],
+        'bukti_administratif' => [],
+        'status_terima'       => 'Diterima',
+    ];
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.apl01', $data)->setPaper('a4', 'portrait');
+    return $pdf->stream('preview.pdf');
 });
 
 Route::post('/apl02/generate', [APL02Controller::class, 'generate'])->name('apl02.generate');

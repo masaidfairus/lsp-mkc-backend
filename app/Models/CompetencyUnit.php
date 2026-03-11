@@ -19,6 +19,6 @@ class CompetencyUnit extends Model
 
     public function competencyElements()
     {
-        return $this->hasMany(CompetencyElement::class);
+        return $this->hasMany(CompetencyElement::class, 'competency_unit_id');
     }
 }
