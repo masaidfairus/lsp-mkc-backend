@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Apl01Status;
+use App\Enums\Apl02Status;
 use App\Enums\CertificationPurpose;
 use App\Enums\Result;
 use App\Enums\Status;

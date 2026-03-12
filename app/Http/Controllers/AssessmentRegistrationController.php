@@ -26,15 +26,18 @@ class AssessmentRegistrationController extends Controller
 
         if ($step == 'data-pemohon-sertifikasi') {
             $validated = $request->validate([
-                'gender' => ['required', new Enum(Gender::class)],
-                'date_of_birth' => ['required', 'date', 'before:today'],
-                'address' => ['required', 'string', 'max:1000'],
-                'phone_number' => ['required', 'string', 'regex:/^(\+62|0)8[1-9][0-9]{6,10}$/'],
+                'gender'                   => ['required', new Enum(Gender::class)],
+                'place_of_birth'           => ['required', 'string', 'max:255'],      // ← tambah
+                'date_of_birth'            => ['required', 'date', 'before:today'],
+                'address'                  => ['required', 'string', 'max:1000'],
+                'home_postal_code'         => ['nullable', 'string', 'max:10'],       // ← tambah
+                'phone_number'             => ['required', 'string', 'regex:/^(\+62|0)8[1-9][0-9]{6,10}$/'],
                 'education_qualifications' => ['required', 'string', 'max:255'],
-                'company_name' => ['required', 'string', 'max:255'],
-                'job_title' => ['required', 'string', 'max:255'],
-                'company_address' => ['required', 'string', 'max:1000'],
-                'company_contact' => ['required', 'string', 'max:20'],
+                'company_name'             => ['required', 'string', 'max:255'],
+                'job_title'                => ['required', 'string', 'max:255'],
+                'company_address'          => ['required', 'string', 'max:1000'],
+                'company_postal_code'      => ['nullable', 'string', 'max:10'],       // ← tambah
+                'company_contact'          => ['required', 'string', 'max:20'],
             ]);
 
             $user->profile()->updateOrCreate([], $validated);

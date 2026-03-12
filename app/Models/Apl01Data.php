@@ -12,13 +12,16 @@ class Apl01Data extends Model
         'user_id',
         'registration_id',
         'gender',
+        'place_of_birth',
         'date_of_birth',
         'address',
+        'home_postal_code',
         'phone_number',
         'education_qualifications',
         'company_name',
         'job_title',
         'company_address',
+        'company_postal_code',
         'company_contact',
     ];
 

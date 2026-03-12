@@ -2,88 +2,150 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Enums\Apl01Status;
+use App\Models\AssessmentRegistration;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class APL01Controller extends Controller
 {
-    public function index()
+    /**
+     * GET /api/apl01/{registration}
+     *
+     * Stream PDF APL-01 dari data real database.
+     * Akses: kandidat pemilik registrasi ATAU admin/assessor.
+     */
+    public function show(Request $request, AssessmentRegistration $registration)
     {
-        return view('apl01.form');
-    }
+        // ── Otorisasi ────────────────────────────────────────────────
+        $user = $request->user();
 
-    public function generate(Request $request)
-    {
-        $request->validate([
-            'nama'           => 'required|string|max:100',
-            'nik'            => 'required|string|max:20',
-            'tempat_lahir'   => 'required|string|max:50',
-            'tanggal_lahir'  => 'required|date',
-            'jenis_kelamin'  => 'required|in:Laki-laki,Perempuan',
-            'agama'          => 'required|string|max:20',
-            'no_telp'        => 'required|string|max:15',
-            'email'          => 'required|email',
-            'alamat'         => 'required|string',
-            'kelurahan'      => 'required|string|max:50',
-            'kecamatan'      => 'required|string|max:50',
-            'kabupaten'      => 'required|string|max:50',
-            'provinsi'       => 'required|string|max:50',
-            'pendidikan'     => 'required|string|max:50',
-            'nama_skema'     => 'required|string|max:150',
-            'kode_skema'     => 'nullable|string|max:50',
-            'tujuan_asesmen' => 'required|string|max:50',
+        if (
+            $user->id !== $registration->user_id &&
+            !in_array($user->role, ['admin', 'assessor']) // sesuaikan dengan value Role enum lo
+        ) {
+            return response()->json(['message' => 'Forbidden.'], 403);
+        }
+
+        // ── Validasi status ──────────────────────────────────────────
+        if (is_null($registration->status_apl01)) {
+            return response()->json(['message' => 'APL-01 belum disubmit.'], 422);
+        }
+
+        // ── Load semua relasi sekaligus (N+1 safe) ───────────────────
+        $registration->load([
+            'candidate',                     // users
+            'aplData',                       // apl01_data       → Bagian 1
+            'scheme',                        // schemes          → Bagian 2
+            'scheme.competencyUnits',        // competency_units → Bagian 2 (unit list)
+            'evidence.requirement',          // apl01_evidence + scheme_requirements → Bagian 3
         ]);
 
-        $data = [
-            // Meta
-            'no_registrasi'    => 'REG-' . date('Y') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT),
-            'tanggal'          => now()->translatedFormat('d F Y'),
+        $aplData   = $registration->aplData;
+        $candidate = $registration->candidate;
+        $scheme    = $registration->scheme;
 
-            // Bagian 1 - Data Pribadi
-            'nama'             => strtoupper($request->nama),
-            'nik'              => $request->nik,
-            'tempat_lahir'     => $request->tempat_lahir,
-            'tanggal_lahir'    => \Carbon\Carbon::parse($request->tanggal_lahir)->translatedFormat('d F Y'),
-            'jenis_kelamin'    => $request->jenis_kelamin,
-            'agama'            => $request->agama,
-            'kebangsaan'       => $request->kebangsaan ?? 'Indonesia',
-            'no_telp'          => $request->no_telp,
-            'email'            => $request->email,
-            'alamat'           => $request->alamat,
-            'rt_rw'            => $request->rt_rw,
-            'kelurahan'        => $request->kelurahan,
-            'kecamatan'        => $request->kecamatan,
-            'kabupaten'        => $request->kabupaten,
-            'provinsi'         => $request->provinsi,
-            'kode_pos'         => $request->kode_pos,
-            'pendidikan'       => $request->pendidikan,
+        // ── Guard: data wajib harus ada ──────────────────────────────
+        if (!$aplData || !$candidate || !$scheme) {
+            return response()->json(['message' => 'Data registrasi tidak lengkap.'], 422);
+        }
 
-            // Bagian 1 - Data Pekerjaan
-            'pekerjaan'        => $request->pekerjaan,
-            'instansi'         => $request->instansi,
-            'alamat_instansi'  => $request->alamat_instansi,
+        // ── Bangun array $data untuk blade ───────────────────────────
+// ── Bangun array $data untuk blade ───────────────────────────
+$data = [
 
-            // Bagian 2 - Skema Sertifikasi
-            'nama_skema'       => $request->nama_skema,
-            'kode_skema'       => $request->kode_skema,
-            'tujuan_asesmen'   => $request->tujuan_asesmen,
+    // ============================================================
+    // BAGIAN 1 — Data Pribadi
+    // ============================================================
+    'nama'          => strtoupper($candidate->name),
+    'nik'           => $candidate->identity_number ?? '-',
+    'email'         => $candidate->email,
+    'tempat_lahir'  => $aplData->place_of_birth ?? '-',  // ← fix
 
-            'unit_kompetensi' => [
-                ['kode' => 'M.741000.004.01', 'judul' => 'Melakukan survey sumber bahan baku'],
-                ['kode' => 'M.741000.006.01', 'judul' => 'Menentukan jenis produk'],                
-            ],
+    'tanggal_lahir' => Carbon::parse($aplData->date_of_birth)->translatedFormat('d F Y'),
+    'jenis_kelamin' => $aplData->gender === 'male' ? 'Laki-laki' : 'Perempuan',
+    'no_telp'       => $aplData->phone_number,
+    'pendidikan'    => $aplData->education_qualifications,
 
-            // Bagian 3 - Persyaratan (opsional, blade punya default)
-            'persyaratan_dasar'  => $request->persyaratan_dasar ?? [],
-            'bukti_administratif'=> $request->bukti_administratif ?? [],
-        ];
+    'alamat'        => $aplData->address,
+    'rt_rw'         => null,
+    'kelurahan'     => '',
+    'kecamatan'     => '',
+    'kabupaten'     => '',
+    'provinsi'      => '',
+    'kode_pos'      => $aplData->home_postal_code ?? '',  // ← fix
+    'kebangsaan'    => 'Indonesia',
 
-        $pdf = Pdf::loadView('forms.apl01', $data)
+    // ============================================================
+    // BAGIAN 1 — Data Pekerjaan
+    // ============================================================
+    'instansi'        => $aplData->company_name,
+    'pekerjaan'       => $aplData->job_title,
+    'alamat_instansi' => $aplData->company_address,
+    'kode_pos_kantor' => $aplData->company_postal_code ?? '',  // ← fix
+
+    // ============================================================
+    // BAGIAN 2 — Skema Sertifikasi
+    // ============================================================
+    'nama_skema'     => $scheme->name,
+    'kode_skema'     => $scheme->code,
+
+    'tujuan_asesmen' => $registration->certification_purpose instanceof \BackedEnum
+        ? $registration->certification_purpose->value
+        : ($registration->certification_purpose ?? ''),
+
+    'unit_kompetensi' => $scheme->competencyUnits
+        ->map(fn($unit) => [
+            'kode'  => $unit->unit_code,
+            'judul' => $unit->unit_title,
+        ])
+        ->toArray(),
+
+    // ============================================================
+    // BAGIAN 3 — Bukti Kelengkapan
+    // ============================================================
+    'persyaratan_dasar'   => $this->getRequirementNames($registration, mandatory: true),
+    'bukti_administratif' => $this->getRequirementNames($registration, mandatory: false),
+
+    'status_terima' => match (true) {
+        $registration->status_apl01 === Apl01Status::APPROVED => 'DITERIMA',
+        $registration->status_apl01 === Apl01Status::REJECTED  => 'DITOLAK',
+        default                                                 => 'DIPROSES',
+    },
+];
+
+        // ── Render & stream PDF ──────────────────────────────────────
+        $pdf = Pdf::loadView('forms.APL.apl01', $data)
                   ->setPaper('a4', 'portrait');
 
-        $filename = 'APL-01_' . str_replace(' ', '_', $request->nama) . '_' . date('Ymd') . '.pdf';
+        $filename = 'APL-01_' . str_replace(' ', '_', $candidate->name) . '_' . date('Ymd') . '.pdf';
 
-        // return $pdf->download($filename);
-        return $pdf->stream($filename); // tampil di browser
+        return $pdf->stream($filename);
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // Helper
+    // ────────────────────────────────────────────────────────────────
+
+    /**
+     * Ambil daftar nama requirement dari evidence yang sudah diupload kandidat,
+     * difilter berdasarkan kolom `is_mandatory` di tabel scheme_requirements.
+     *
+     * @return array<string>  e.g. ['KTP', 'Pas Foto 3x4 Background Merah']
+     */
+    private function getRequirementNames(
+        AssessmentRegistration $registration,
+        bool $mandatory
+    ): array {
+        return $registration->evidence
+            ->filter(fn($e) => $e->requirement?->is_mandatory === $mandatory)
+            ->map(fn($e) => [
+                'nama'   => $e->requirement->requirement_name,
+                'status' => $e->status, // EvidenceStatus enum
+            ])
+            ->unique('nama')
+            ->values()
+            ->toArray();
     }
 }

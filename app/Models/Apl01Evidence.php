@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\EvidenceStatus;
 
 class Apl01Evidence extends Model
 {
@@ -17,6 +18,7 @@ class Apl01Evidence extends Model
     protected $casts = [
         'is_valid_admin' => 'boolean',
         'verified_at'    => 'datetime',
+        'status' => EvidenceStatus::class,
     ];
 
     public function apl01Data()

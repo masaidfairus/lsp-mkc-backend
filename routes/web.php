@@ -82,7 +82,7 @@ Route::get('/apl01/preview', function () {
         'status_terima'       => 'Diterima',
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.apl01', $data)->setPaper('a4', 'portrait');
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.APL.apl01', $data)->setPaper('a4', 'portrait');
     return $pdf->stream('preview.pdf');
 });
 
