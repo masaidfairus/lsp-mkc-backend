@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('assessment_feedback', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('registration_id')->constrained('assessment_registration')->cascadeOnDelete();
+            $table->foreignId('registration_id')->constrained('assessment_registrations')->cascadeOnDelete();
             $table->json('feedback_json');
             $table->timestamps();
         });

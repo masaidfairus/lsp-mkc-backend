@@ -19,7 +19,6 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->foreignId('scheme_id')
                 ->nullable()
-                ->after('portfolio_type_id')
                 ->constrained('schemes')
                 ->nullOnDelete();
             $table->timestamps();

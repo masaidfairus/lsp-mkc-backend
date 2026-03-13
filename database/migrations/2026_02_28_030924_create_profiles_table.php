@@ -23,8 +23,8 @@ return new class extends Migration {
             $table->string('job_title');
             $table->text('company_address');
             $table->string('company_contact');
-            $table->string('asesi_type')->default('pribadi')->after('company_contact');
-            $table->string('institution_name')->nullable()->after('asesi_type');
+            $table->string('asesi_type')->default('pribadi');
+            $table->string('institution_name')->nullable();
             $table->timestamps();
         });
     }
