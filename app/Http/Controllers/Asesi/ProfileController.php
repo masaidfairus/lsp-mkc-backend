@@ -11,8 +11,10 @@ class ProfileController extends Controller
 {
     public function show(Request $request)
     {
-        $user = $request->user();
-        return $user->profile;
+        return $this->successResponse(
+            $request->user()->profile,
+            'Data profile berhasil ditampilkan'
+        );
     }
 
     public function store(Request $request)
@@ -29,13 +31,41 @@ class ProfileController extends Controller
             'job_title' => ['required', 'string', 'max:255'],
             'company_address' => ['required', 'string', 'max:1000'],
             'company_contact' => ['required', 'string', 'max:20'],
+            'asesi_type' => ['required', 'in:pribadi,institusi'],
+            'institution_name' => ['required_if:asesi_type,institusi', 'nullable', 'string', 'max:255'],
         ]);
 
-        $user->profile()->firstOrCreate($validated);
+        $user->profile()->updateOrCreate(['user_id' => $user->id], $validated);
 
-        return $this->successResponse([$user->profile], 'Data profile anda telah disimpan');
+        return $this->successResponse(
+            $user->fresh()->profile,
+            'Data profile berhasil disimpan'
+        );
     }
 
     public function update(Request $request)
-    {}
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'gender' => ['sometimes', new Enum(Gender::class)],
+            'date_of_birth' => ['sometimes', 'date', 'before:today'],
+            'address' => ['sometimes', 'string', 'max:1000'],
+            'phone_number' => ['sometimes', 'string', 'regex:/^(\+62|0)8[1-9][0-9]{6,10}$/'],
+            'education_qualifications' => ['sometimes', 'string', 'max:255'],
+            'company_name' => ['sometimes', 'string', 'max:255'],
+            'job_title' => ['sometimes', 'string', 'max:255'],
+            'company_address' => ['sometimes', 'string', 'max:1000'],
+            'company_contact' => ['sometimes', 'string', 'max:20'],
+            'asesi_type' => ['sometimes', 'in:pribadi,institusi'],
+            'institution_name' => ['required_if:asesi_type,institusi', 'nullable', 'string', 'max:255'],
+        ]);
+
+        $user->profile()->update($validated);
+
+        return $this->successResponse(
+            $user->fresh()->profile,
+            'Data profile berhasil diupdate'
+        );
+    }
 }
