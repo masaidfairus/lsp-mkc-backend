@@ -69,6 +69,16 @@ class AssessmentRegistration extends Model
         return $this->hasMany(Appeal::class);
     }
 
+    public function apl02Portolio()
+    {
+        return $this->hasMany(Apl02Portfolio::class);
+    }
+
+    public function adminEvidence()
+    {
+        return $this->hasMany(AdministrativeEvidence::class, 'registration_id');
+    }
+
     public function payments()
     {
         return $this->hasOne(Payment::class, 'registration_id');

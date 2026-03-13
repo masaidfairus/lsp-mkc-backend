@@ -8,6 +8,7 @@ class Portfolio extends Model
 {
     protected $fillable = [
         'user_id',
+        'scheme_id',
         'portfolio_type_id',
         'file_path',
         'file_url',
@@ -24,8 +25,8 @@ class Portfolio extends Model
         return $this->belongsTo(PortfolioType::class);
     }
 
-    public function selfAssessment()
+    public function apl02Portolio()
     {
-        return $this->hasMany(SelfAssessment::class);
+        return $this->hasMany(Apl02Portfolio::class);
     }
 }

@@ -5,8 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -24,6 +23,8 @@ return new class extends Migration
             $table->string('job_title');
             $table->text('company_address');
             $table->string('company_contact');
+            $table->string('asesi_type')->default('pribadi');
+            $table->string('institution_name')->nullable();
             $table->timestamps();
         });
     }

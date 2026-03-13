@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -18,6 +17,10 @@ return new class extends Migration
             $table->string('file_path');
             $table->string('file_url');
             $table->text('description')->nullable();
+            $table->foreignId('scheme_id')
+                ->nullable()
+                ->constrained('schemes')
+                ->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -1,9 +1,9 @@
 <?php
 
 use App\Enums\Apl01Status;
+use App\Enums\Apl02Status;
 use App\Enums\CertificationPurpose;
 use App\Enums\Result;
-use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
