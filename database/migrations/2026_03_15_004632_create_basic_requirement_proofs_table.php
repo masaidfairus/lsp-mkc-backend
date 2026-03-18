@@ -10,11 +10,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('scheme_requirements', function (Blueprint $table) {
+        Schema::create('basic_requirement_proofs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('scheme_id')->constrained('schemes')->cascadeOnDelete();
-            $table->string('requirement_name');
-            $table->boolean('is_mandatory')->default(true);
+            $table->foreignId('list_id')->constrained('document_lists')->cascadeOnDelete();
+            $table->boolean('is_mandatory')->default(false);
+            $table->string('or_group')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('scheme_requirements');
+        Schema::dropIfExists('basic_requirement_proofs');
     }
 };

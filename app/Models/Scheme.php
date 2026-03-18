@@ -19,11 +19,6 @@ class Scheme extends Model
         'certification_fee' => 'float',
         'recertification_fee' => 'float',
     ];
-    
-    public function requirements()
-    {
-        return $this->hasMany(SchemeRequirement::class);
-    }
 
     public function peerValidations()
     {
@@ -38,5 +33,15 @@ class Scheme extends Model
     public function registrations()
     {
         return $this->hasMany(AssessmentRegistration::class);
+    }
+
+    public function basicRequirementProofs()
+    {
+        return $this->hasMany(BasicRequirementProof::class);
+    }
+
+    public function administrativeProofs()
+    {
+        return $this->hasMany(AdministrativeProof::class);
     }
 }

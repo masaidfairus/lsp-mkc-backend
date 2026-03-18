@@ -12,7 +12,7 @@ class SchemeController extends Controller
      */
     public function index()
     {
-        $schemes = Scheme::with(['competencyUnits.competencyElements.performanceCriteria', 'requirements'])->get();
+        $schemes = Scheme::with(['competencyUnits.competencyElements.performanceCriteria'])->get();
         return $schemes;
     }
 
@@ -21,7 +21,7 @@ class SchemeController extends Controller
      */ 
     public function show(Scheme $scheme)
     {
-        $schemeData = $scheme::with(['competencyUnits.competencyElements.performanceCriteria', 'requirements'])->get();
+        $schemeData = $scheme::with(['competencyUnits.competencyElements.performanceCriteria'])->get();
         return $schemeData;
     }
 }

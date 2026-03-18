@@ -8,7 +8,7 @@ class Apl02Portfolio extends Model
 {
     protected $fillable = [
         'registration_id',
-        'portfolio_id',
+        'file_profile_id',
         'is_active',
     ];
 
@@ -21,8 +21,8 @@ class Apl02Portfolio extends Model
         return $this->belongsTo(AssessmentRegistration::class);
     }
 
-    public function portfolio()
+    public function fileProfile()
     {
-        return $this->belongsTo(Portfolio::class);
+        return $this->belongsTo(FileProfile::class);
     }
 }
