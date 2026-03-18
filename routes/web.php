@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\APL01Controller;
-use App\Http\Controllers\APL02Controller;
+use App\Http\Controllers\PDF\PdfApl01Controller;
+use App\Http\Controllers\PDF\PdfApl02Controller;
 
 // Route::get('/active', function () {
 //     return view('auth.activation');
@@ -27,8 +27,8 @@ Route::get('/logout', [AuthController::class, 'logout']);
 // ============================================================
 // APL01
 // ============================================================
-Route::get('/apl01', [APL01Controller::class, 'index'])->name('apl01.form');
-Route::post('/apl01/generate', [APL01Controller::class, 'generate'])->name('apl01.generate');
+Route::get('/apl01', [PdfApl01Controller::class, 'index'])->name('apl01.form');
+Route::post('/apl01/generate', [PdfApl01Controller::class, 'generate'])->name('apl01.generate');
 
 Route::get('/apl01/preview', function () {
     $data = [
@@ -68,9 +68,9 @@ Route::get('/apl01/preview', function () {
             ['kode' => 'N.821100.001.02', 'judul' => 'Menangani Penerimaan dan Pengiriman Dokumen/Surat'],
             ['kode' => 'N.821100.067.01', 'judul' => 'Melakukan Transaksi Perbankan Sederhana'],
         ],
-        'persyaratan_dasar'   => [],
+        'persyaratan_dasar' => [],
         'bukti_administratif' => [],
-        'status_terima'       => 'Diterima',
+        'status_terima' => 'Diterima',
     ];
 
     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.apl01', $data)->setPaper('a4', 'portrait');
@@ -80,23 +80,23 @@ Route::get('/apl01/preview', function () {
 // ============================================================
 // APL02
 // ============================================================
-Route::post('/apl02/generate', [APL02Controller::class, 'generate'])->name('apl02.generate');
+Route::post('/apl02/generate', [PdfApl02Controller::class, 'generate'])->name('apl02.generate');
 
 Route::get('/apl02/preview', function () {
     $data = [
-        'nama_skema'      => 'Ahli Desain Grafis',
-        'kode_skema'      => 'SUK-SKS-REV1-L007',
-        'nama_asesi'      => '',
-        'nama_asesor'     => '',
-        'no_reg_asesor'   => '',
+        'nama_skema' => 'Ahli Desain Grafis',
+        'kode_skema' => 'SUK-SKS-REV1-L007',
+        'nama_asesi' => '',
+        'nama_asesor' => '',
+        'no_reg_asesor' => '',
         'unit_kompetensi' => [
             [
-                'no'    => 1,
-                'kode'  => 'M.74100.001.02',
+                'no' => 1,
+                'kode' => 'M.74100.001.02',
                 'judul' => 'Mengaplikasikan Prinsip Dasar Desain',
                 'elemen' => [
                     [
-                        'no'   => 1,
+                        'no' => 1,
                         'nama' => 'Menerapkan materi informasi yang berkaitan dengan pengetahuan dasar desain',
                         'kriteria' => [
                             ['no' => '1.1', 'uraian' => 'Sumber informasi ditentukan agar keabsahan informasi mengenai pengetahuan dasar desain sesuai dengan kebutuhan.'],
@@ -117,12 +117,12 @@ Route::get('/apl02/preview', function () {
 // ============================================================
 Route::get('/mapa01/preview', function () {
     $data = [
-        'nama_skema'     => 'AHLI DESAIN GRAFIS',
-        'kode_skema'     => 'SUK-SKS-REV1-L007',
+        'nama_skema' => 'AHLI DESAIN GRAFIS',
+        'kode_skema' => 'SUK-SKS-REV1-L007',
         'tujuan_asesmen' => 'Sertifikasi',
         'kelompok_pekerjaan' => [
             [
-                'no'   => 1,
+                'no' => 1,
                 'nama' => 'Menerapkan pengetahuan tentang desain',
                 'unit' => [
                     ['kode' => 'M.74100.001.02', 'judul' => 'Mengaplikasikan Prinsip Dasar Desain'],
@@ -131,7 +131,7 @@ Route::get('/mapa01/preview', function () {
                 ],
             ],
             [
-                'no'   => 2,
+                'no' => 2,
                 'nama' => 'Menentukan obyektif dari program desain',
                 'unit' => [
                     ['kode' => 'M.74100.004.02', 'judul' => 'Menerapkan Project Brief'],
@@ -140,7 +140,7 @@ Route::get('/mapa01/preview', function () {
                 ],
             ],
             [
-                'no'   => 3,
+                'no' => 3,
                 'nama' => 'Menerapkan proses desain',
                 'unit' => [
                     ['kode' => 'M.74100.007.01', 'judul' => 'Menerapkan strategi Desain'],
@@ -152,7 +152,7 @@ Route::get('/mapa01/preview', function () {
                 ],
             ],
             [
-                'no'   => 4,
+                'no' => 4,
                 'nama' => 'Menerapkan proses produksi',
                 'unit' => [
                     ['kode' => 'M.74100.013.02', 'judul' => 'Membuat Materi Siap Produksi'],
@@ -186,7 +186,7 @@ Route::get('/mapa02/preview', function () {
 
         'kelompok_pekerjaan' => [
             [
-                'no'   => 1,
+                'no' => 1,
                 'nama' => 'Menerapkan pengetahuan tentang desain',
                 'unit' => [
                     ['kode' => 'M.74100.001.02', 'judul' => 'Mengaplikasikan Prinsip Dasar Desain'],
@@ -195,7 +195,7 @@ Route::get('/mapa02/preview', function () {
                 ],
             ],
             [
-                'no'   => 2,
+                'no' => 2,
                 'nama' => 'Menentukan obyektif dari program desain',
                 'unit' => [
                     ['kode' => 'M.74100.004.02', 'judul' => 'Menerapkan Project Brief'],
@@ -204,7 +204,7 @@ Route::get('/mapa02/preview', function () {
                 ],
             ],
             [
-                'no'   => 3,
+                'no' => 3,
                 'nama' => 'Menerapkan proses desain',
                 'unit' => [
                     ['kode' => 'M.74100.007.01', 'judul' => 'Menetapkan Strategi Desain'],
@@ -216,7 +216,7 @@ Route::get('/mapa02/preview', function () {
                 ],
             ],
             [
-                'no'   => 4,
+                'no' => 4,
                 'nama' => 'Menerapkan proses produksi',
                 'unit' => [
                     ['kode' => 'M.74100.013.02', 'judul' => 'Membuat Materi Siap Produksi'],
@@ -224,10 +224,10 @@ Route::get('/mapa02/preview', function () {
             ],
         ],
 
-        'penyusun_nama'   => '',
+        'penyusun_nama' => '',
         'penyusun_no_reg' => '',
-        'validator_nama'  => '',
-        'validator_no_reg'=> '',
+        'validator_nama' => '',
+        'validator_no_reg' => '',
     ];
 
     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.mapa.mapa02', $data)
@@ -238,60 +238,60 @@ Route::get('/mapa02/preview', function () {
 
 Route::get('/invoice/preview', function () {
     $data = [
-        'no_surat'      => 'No Surat Disini',
+        'no_surat' => 'No Surat Disini',
         'tanggal_surat' => '08 Maret 2025',
-        'nama_asesi'    => '',
-        'nik'           => '',
-        'no_reg'        => '',
-        'alamat'        => '',
-        'nama_skema'    => '',
-        'kode_skema'    => '',
+        'nama_asesi' => '',
+        'nik' => '',
+        'no_reg' => '',
+        'alamat' => '',
+        'nama_skema' => '',
+        'kode_skema' => '',
 
         'items' => [
             [
-                'uraian'      => 'Biaya Pendaftaran Sertifikasi',
-                'keterangan'  => '',
-                'qty'         => 1,
-                'harga'       => 150000,
+                'uraian' => 'Biaya Pendaftaran Sertifikasi',
+                'keterangan' => '',
+                'qty' => 1,
+                'harga' => 150000,
             ],
             [
-                'uraian'      => 'Biaya Asesmen Kompetensi',
-                'keterangan'  => 'Skema Ahli Desain Grafis (13 Unit Kompetensi)',
-                'qty'         => 1,
-                'harga'       => 1500000,
+                'uraian' => 'Biaya Asesmen Kompetensi',
+                'keterangan' => 'Skema Ahli Desain Grafis (13 Unit Kompetensi)',
+                'qty' => 1,
+                'harga' => 1500000,
             ],
             [
-                'uraian'      => 'Biaya Penerbitan Sertifikat',
-                'keterangan'  => '',
-                'qty'         => 1,
-                'harga'       => 200000,
+                'uraian' => 'Biaya Penerbitan Sertifikat',
+                'keterangan' => '',
+                'qty' => 1,
+                'harga' => 200000,
             ],
             [
-                'uraian'      => 'Biaya Administrasi',
-                'keterangan'  => '',
-                'qty'         => 1,
-                'harga'       => 100000,
+                'uraian' => 'Biaya Administrasi',
+                'keterangan' => '',
+                'qty' => 1,
+                'harga' => 100000,
             ],
         ],
 
-        'diskon'        => 0,
-        'ppn_persen'    => 0, // isi 11 kalau kena PPN
+        'diskon' => 0,
+        'ppn_persen' => 0, // isi 11 kalau kena PPN
 
         // Info LSP
-        'lsp_nama'      => 'INVOICE SERTIFIKASI LSP',
-        'lsp_alamat'    => 'Jl. Lorem Ipsum Dolor Sit',
-        'lsp_telp'      => '0888-8888-8888',
-        'lsp_email'     => 'lsp@gmail.com',
+        'lsp_nama' => 'INVOICE SERTIFIKASI LSP',
+        'lsp_alamat' => 'Jl. Lorem Ipsum Dolor Sit',
+        'lsp_telp' => '0888-8888-8888',
+        'lsp_email' => 'lsp@gmail.com',
 
         // Rekening
-        'rek_bank'      => 'BNI',
-        'rek_no'        => '1234567890',
+        'rek_bank' => 'BNI',
+        'rek_no' => '1234567890',
         'rek_atas_nama' => 'LSP Mitra Karya Cemerlang',
 
         // TTD
-        'kota'          => 'Jakarta',
-        'nama_ttd'      => 'Lorem Ipsum',
-        'jabatan_ttd'   => 'Manajer Sertifikasi',
+        'kota' => 'Jakarta',
+        'nama_ttd' => 'Lorem Ipsum',
+        'jabatan_ttd' => 'Manajer Sertifikasi',
     ];
 
     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.invoice', $data)
@@ -302,13 +302,13 @@ Route::get('/invoice/preview', function () {
 
 Route::get('/ak01/preview', function () {
     $data = [
-        'nama_skema'      => 'AHLI DESAIN GRAFIS',
-        'kode_skema'      => 'SUK-SKS-REV1-L007',
-        'tuk'             => 'Sewaktu/Tempat Kerja/Mandiri',
-        'nama_asesor'     => '',
-        'nama_asesi'      => '',
-        'hari_tanggal'    => '',
-        'waktu'           => '',
+        'nama_skema' => 'AHLI DESAIN GRAFIS',
+        'kode_skema' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
+        'nama_asesor' => '',
+        'nama_asesi' => '',
+        'hari_tanggal' => '',
+        'waktu' => '',
         'tuk_pelaksanaan' => '',
     ];
 
@@ -320,12 +320,12 @@ Route::get('/ak01/preview', function () {
 
 Route::get('/ak04/preview', function () {
     $data = [
-        'nama_asesi'  => '',
+        'nama_asesi' => '',
         'nama_asesor' => '',
-        'tanggal'     => '',
-        'nama_skema'  => 'AHLI DESAIN GRAFIS',
-        'no_skema'    => 'SUK-SKS-REV1-L007',
-        'alasan'      => '',
+        'tanggal' => '',
+        'nama_skema' => 'AHLI DESAIN GRAFIS',
+        'no_skema' => 'SUK-SKS-REV1-L007',
+        'alasan' => '',
     ];
 
     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.AK.ak04', $data)
@@ -336,12 +336,12 @@ Route::get('/ak04/preview', function () {
 
 Route::get('/ak07/preview', function () {
     $data = [
-        'nama_skema'  => 'AHLI DESAIN GRAFIS',
-        'kode_skema'  => 'SUK-SKS-REV1-L007',
-        'tuk'         => 'Sewaktu/Tempat Kerja/Mandiri',
+        'nama_skema' => 'AHLI DESAIN GRAFIS',
+        'kode_skema' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
         'nama_asesor' => '',
-        'nama_asesi'  => '',
-        'tanggal'     => '',
+        'nama_asesi' => '',
+        'tanggal' => '',
     ];
 
     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.AK.ak07', $data)
@@ -352,91 +352,127 @@ Route::get('/ak07/preview', function () {
 
 Route::get('/ia01/preview', function () {
     $data = [
-        'nama_skema'  => 'AHLI DESAIN GRAFIS',
-        'kode_skema'  => 'SUK-SKS-REV1-L007',
-        'tuk'         => 'Sewaktu/Tempat Kerja/Mandiri',
+        'nama_skema' => 'AHLI DESAIN GRAFIS',
+        'kode_skema' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
         'nama_asesor' => '',
-        'nama_asesi'  => '',
-        'tanggal'     => '',
+        'nama_asesi' => '',
+        'tanggal' => '',
 
         'kelompok_pekerjaan' => [
 
             // ─── KP 1 ───────────────────────────────────────────
             [
-                'no'          => 1,
-                'nama'        => 'Menerapkan pengetahuan tentang desain',
+                'no' => 1,
+                'nama' => 'Menerapkan pengetahuan tentang desain',
                 'unit_offset' => 0,
-                'unit'        => [
+                'unit' => [
                     [
-                        'kode'  => 'M.74100.001.02',
+                        'kode' => 'M.74100.001.02',
                         'judul' => 'Mengaplikasikan Prinsip Dasar Desain',
                         'elemen' => [
-                            ['nama' => 'Menerapkan materi informasi yang berkaitan dengan pengetahuan dasar desain', 'kuk' => [
-                                'Sumber informasi ditentukan agar keabsahan informasi mengenai pengetahuan dasar desain sesuai dengan kebutuhan.',
-                                'Materi informasi dijelaskan secara sistematis sesuai dengan tahapan kerja desain.',
-                            ]],
-                            ['nama' => 'Menjelaskan pengetahuan dasar seni rupa', 'kuk' => [
-                                'Definisi seni rupa dijelaskan secara teoritis dan melalui contoh karya.',
-                                'Elemen dasar yang terkandung dalam seni rupa diuraikan sesuai karakter dan penggunaannya masing-masing.',
-                                'Prinsip-prinsip dasar yang digunakan dalam pengolahan elemen desain/seni rupa dikaitkan sesuai dengan kebutuhan desain.',
-                            ]],
-                            ['nama' => 'Menjelaskan pengertian dasar desain sebagai bagian dari lingkup seni rupa', 'kuk' => [
-                                'Perbedaan seni dan desain dijelaskan secara teoritis dan melalui contoh karya.',
-                                'Definisi Desain Grafis/DKV dibedakan dengan bidang desain lainnya.',
-                                'Fungsi utama dari Desain Grafis/DKV diuraikan secara sistematis.',
-                                'Prinsip dasar Desain Grafis/DKV dikaitkan sesuai dengan kebutuhan desain.',
-                            ]],
-                            ['nama' => 'Mengaplikasikan pengetahuan mengenai sejarah seni rupa dan desain', 'kuk' => [
-                                'Pengetahuan sejarah seni rupa dan desain dijelaskan secara verbal dan visual.',
-                                'Ragam gaya desain diaplikasikan sesuai Prinsip Dasar Desain.',
-                            ]],
+                            [
+                                'nama' => 'Menerapkan materi informasi yang berkaitan dengan pengetahuan dasar desain',
+                                'kuk' => [
+                                    'Sumber informasi ditentukan agar keabsahan informasi mengenai pengetahuan dasar desain sesuai dengan kebutuhan.',
+                                    'Materi informasi dijelaskan secara sistematis sesuai dengan tahapan kerja desain.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Menjelaskan pengetahuan dasar seni rupa',
+                                'kuk' => [
+                                    'Definisi seni rupa dijelaskan secara teoritis dan melalui contoh karya.',
+                                    'Elemen dasar yang terkandung dalam seni rupa diuraikan sesuai karakter dan penggunaannya masing-masing.',
+                                    'Prinsip-prinsip dasar yang digunakan dalam pengolahan elemen desain/seni rupa dikaitkan sesuai dengan kebutuhan desain.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Menjelaskan pengertian dasar desain sebagai bagian dari lingkup seni rupa',
+                                'kuk' => [
+                                    'Perbedaan seni dan desain dijelaskan secara teoritis dan melalui contoh karya.',
+                                    'Definisi Desain Grafis/DKV dibedakan dengan bidang desain lainnya.',
+                                    'Fungsi utama dari Desain Grafis/DKV diuraikan secara sistematis.',
+                                    'Prinsip dasar Desain Grafis/DKV dikaitkan sesuai dengan kebutuhan desain.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Mengaplikasikan pengetahuan mengenai sejarah seni rupa dan desain',
+                                'kuk' => [
+                                    'Pengetahuan sejarah seni rupa dan desain dijelaskan secara verbal dan visual.',
+                                    'Ragam gaya desain diaplikasikan sesuai Prinsip Dasar Desain.',
+                                ]
+                            ],
                         ],
                     ],
                     [
-                        'kode'  => 'M.74100.002.02',
+                        'kode' => 'M.74100.002.02',
                         'judul' => 'Menerapkan Prinsip Dasar Komunikasi',
                         'elemen' => [
-                            ['nama' => 'Menggali materi informasi yang berkaitan dengan pengetahuan dasar komunikasi', 'kuk' => [
-                                'Sumber informasi ditelusuri agar keabsahan informasi mengenai pengetahuan dasar komunikasi sesuai dengan kebutuhan.',
-                                'Materi informasi ditunjukkan secara sistematis sesuai dengan proses komunikasi.',
-                            ]],
-                            ['nama' => 'Menjelaskan pengetahuan dasar komunikasi', 'kuk' => [
-                                'Definisi dan prinsip dasar komunikasi diterangkan secara teoritis.',
-                                'Fungsi komunikasi diuraikan secara sistematis.',
-                                'Komponen komunikator dari proses komunikasi dijelaskan secara teoritis.',
-                            ]],
-                            ['nama' => 'Membedakan komponen komunikasi', 'kuk' => [
-                                'Komponen pesan dari proses komunikasi dijelaskan secara teoritis.',
-                                'Komponen media dari proses komunikasi dijelaskan secara teoritis sesuai jenis-jenisnya.',
-                                'Komponen komunikan dalam proses komunikasi dijelaskan secara teoritis.',
-                                'Komponen pengaruh proses komunikasi dijelaskan secara teoritis.',
-                            ]],
-                            ['nama' => 'Menerapkan pengetahuan dasar komunikasi visual', 'kuk' => [
-                                'Definisi dan prinsip dasar komunikasi visual dijelaskan secara teoritis.',
-                                'Proses dan cara komunikasi visual dilaksanakan sesuai tahapan.',
-                            ]],
+                            [
+                                'nama' => 'Menggali materi informasi yang berkaitan dengan pengetahuan dasar komunikasi',
+                                'kuk' => [
+                                    'Sumber informasi ditelusuri agar keabsahan informasi mengenai pengetahuan dasar komunikasi sesuai dengan kebutuhan.',
+                                    'Materi informasi ditunjukkan secara sistematis sesuai dengan proses komunikasi.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Menjelaskan pengetahuan dasar komunikasi',
+                                'kuk' => [
+                                    'Definisi dan prinsip dasar komunikasi diterangkan secara teoritis.',
+                                    'Fungsi komunikasi diuraikan secara sistematis.',
+                                    'Komponen komunikator dari proses komunikasi dijelaskan secara teoritis.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Membedakan komponen komunikasi',
+                                'kuk' => [
+                                    'Komponen pesan dari proses komunikasi dijelaskan secara teoritis.',
+                                    'Komponen media dari proses komunikasi dijelaskan secara teoritis sesuai jenis-jenisnya.',
+                                    'Komponen komunikan dalam proses komunikasi dijelaskan secara teoritis.',
+                                    'Komponen pengaruh proses komunikasi dijelaskan secara teoritis.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Menerapkan pengetahuan dasar komunikasi visual',
+                                'kuk' => [
+                                    'Definisi dan prinsip dasar komunikasi visual dijelaskan secara teoritis.',
+                                    'Proses dan cara komunikasi visual dilaksanakan sesuai tahapan.',
+                                ]
+                            ],
                         ],
                     ],
                     [
-                        'kode'  => 'M.74100.003.02',
+                        'kode' => 'M.74100.003.02',
                         'judul' => 'Menerapkan Pengetahuan Produksi Desain',
                         'elemen' => [
-                            ['nama' => 'Melaksanakan prinsip dan proses pra-produksi desain', 'kuk' => [
-                                'Prinsip-prinsip dalam proses pra-produksi desain diterapkan sesuai tahapan.',
-                                'Proses pra-produksi desain dikerjakan secara lengkap hingga karya komunikasi visual siap produksi.',
-                            ]],
-                            ['nama' => 'Melaksanakan prinsip dan proses produksi desain', 'kuk' => [
-                                'Jenis-jenis produksi dan prinsip serta kualitas hasil dari masing-masing teknik produksi desain diuraikan sesuai jenis dan tahapannya.',
-                                'Jenis-jenis peralatan produksi dalam proses produksi desain dipakai sesuai kebutuhan.',
-                            ]],
-                            ['nama' => 'Melaksanakan prinsip dan proses pasca produksi desain', 'kuk' => [
-                                'Jenis-jenis pasca produksi desain dan prinsip dari masing-masing teknik pasca produksi desain diuraikan sesuai jenis dan tahapannya.',
-                                'Teknik pasca produksi desain dipilih sesuai karakter dan kebutuhan.',
-                            ]],
-                            ['nama' => 'Mengelola pelaksanaan seluruh tahap produksi desain', 'kuk' => [
-                                'Seluruh proses pra produksi, produksi hingga pasca produksi desain dilaksanakan sesuai kebutuhan dan tujuan desain.',
-                                'Seluruh kegiatan proses produksi desain dan kemajuan pelaksanaan produksi didokumentasikan sesuai kebutuhan sebuah laporan.',
-                            ]],
+                            [
+                                'nama' => 'Melaksanakan prinsip dan proses pra-produksi desain',
+                                'kuk' => [
+                                    'Prinsip-prinsip dalam proses pra-produksi desain diterapkan sesuai tahapan.',
+                                    'Proses pra-produksi desain dikerjakan secara lengkap hingga karya komunikasi visual siap produksi.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Melaksanakan prinsip dan proses produksi desain',
+                                'kuk' => [
+                                    'Jenis-jenis produksi dan prinsip serta kualitas hasil dari masing-masing teknik produksi desain diuraikan sesuai jenis dan tahapannya.',
+                                    'Jenis-jenis peralatan produksi dalam proses produksi desain dipakai sesuai kebutuhan.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Melaksanakan prinsip dan proses pasca produksi desain',
+                                'kuk' => [
+                                    'Jenis-jenis pasca produksi desain dan prinsip dari masing-masing teknik pasca produksi desain diuraikan sesuai jenis dan tahapannya.',
+                                    'Teknik pasca produksi desain dipilih sesuai karakter dan kebutuhan.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Mengelola pelaksanaan seluruh tahap produksi desain',
+                                'kuk' => [
+                                    'Seluruh proses pra produksi, produksi hingga pasca produksi desain dilaksanakan sesuai kebutuhan dan tujuan desain.',
+                                    'Seluruh kegiatan proses produksi desain dan kemajuan pelaksanaan produksi didokumentasikan sesuai kebutuhan sebuah laporan.',
+                                ]
+                            ],
                         ],
                     ],
                 ],
@@ -444,64 +480,85 @@ Route::get('/ia01/preview', function () {
 
             // ─── KP 2 ───────────────────────────────────────────
             [
-                'no'          => 2,
-                'nama'        => 'Menentukan obyektif dari program desain',
+                'no' => 2,
+                'nama' => 'Menentukan obyektif dari program desain',
                 'unit_offset' => 3,
-                'unit'        => [
+                'unit' => [
                     [
-                        'kode'  => 'M.74100.004.02',
+                        'kode' => 'M.74100.004.02',
                         'judul' => 'Menerapkan Project Brief',
                         'elemen' => [
-                            ['nama' => 'Memahami project brief', 'kuk' => [
-                                'Data-data perusahaan/klien diuraikan secara verbal dan visual.',
-                                'Permasalahan klien yang tercantum dalam project brief dirangkum sesuai kebutuhan.',
-                                'Informasi anggaran yang dimiliki oleh klien dirumuskan sesuai kebutuhan.',
-                            ]],
-                            ['nama' => 'Melaksanakan project brief', 'kuk' => [
-                                'Tujuan proyek ditentukan sesuai permasalahan klien.',
-                                'Ruang lingkup proyek disusun sesuai kebutuhan klien.',
-                                'Waktu pengerjaan proyek disusun sesuai tahapan kerja.',
-                                'Anggaran proyek diatur sesuai jadwal dan tahapan kerja.',
-                            ]],
+                            [
+                                'nama' => 'Memahami project brief',
+                                'kuk' => [
+                                    'Data-data perusahaan/klien diuraikan secara verbal dan visual.',
+                                    'Permasalahan klien yang tercantum dalam project brief dirangkum sesuai kebutuhan.',
+                                    'Informasi anggaran yang dimiliki oleh klien dirumuskan sesuai kebutuhan.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Melaksanakan project brief',
+                                'kuk' => [
+                                    'Tujuan proyek ditentukan sesuai permasalahan klien.',
+                                    'Ruang lingkup proyek disusun sesuai kebutuhan klien.',
+                                    'Waktu pengerjaan proyek disusun sesuai tahapan kerja.',
+                                    'Anggaran proyek diatur sesuai jadwal dan tahapan kerja.',
+                                ]
+                            ],
                         ],
                     ],
                     [
-                        'kode'  => 'M.74100.005.02',
+                        'kode' => 'M.74100.005.02',
                         'judul' => 'Menerapkan Design Brief',
                         'elemen' => [
-                            ['nama' => 'Menyusun design brief', 'kuk' => [
-                                'Design brief untuk pengembangan konsep desain disusun berdasarkan project brief.',
-                                'Design brief untuk pihak ketiga disusun berdasarkan project brief.',
-                            ]],
-                            ['nama' => 'Melaksanakan design brief', 'kuk' => [
-                                'Proyek desain diuraikan secara komprehensif.',
-                                'Tujuan desain dinyatakan sesuai project brief.',
-                                'Ruang lingkup desain disimpulkan berdasarkan project brief.',
-                                'Khalayak sasaran ditentukan sesuai project brief.',
-                                'Media desain ditentukan sesuai tujuan desain.',
-                                'Waktu pengerjaan desain dilaksanakan sesuai jadwal.',
-                                'Pembagian tugas dan tanggung jawab dikerjakan sesuai proyek desain.',
-                            ]],
+                            [
+                                'nama' => 'Menyusun design brief',
+                                'kuk' => [
+                                    'Design brief untuk pengembangan konsep desain disusun berdasarkan project brief.',
+                                    'Design brief untuk pihak ketiga disusun berdasarkan project brief.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Melaksanakan design brief',
+                                'kuk' => [
+                                    'Proyek desain diuraikan secara komprehensif.',
+                                    'Tujuan desain dinyatakan sesuai project brief.',
+                                    'Ruang lingkup desain disimpulkan berdasarkan project brief.',
+                                    'Khalayak sasaran ditentukan sesuai project brief.',
+                                    'Media desain ditentukan sesuai tujuan desain.',
+                                    'Waktu pengerjaan desain dilaksanakan sesuai jadwal.',
+                                    'Pembagian tugas dan tanggung jawab dikerjakan sesuai proyek desain.',
+                                ]
+                            ],
                         ],
                     ],
                     [
-                        'kode'  => 'M.74100.006.01',
+                        'kode' => 'M.74100.006.01',
                         'judul' => 'Mengorganisasi Informasi Terkait Proyek Desain',
                         'elemen' => [
-                            ['nama' => 'Mempersiapkan informasi', 'kuk' => [
-                                'Metode pengumpulan informasi dipilih sesuai kebutuhan.',
-                                'Informasi terkait design brief diorganisir secara sistematis.',
-                                'Informasi terkait design brief disusun berdasarkan metode analisis.',
-                            ]],
-                            ['nama' => 'Menganalisis informasi', 'kuk' => [
-                                'Metode analisis informasi dijelaskan secara teoritis.',
-                                'Metode analisis informasi dipilih sesuai kebutuhan dalam design brief.',
-                                'Informasi disusun sesuai kebutuhan pembuatan rekomendasi.',
-                            ]],
-                            ['nama' => 'Merumuskan informasi kunci', 'kuk' => [
-                                'Rekomendasi informasi dibuat sesuai kebutuhan untuk pemahaman proyek desain.',
-                                'Rekomendasi informasi dirumuskan sebagai informasi kunci sesuai kebutuhan dasar pengembangan strategi dan konsep desain.',
-                            ]],
+                            [
+                                'nama' => 'Mempersiapkan informasi',
+                                'kuk' => [
+                                    'Metode pengumpulan informasi dipilih sesuai kebutuhan.',
+                                    'Informasi terkait design brief diorganisir secara sistematis.',
+                                    'Informasi terkait design brief disusun berdasarkan metode analisis.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Menganalisis informasi',
+                                'kuk' => [
+                                    'Metode analisis informasi dijelaskan secara teoritis.',
+                                    'Metode analisis informasi dipilih sesuai kebutuhan dalam design brief.',
+                                    'Informasi disusun sesuai kebutuhan pembuatan rekomendasi.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Merumuskan informasi kunci',
+                                'kuk' => [
+                                    'Rekomendasi informasi dibuat sesuai kebutuhan untuk pemahaman proyek desain.',
+                                    'Rekomendasi informasi dirumuskan sebagai informasi kunci sesuai kebutuhan dasar pengembangan strategi dan konsep desain.',
+                                ]
+                            ],
                         ],
                     ],
                 ],
@@ -509,127 +566,178 @@ Route::get('/ia01/preview', function () {
 
             // ─── KP 3 ───────────────────────────────────────────
             [
-                'no'          => 3,
-                'nama'        => 'Menerapkan proses desain',
+                'no' => 3,
+                'nama' => 'Menerapkan proses desain',
                 'unit_offset' => 6,
-                'unit'        => [
+                'unit' => [
                     [
-                        'kode'  => 'M.74100.007.01',
+                        'kode' => 'M.74100.007.01',
                         'judul' => 'Menetapkan Strategi Desain',
                         'elemen' => [
-                            ['nama' => 'Merencanakan strategi desain', 'kuk' => [
-                                'Strategi desain dipilih sesuai design brief.',
-                                'Informasi kunci dikembangkan menjadi strategi desain berdasarkan project brief.',
-                            ]],
-                            ['nama' => 'Menetapkan strategi desain', 'kuk' => [
-                                'Alternatif skenario strategi desain dipilih sesuai tujuan proyek desain.',
-                                'Strategi desain ditetapkan sebagai dasar konsep desain.',
-                            ]],
+                            [
+                                'nama' => 'Merencanakan strategi desain',
+                                'kuk' => [
+                                    'Strategi desain dipilih sesuai design brief.',
+                                    'Informasi kunci dikembangkan menjadi strategi desain berdasarkan project brief.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Menetapkan strategi desain',
+                                'kuk' => [
+                                    'Alternatif skenario strategi desain dipilih sesuai tujuan proyek desain.',
+                                    'Strategi desain ditetapkan sebagai dasar konsep desain.',
+                                ]
+                            ],
                         ],
                     ],
                     [
-                        'kode'  => 'M.74100.008.02',
+                        'kode' => 'M.74100.008.02',
                         'judul' => 'Menetapkan Konsep Desain',
                         'elemen' => [
-                            ['nama' => 'Mengembangkan informasi kunci', 'kuk' => [
-                                'Bahan informasi kunci dikelompokkan sesuai konteks dan tujuan desain.',
-                                'Informasi kunci dikembangkan menjadi Gagasan.',
-                            ]],
-                            ['nama' => 'Mengolah gagasan konsep desain', 'kuk' => [
-                                'Gagasan dikembangkan menjadi beberapa alternatif sesuai design brief.',
-                                'Alternatif gagasan divalidasi sesuai dengan tujuan desain.',
-                                'Gagasan terpilih disusun menjadi konsep desain.',
-                            ]],
-                            ['nama' => 'Mengkomunikasikan konsep desain dalam tim internal', 'kuk' => [
-                                'Metode komunikasi yang paling sesuai dipilih berdasarkan tujuan desain.',
-                                'Aspek di dalam konsep desain dikembangkan sesuai dengan metode komunikasi terpilih.',
-                                'Konsep desain diuraikan sesuai dengan tujuan desain dalam tim internal.',
-                            ]],
-                            ['nama' => 'Menetapkan konsep desain dalam tim internal', 'kuk' => [
-                                'Umpan balik mengenai konsep desain oleh tim internal dihubungkan dengan tujuan desain.',
-                                'Konsep desain dirumuskan sesuai perkembangan konsep di tim internal.',
-                            ]],
+                            [
+                                'nama' => 'Mengembangkan informasi kunci',
+                                'kuk' => [
+                                    'Bahan informasi kunci dikelompokkan sesuai konteks dan tujuan desain.',
+                                    'Informasi kunci dikembangkan menjadi Gagasan.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Mengolah gagasan konsep desain',
+                                'kuk' => [
+                                    'Gagasan dikembangkan menjadi beberapa alternatif sesuai design brief.',
+                                    'Alternatif gagasan divalidasi sesuai dengan tujuan desain.',
+                                    'Gagasan terpilih disusun menjadi konsep desain.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Mengkomunikasikan konsep desain dalam tim internal',
+                                'kuk' => [
+                                    'Metode komunikasi yang paling sesuai dipilih berdasarkan tujuan desain.',
+                                    'Aspek di dalam konsep desain dikembangkan sesuai dengan metode komunikasi terpilih.',
+                                    'Konsep desain diuraikan sesuai dengan tujuan desain dalam tim internal.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Menetapkan konsep desain dalam tim internal',
+                                'kuk' => [
+                                    'Umpan balik mengenai konsep desain oleh tim internal dihubungkan dengan tujuan desain.',
+                                    'Konsep desain dirumuskan sesuai perkembangan konsep di tim internal.',
+                                ]
+                            ],
                         ],
                     ],
                     [
-                        'kode'  => 'M.74100.009.02',
+                        'kode' => 'M.74100.009.02',
                         'judul' => 'Mengoperasikan Perangkat Lunak Desain',
                         'elemen' => [
-                            ['nama' => 'Memilih jenis perangkat lunak', 'kuk' => [
-                                'Perangkat lunak yang relevan digunakan dijelaskan sesuai jenis-jenis dan perbedaan utamanya.',
-                                'Manfaat, karakter, keunggulan dan kekurangan dari tiap jenis perangkat lunak yang digunakan diuraikan secara teoritis dan melalui contoh karya.',
-                                'Perangkat lunak dipilih sesuai kebutuhan.',
-                            ]],
-                            ['nama' => 'Menetapkan perangkat lunak', 'kuk' => [
-                                'Fasilitas dalam perangkat lunak digunakan secara optimal sesuai fungsinya.',
-                                'Perangkat lunak yang sesuai dimanfaatkan untuk menghasilkan karya desain yang produktif dan hasil kerja yang optimal.',
-                            ]],
+                            [
+                                'nama' => 'Memilih jenis perangkat lunak',
+                                'kuk' => [
+                                    'Perangkat lunak yang relevan digunakan dijelaskan sesuai jenis-jenis dan perbedaan utamanya.',
+                                    'Manfaat, karakter, keunggulan dan kekurangan dari tiap jenis perangkat lunak yang digunakan diuraikan secara teoritis dan melalui contoh karya.',
+                                    'Perangkat lunak dipilih sesuai kebutuhan.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Menetapkan perangkat lunak',
+                                'kuk' => [
+                                    'Fasilitas dalam perangkat lunak digunakan secara optimal sesuai fungsinya.',
+                                    'Perangkat lunak yang sesuai dimanfaatkan untuk menghasilkan karya desain yang produktif dan hasil kerja yang optimal.',
+                                ]
+                            ],
                         ],
                     ],
                     [
-                        'kode'  => 'M.74100.010.01',
+                        'kode' => 'M.74100.010.01',
                         'judul' => 'Menciptakan Karya Desain',
                         'elemen' => [
-                            ['nama' => 'Mengidentifikasi design brief atau project brief', 'kuk' => [
-                                'Kata kunci yang berkaitan dengan data-data awal dan kebutuhan mood/karakter visual ditetapkan melalui proses brainstorming.',
-                                'Konsep desain ditentukan berdasarkan kata-kata kunci.',
-                                'Karakter/mood visual dikembangkan sesuai arahan dari konsep desain.',
-                            ]],
-                            ['nama' => 'Membuat sketsa karya desain', 'kuk' => [
-                                'Sketsa thumbnail dikembangkan sesuai konsep kreatif yang telah ditentukan.',
-                                'Sketsa kasar dimodifikasi sesuai dengan sketsa thumbnail.',
-                                'Sketsa berwarna dikembangkan sesuai dengan sketsa kasar yang telah disesuaikan dengan design brief.',
-                            ]],
-                            ['nama' => 'Mengembangkan wujud karya desain', 'kuk' => [
-                                'Media karya desain ditentukan sesuai kebutuhan atau pesan yang ingin disampaikan.',
-                                'Elemen visualisasi karya desain ditentukan sesuai objektif pada project brief.',
-                                'Komposisi elemen visual/layout karya desain ditentukan sesuai dengan prinsip desain dan objektif.',
-                                'Alternatif/variasi karya desain dikembangkan agar melengkapi kemungkinan pencapaian konsep yang strategis.',
-                            ]],
-                            ['nama' => 'Mendiskusikan wujud karya desain', 'kuk' => [
-                                'Alternatif wujud karya desain didiskusikan kesesuaiannya dengan konsep desain.',
-                                'Karya desain yang akan dijadikan purwarupa/dummy ditentukan sesuai hasil diskusi wujud karya desain.',
-                            ]],
+                            [
+                                'nama' => 'Mengidentifikasi design brief atau project brief',
+                                'kuk' => [
+                                    'Kata kunci yang berkaitan dengan data-data awal dan kebutuhan mood/karakter visual ditetapkan melalui proses brainstorming.',
+                                    'Konsep desain ditentukan berdasarkan kata-kata kunci.',
+                                    'Karakter/mood visual dikembangkan sesuai arahan dari konsep desain.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Membuat sketsa karya desain',
+                                'kuk' => [
+                                    'Sketsa thumbnail dikembangkan sesuai konsep kreatif yang telah ditentukan.',
+                                    'Sketsa kasar dimodifikasi sesuai dengan sketsa thumbnail.',
+                                    'Sketsa berwarna dikembangkan sesuai dengan sketsa kasar yang telah disesuaikan dengan design brief.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Mengembangkan wujud karya desain',
+                                'kuk' => [
+                                    'Media karya desain ditentukan sesuai kebutuhan atau pesan yang ingin disampaikan.',
+                                    'Elemen visualisasi karya desain ditentukan sesuai objektif pada project brief.',
+                                    'Komposisi elemen visual/layout karya desain ditentukan sesuai dengan prinsip desain dan objektif.',
+                                    'Alternatif/variasi karya desain dikembangkan agar melengkapi kemungkinan pencapaian konsep yang strategis.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Mendiskusikan wujud karya desain',
+                                'kuk' => [
+                                    'Alternatif wujud karya desain didiskusikan kesesuaiannya dengan konsep desain.',
+                                    'Karya desain yang akan dijadikan purwarupa/dummy ditentukan sesuai hasil diskusi wujud karya desain.',
+                                ]
+                            ],
                         ],
                     ],
                     [
-                        'kode'  => 'M.74100.011.02',
+                        'kode' => 'M.74100.011.02',
                         'judul' => 'Mengevaluasi Hasil Karya Desain',
                         'elemen' => [
-                            ['nama' => 'Membandingkan karya-karya desain yang ada', 'kuk' => [
-                                'Keunggulan/keberhasilan masing-masing karya desain diidentifikasikan secara jelas dan selengkap-lengkapnya berdasarkan pengetahuan desain dan referensi terkait.',
-                                'Kelemahan/kekurangan masing-masing karya desain diidentifikasikan secara jelas dan selengkap-lengkapnya berdasarkan pengetahuan desain dan referensi terkait.',
-                                'Hasil perbandingan desain secara objektif ditimbang kembali untuk menemukan solusi yang paling sesuai dengan design brief.',
-                                'Hasil pertimbangan dikonfirmasi kembali sesuai project brief.',
-                                'Karya yang memenuhi kriteria design brief dipersiapkan untuk dipresentasikan.',
-                            ]],
+                            [
+                                'nama' => 'Membandingkan karya-karya desain yang ada',
+                                'kuk' => [
+                                    'Keunggulan/keberhasilan masing-masing karya desain diidentifikasikan secara jelas dan selengkap-lengkapnya berdasarkan pengetahuan desain dan referensi terkait.',
+                                    'Kelemahan/kekurangan masing-masing karya desain diidentifikasikan secara jelas dan selengkap-lengkapnya berdasarkan pengetahuan desain dan referensi terkait.',
+                                    'Hasil perbandingan desain secara objektif ditimbang kembali untuk menemukan solusi yang paling sesuai dengan design brief.',
+                                    'Hasil pertimbangan dikonfirmasi kembali sesuai project brief.',
+                                    'Karya yang memenuhi kriteria design brief dipersiapkan untuk dipresentasikan.',
+                                ]
+                            ],
                         ],
                     ],
                     [
-                        'kode'  => 'M.74100.012.02',
+                        'kode' => 'M.74100.012.02',
                         'judul' => 'Mempresentasikan Karya Desain',
                         'elemen' => [
-                            ['nama' => 'Menggunakan teori desain grafis dalam memaparkan atau mengidentifikasi konsep desain', 'kuk' => [
-                                'Pendekatan kreatif serta segala proses dalam pencapaian hasil akhir desain disajikan secara proporsional dan pada tempatnya dan melalui progres yang berkesinambungan.',
-                                'Penggunaan media dalam karya rancangan dijelaskan sesuai dengan konsep desain.',
-                                'Penggunaan layout berikut elemennya dalam karya rancangan dijelaskan sesuai dengan konsep desain.',
-                                'Penggunaan tipografi dalam karya rancangan dijelaskan sesuai dengan konsep desain.',
-                                'Penggunaan warna dalam karya rancangan dijelaskan sesuai dengan konsep desain.',
-                            ]],
-                            ['nama' => 'Menggunakan teori komunikasi untuk mengidentifikasi komponen karya yang dipresentasikan', 'kuk' => [
-                                'Subyek penyampai pesan/klien beserta kompetitornya diidentifikasi sesuai konsep desain.',
-                                'Pesan-pesan melalui karya desain diuraikan secara rasional sesuai konsep desain.',
-                                'Target atau sasaran komunikasi dijabarkan sesuai konsep desain.',
-                            ]],
-                            ['nama' => 'Menjabarkan tahapan-tahapan desain secara menyeluruh kepada klien', 'kuk' => [
-                                'Permasalahan dijelaskan secara lengkap.',
-                                'Konsep solusi kreatif dijelaskan secara obyektif dan detil.',
-                                'Eksekusi desain akhir sesuai konsep awal dijelaskan secara sistematis.',
-                            ]],
-                            ['nama' => 'Menampilkan presentasi visual', 'kuk' => [
-                                'Dokumentasi serta tahapan dari pengembangan dan hasil karya desain ditampilkan secara tertulis maupun lisan.',
-                                'Dummy atau purwarupa dipresentasikan dengan penjelasan secara lugas kepada klien.',
-                            ]],
+                            [
+                                'nama' => 'Menggunakan teori desain grafis dalam memaparkan atau mengidentifikasi konsep desain',
+                                'kuk' => [
+                                    'Pendekatan kreatif serta segala proses dalam pencapaian hasil akhir desain disajikan secara proporsional dan pada tempatnya dan melalui progres yang berkesinambungan.',
+                                    'Penggunaan media dalam karya rancangan dijelaskan sesuai dengan konsep desain.',
+                                    'Penggunaan layout berikut elemennya dalam karya rancangan dijelaskan sesuai dengan konsep desain.',
+                                    'Penggunaan tipografi dalam karya rancangan dijelaskan sesuai dengan konsep desain.',
+                                    'Penggunaan warna dalam karya rancangan dijelaskan sesuai dengan konsep desain.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Menggunakan teori komunikasi untuk mengidentifikasi komponen karya yang dipresentasikan',
+                                'kuk' => [
+                                    'Subyek penyampai pesan/klien beserta kompetitornya diidentifikasi sesuai konsep desain.',
+                                    'Pesan-pesan melalui karya desain diuraikan secara rasional sesuai konsep desain.',
+                                    'Target atau sasaran komunikasi dijabarkan sesuai konsep desain.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Menjabarkan tahapan-tahapan desain secara menyeluruh kepada klien',
+                                'kuk' => [
+                                    'Permasalahan dijelaskan secara lengkap.',
+                                    'Konsep solusi kreatif dijelaskan secara obyektif dan detil.',
+                                    'Eksekusi desain akhir sesuai konsep awal dijelaskan secara sistematis.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Menampilkan presentasi visual',
+                                'kuk' => [
+                                    'Dokumentasi serta tahapan dari pengembangan dan hasil karya desain ditampilkan secara tertulis maupun lisan.',
+                                    'Dummy atau purwarupa dipresentasikan dengan penjelasan secara lugas kepada klien.',
+                                ]
+                            ],
                         ],
                     ],
                 ],
@@ -637,22 +745,28 @@ Route::get('/ia01/preview', function () {
 
             // ─── KP 4 ───────────────────────────────────────────
             [
-                'no'          => 4,
-                'nama'        => 'Menerapkan proses produksi',
+                'no' => 4,
+                'nama' => 'Menerapkan proses produksi',
                 'unit_offset' => 12,
-                'unit'        => [
+                'unit' => [
                     [
-                        'kode'  => 'M.74100.013.02',
+                        'kode' => 'M.74100.013.02',
                         'judul' => 'Membuat Materi Siap Produksi',
                         'elemen' => [
-                            ['nama' => 'Menerjemahkan desain akhir menjadi materi siap produksi', 'kuk' => [
-                                'Format materi siap produksi ditentukan sesuai dengan kebutuhan produksi.',
-                                'Materi siap produksi dibuat dengan menggunakan teknik dan cara yang sesuai dengan kebutuhan produksi.',
-                            ]],
-                            ['nama' => 'Memastikan materi siap produksi', 'kuk' => [
-                                'Isi materi siap produksi diperiksa kembali agar seluruh informasi di dalamnya dan kualitas tampilannya sesuai dengan kebutuhan proyek.',
-                                'Materi siap produksi ditetapkan menjadi bersifat akhir sesuai persetujuan klien.',
-                            ]],
+                            [
+                                'nama' => 'Menerjemahkan desain akhir menjadi materi siap produksi',
+                                'kuk' => [
+                                    'Format materi siap produksi ditentukan sesuai dengan kebutuhan produksi.',
+                                    'Materi siap produksi dibuat dengan menggunakan teknik dan cara yang sesuai dengan kebutuhan produksi.',
+                                ]
+                            ],
+                            [
+                                'nama' => 'Memastikan materi siap produksi',
+                                'kuk' => [
+                                    'Isi materi siap produksi diperiksa kembali agar seluruh informasi di dalamnya dan kualitas tampilannya sesuai dengan kebutuhan proyek.',
+                                    'Materi siap produksi ditetapkan menjadi bersifat akhir sesuai persetujuan klien.',
+                                ]
+                            ],
                         ],
                     ],
                 ],
@@ -669,16 +783,16 @@ Route::get('/ia01/preview', function () {
 
 Route::get('/ia02/preview', function () {
     $data = [
-        'nama_skema'  => 'AHLI DESAIN GRAFIS',
-        'kode_skema'  => 'SUK-SKS-REV1-L007',
-        'tuk'         => 'Sewaktu/Tempat Kerja/Mandiri',
+        'nama_skema' => 'AHLI DESAIN GRAFIS',
+        'kode_skema' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
         'nama_asesor' => '',
-        'nama_asesi'  => '',
-        'tanggal'     => '',
+        'nama_asesi' => '',
+        'tanggal' => '',
 
         'kelompok_pekerjaan' => [
             [
-                'no'   => 1,
+                'no' => 1,
                 'nama' => 'Menerapkan pengetahuan tentang desain',
                 'unit' => [
                     ['kode' => 'M.74100.001.02', 'judul' => 'Mengaplikasikan Prinsip Dasar Desain'],
@@ -688,7 +802,7 @@ Route::get('/ia02/preview', function () {
                 'perlengkapan' => ['A', 'B', 'C', 'Dst'],
             ],
             [
-                'no'   => 2,
+                'no' => 2,
                 'nama' => 'Menentukan obyektif dari program desain',
                 'unit' => [
                     ['kode' => 'M.74100.004.02', 'judul' => 'Menerapkan Project Brief'],
@@ -698,7 +812,7 @@ Route::get('/ia02/preview', function () {
                 'perlengkapan' => ['A', 'B', 'C', 'Dst'],
             ],
             [
-                'no'   => 3,
+                'no' => 3,
                 'nama' => 'Menerapkan proses desain',
                 'unit' => [
                     ['kode' => 'M.74100.007.01', 'judul' => 'Menerapkan strategi Desain'],
@@ -711,7 +825,7 @@ Route::get('/ia02/preview', function () {
                 'perlengkapan' => ['A', 'B', 'C', 'Dst'],
             ],
             [
-                'no'   => 4,
+                'no' => 4,
                 'nama' => 'Menerapkan proses produksi',
                 'unit' => [
                     ['kode' => 'M.74100.013.02', 'judul' => 'Membuat Materi Siap Produksi'],
@@ -720,7 +834,7 @@ Route::get('/ia02/preview', function () {
             ],
         ],
 
-        'penyusun'  => [
+        'penyusun' => [
             ['nama' => '', 'nomor_met' => ''],
             ['nama' => '', 'nomor_met' => ''],
         ],
@@ -738,16 +852,16 @@ Route::get('/ia02/preview', function () {
 
 Route::get('/ia03/preview', function () {
     $data = [
-        'judul'       => 'AHLI DESAIN GRAFIS',
-        'nomor'       => 'SUK-SKS-REV1-L007',
-        'tuk'         => 'Sewaktu/Tempat Kerja/Mandiri',
+        'judul' => 'AHLI DESAIN GRAFIS',
+        'nomor' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
         'nama_asesor' => '',
-        'nama_asesi'  => '',
-        'tanggal'     => '',
+        'nama_asesi' => '',
+        'tanggal' => '',
 
         'kelompok' => [
             [
-                'no'   => 1,
+                'no' => 1,
                 'nama' => 'Menerapkan pengetahuan tentang desain',
                 'units' => [
                     ['no' => 1, 'kode' => 'M.74100.001.02', 'judul' => 'Mengaplikasikan Prinsip Dasar Desain'],
@@ -761,7 +875,7 @@ Route::get('/ia03/preview', function () {
                 ],
             ],
             [
-                'no'   => 2,
+                'no' => 2,
                 'nama' => 'Menentukan obyektif dari program desain',
                 'units' => [
                     ['no' => 1, 'kode' => 'M.74100.004.02', 'judul' => 'Menerapkan Project Brief'],
@@ -775,7 +889,7 @@ Route::get('/ia03/preview', function () {
                 ],
             ],
             [
-                'no'   => 3,
+                'no' => 3,
                 'nama' => 'Menerapkan proses desain',
                 'units' => [
                     ['no' => 1, 'kode' => 'M.74100.007.01', 'judul' => 'Menerapkan strategi Desain'],
@@ -792,7 +906,7 @@ Route::get('/ia03/preview', function () {
                 ],
             ],
             [
-                'no'   => 4,
+                'no' => 4,
                 'nama' => 'Menerapkan proses produksi',
                 'units' => [
                     ['no' => 1, 'kode' => 'M.74100.013.02', 'judul' => 'Membuat Materi Siap Produksi'],
@@ -805,11 +919,11 @@ Route::get('/ia03/preview', function () {
             ],
         ],
 
-        'umpan_balik'        => '',
-        'asesi_nama'         => '',
-        'asesi_ttd_tanggal'  => '',
-        'asesor_nama'        => '',
-        'asesor_no_reg'      => '',
+        'umpan_balik' => '',
+        'asesi_nama' => '',
+        'asesi_ttd_tanggal' => '',
+        'asesor_nama' => '',
+        'asesor_no_reg' => '',
         'asesor_ttd_tanggal' => '',
     ];
 
@@ -821,44 +935,44 @@ Route::get('/ia03/preview', function () {
 
 Route::get('/ia04a/preview', function () {
     $data = [
-        'judul'       => 'AHLI DESAIN GRAFIS',
-        'nomor'       => 'SUK-SKS-REV1-L007',
-        'tuk'         => 'Sewaktu/Tempat Kerja/Mandiri',
+        'judul' => 'AHLI DESAIN GRAFIS',
+        'nomor' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
         'nama_asesor' => '',
-        'nama_asesi'  => '',
-        'tanggal'     => '',
+        'nama_asesi' => '',
+        'tanggal' => '',
 
         'kelompok' => [
             [
-                'no'   => 1,
+                'no' => 1,
                 'nama' => 'Menerapkan pengetahuan tentang desain',
                 'units' => [
                     ['no' => 1, 'kode' => 'M.74100.001.02', 'judul' => 'Mengaplikasikan Prinsip Dasar Desain'],
                     ['no' => 2, 'kode' => 'M.74100.002.02', 'judul' => 'Menerapkan Prinsip Dasar Komunikasi'],
                     ['no' => 3, 'kode' => 'M.74100.003.02', 'judul' => 'Menerapkan Pengetahuan Dasar Desain'],
                 ],
-                'skenario'          => '',
-                'waktu_skenario'    => '',
-                'hasil'             => '',
-                'waktu_hasil'       => '',
-                'umpan_balik'       => '',
+                'skenario' => '',
+                'waktu_skenario' => '',
+                'hasil' => '',
+                'waktu_hasil' => '',
+                'umpan_balik' => '',
             ],
             [
-                'no'   => 2,
+                'no' => 2,
                 'nama' => 'Menentukan obyektif dari program desain',
                 'units' => [
                     ['no' => 1, 'kode' => 'M.74100.004.02', 'judul' => 'Menerapkan Project Brief'],
                     ['no' => 2, 'kode' => 'M.74100.005.02', 'judul' => 'Menerapkan Design Brief'],
                     ['no' => 3, 'kode' => 'M.74100.006.01', 'judul' => 'Mengorganisasikan Informasi Terkait Proyek Desain'],
                 ],
-                'skenario'          => '',
-                'waktu_skenario'    => '',
-                'hasil'             => '',
-                'waktu_hasil'       => '',
-                'umpan_balik'       => '',
+                'skenario' => '',
+                'waktu_skenario' => '',
+                'hasil' => '',
+                'waktu_hasil' => '',
+                'umpan_balik' => '',
             ],
             [
-                'no'   => 3,
+                'no' => 3,
                 'nama' => 'Menerapkan proses desain',
                 'units' => [
                     ['no' => 1, 'kode' => 'M.74100.007.01', 'judul' => 'Menerapkan strategi Desain'],
@@ -868,23 +982,23 @@ Route::get('/ia04a/preview', function () {
                     ['no' => 5, 'kode' => 'M.74100.011.02', 'judul' => 'Mengevaluasi Hasil Karya Desain'],
                     ['no' => 6, 'kode' => 'M.74100.012.02', 'judul' => 'Mempresentasikan Karya Desain'],
                 ],
-                'skenario'          => '',
-                'waktu_skenario'    => '',
-                'hasil'             => '',
-                'waktu_hasil'       => '',
-                'umpan_balik'       => '',
+                'skenario' => '',
+                'waktu_skenario' => '',
+                'hasil' => '',
+                'waktu_hasil' => '',
+                'umpan_balik' => '',
             ],
             [
-                'no'   => 4,
+                'no' => 4,
                 'nama' => 'Menerapkan proses produksi',
                 'units' => [
                     ['no' => 1, 'kode' => 'M.74100.013.02', 'judul' => 'Membuat Materi Siap Produksi'],
                 ],
-                'skenario'          => '',
-                'waktu_skenario'    => '',
-                'hasil'             => '',
-                'waktu_hasil'       => '',
-                'umpan_balik'       => '',
+                'skenario' => '',
+                'waktu_skenario' => '',
+                'hasil' => '',
+                'waktu_hasil' => '',
+                'umpan_balik' => '',
             ],
         ],
 
@@ -906,37 +1020,37 @@ Route::get('/ia04a/preview', function () {
 
 Route::get('/ia04b/preview', function () {
     $data = [
-        'judul'                    => 'AHLI DESAIN GRAFIS',
-        'nomor'                    => 'SUK-SKS-REV1-L007',
-        'tuk'                      => 'Sewaktu/Tempat Kerja/Mandiri',
+        'judul' => 'AHLI DESAIN GRAFIS',
+        'nomor' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
         'judul_kegiatan_terstruktur' => '',
-        'nama_asesor'              => '',
-        'nama_asesi'               => '',
-        'tanggal'                  => '',
+        'nama_asesor' => '',
+        'nama_asesi' => '',
+        'tanggal' => '',
 
         'aspek_penilaian' => [
             [
-                'lingkup'        => '',
-                'pertanyaan'     => "",
-                'kesesuaian'     => "",
+                'lingkup' => '',
+                'pertanyaan' => "",
+                'kesesuaian' => "",
             ],
             [
-                'lingkup'    => '',
+                'lingkup' => '',
                 'pertanyaan' => '',
                 'kesesuaian' => '',
             ],
             [
-                'lingkup'    => '',
+                'lingkup' => '',
                 'pertanyaan' => '',
                 'kesesuaian' => '',
             ],
             [
-                'lingkup'    => '',
+                'lingkup' => '',
                 'pertanyaan' => '',
                 'kesesuaian' => '',
             ],
             [
-                'lingkup'    => 'dst.',
+                'lingkup' => 'dst.',
                 'pertanyaan' => '',
                 'kesesuaian' => '',
             ],
@@ -960,30 +1074,30 @@ Route::get('/ia04b/preview', function () {
 
 Route::get('/ia05a/preview', function () {
     $data = [
-        'judul'       => 'AHLI DESAIN GRAFIS',
-        'nomor'       => 'SUK-SKS-REV1-L007',
-        'tuk'         => 'Sewaktu/Tempat Kerja/Mandiri',
+        'judul' => 'AHLI DESAIN GRAFIS',
+        'nomor' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
         'nama_asesor' => '',
-        'nama_asesi'  => '',
-        'tanggal'     => '',
-        'waktu'       => '',
+        'nama_asesi' => '',
+        'tanggal' => '',
+        'waktu' => '',
 
         // Setiap soal punya pertanyaan + 4 pilihan (a,b,c,d)
         'soal' => [
             [
-                'no'        => 1,
-                'pertanyaan'=> '',
-                'pilihan'   => ['a' => '', 'b' => '', 'c' => '', 'd' => ''],
+                'no' => 1,
+                'pertanyaan' => '',
+                'pilihan' => ['a' => '', 'b' => '', 'c' => '', 'd' => ''],
             ],
             [
-                'no'        => 2,
-                'pertanyaan'=> '',
-                'pilihan'   => ['a' => '', 'b' => '', 'c' => '', 'd' => ''],
+                'no' => 2,
+                'pertanyaan' => '',
+                'pilihan' => ['a' => '', 'b' => '', 'c' => '', 'd' => ''],
             ],
             [
-                'no'        => 3,
-                'pertanyaan'=> '',
-                'pilihan'   => ['a' => '', 'b' => '', 'c' => '', 'd' => ''],
+                'no' => 3,
+                'pertanyaan' => '',
+                'pilihan' => ['a' => '', 'b' => '', 'c' => '', 'd' => ''],
             ],
         ],
 
@@ -1005,40 +1119,40 @@ Route::get('/ia05a/preview', function () {
 
 Route::get('/ia05b/preview', function () {
     $data = [
-        'judul'  => 'AHLI DESAIN GRAFIS',
-        'nomor'  => 'SUK-SKS-REV1-L007',
-        'tuk'    => 'Sewaktu/Tempat Kerja/Mandiri',
+        'judul' => 'AHLI DESAIN GRAFIS',
+        'nomor' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
 
         'kelompok' => [
             [
-                'nama'  => 'Menerapkan pengetahuan tentang desain',
+                'nama' => 'Menerapkan pengetahuan tentang desain',
                 'units' => [
-                    ['no' => 1,  'kode' => 'M.74100.001.02', 'judul' => 'Mengaplikasikan Prinsip Dasar Desain'],
-                    ['no' => 2,  'kode' => 'M.74100.002.02', 'judul' => 'Menerapkan Prinsip Dasar Komunikasi'],
-                    ['no' => 3,  'kode' => 'M.74100.003.02', 'judul' => 'Menerapkan Pengetahuan Dasar Desain'],
+                    ['no' => 1, 'kode' => 'M.74100.001.02', 'judul' => 'Mengaplikasikan Prinsip Dasar Desain'],
+                    ['no' => 2, 'kode' => 'M.74100.002.02', 'judul' => 'Menerapkan Prinsip Dasar Komunikasi'],
+                    ['no' => 3, 'kode' => 'M.74100.003.02', 'judul' => 'Menerapkan Pengetahuan Dasar Desain'],
                 ],
             ],
             [
-                'nama'  => 'Menentukan obyektif dari program desain',
+                'nama' => 'Menentukan obyektif dari program desain',
                 'units' => [
-                    ['no' => 4,  'kode' => 'M.74100.004.02', 'judul' => 'Menerapkan Project Brief'],
-                    ['no' => 5,  'kode' => 'M.74100.005.02', 'judul' => 'Menerapkan Design Brief'],
-                    ['no' => 6,  'kode' => 'M.74100.006.01', 'judul' => 'Mengorganisasikan Informasi Terkait Proyek Desain'],
+                    ['no' => 4, 'kode' => 'M.74100.004.02', 'judul' => 'Menerapkan Project Brief'],
+                    ['no' => 5, 'kode' => 'M.74100.005.02', 'judul' => 'Menerapkan Design Brief'],
+                    ['no' => 6, 'kode' => 'M.74100.006.01', 'judul' => 'Mengorganisasikan Informasi Terkait Proyek Desain'],
                 ],
             ],
             [
-                'nama'  => 'Menerapkan proses desain',
+                'nama' => 'Menerapkan proses desain',
                 'units' => [
-                    ['no' => 7,  'kode' => 'M.74100.007.01', 'judul' => 'Menerapkan strategi Desain'],
-                    ['no' => 8,  'kode' => 'M.74100.008.02', 'judul' => 'Menerapkan Konsep Design'],
-                    ['no' => 9,  'kode' => 'M.74100.009.02', 'judul' => 'Mengoperasikan Perangkat Lunak Desain'],
+                    ['no' => 7, 'kode' => 'M.74100.007.01', 'judul' => 'Menerapkan strategi Desain'],
+                    ['no' => 8, 'kode' => 'M.74100.008.02', 'judul' => 'Menerapkan Konsep Design'],
+                    ['no' => 9, 'kode' => 'M.74100.009.02', 'judul' => 'Mengoperasikan Perangkat Lunak Desain'],
                     ['no' => 10, 'kode' => 'M.74100.010.01', 'judul' => 'Menciptakan Karya Desain'],
                     ['no' => 11, 'kode' => 'M.74100.011.02', 'judul' => 'Mengevaluasi Hasil Karya Desain'],
                     ['no' => 12, 'kode' => 'M.74100.012.02', 'judul' => 'Mempresentasikan Karya Desain'],
                 ],
             ],
             [
-                'nama'  => 'Menerapkan proses produksi',
+                'nama' => 'Menerapkan proses produksi',
                 'units' => [
                     ['no' => 13, 'kode' => 'M.74100.013.02', 'judul' => 'Membuat Materi Siap Produksi'],
                 ],
@@ -1047,15 +1161,15 @@ Route::get('/ia05b/preview', function () {
 
         // Kunci jawaban nomor 1-9 + dst
         'kunci_jawaban' => [
-            ['no' => '1.',   'jawaban' => ''],
-            ['no' => '2.',   'jawaban' => ''],
-            ['no' => '3.',   'jawaban' => ''],
-            ['no' => '4.',   'jawaban' => ''],
-            ['no' => '5.',   'jawaban' => ''],
-            ['no' => '6.',   'jawaban' => ''],
-            ['no' => '7.',   'jawaban' => ''],
-            ['no' => '8.',   'jawaban' => ''],
-            ['no' => '9.',   'jawaban' => ''],
+            ['no' => '1.', 'jawaban' => ''],
+            ['no' => '2.', 'jawaban' => ''],
+            ['no' => '3.', 'jawaban' => ''],
+            ['no' => '4.', 'jawaban' => ''],
+            ['no' => '5.', 'jawaban' => ''],
+            ['no' => '6.', 'jawaban' => ''],
+            ['no' => '7.', 'jawaban' => ''],
+            ['no' => '8.', 'jawaban' => ''],
+            ['no' => '9.', 'jawaban' => ''],
             ['no' => 'Dst.', 'jawaban' => ''],
         ],
 
@@ -1077,38 +1191,38 @@ Route::get('/ia05b/preview', function () {
 
 Route::get('/ak02/preview', function () {
     $data = [
-        'judul'           => 'AHLI DESAIN GRAFIS',
-        'nomor'           => 'SUK-SKS-REV1-L007',
-        'tuk'             => 'Sewaktu/Tempat Kerja/Mandiri',
-        'nama_asesor'     => '',
-        'nama_asesi'      => '',
-        'tanggal_mulai'   => '',
+        'judul' => 'AHLI DESAIN GRAFIS',
+        'nomor' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
+        'nama_asesor' => '',
+        'nama_asesi' => '',
+        'tanggal_mulai' => '',
         'tanggal_selesai' => '',
 
         'unit_kompetensi' => [
-            ['no' => 1,  'judul' => 'Mengaplikasikan Prinsip Dasar Desain'],
-            ['no' => 2,  'judul' => 'Menerapkan Prinsip Dasar Komunikasi'],
-            ['no' => 3,  'judul' => 'Menerapkan Pengetahuan Dasar Desain'],
-            ['no' => 4,  'judul' => 'Menerapkan Project Brief'],
-            ['no' => 5,  'judul' => 'Menerapkan Design Brief'],
-            ['no' => 6,  'judul' => 'Mengorganisasikan Informasi Terkait Proyek Desain'],
-            ['no' => 7,  'judul' => 'Menerapkan strategi Desain'],
-            ['no' => 8,  'judul' => 'Menerapkan Konsep Design'],
-            ['no' => 9,  'judul' => 'Mengoperasikan Perangkat Lunak Desain'],
+            ['no' => 1, 'judul' => 'Mengaplikasikan Prinsip Dasar Desain'],
+            ['no' => 2, 'judul' => 'Menerapkan Prinsip Dasar Komunikasi'],
+            ['no' => 3, 'judul' => 'Menerapkan Pengetahuan Dasar Desain'],
+            ['no' => 4, 'judul' => 'Menerapkan Project Brief'],
+            ['no' => 5, 'judul' => 'Menerapkan Design Brief'],
+            ['no' => 6, 'judul' => 'Mengorganisasikan Informasi Terkait Proyek Desain'],
+            ['no' => 7, 'judul' => 'Menerapkan strategi Desain'],
+            ['no' => 8, 'judul' => 'Menerapkan Konsep Design'],
+            ['no' => 9, 'judul' => 'Mengoperasikan Perangkat Lunak Desain'],
             ['no' => 10, 'judul' => 'Menciptakan Karya Desain'],
             ['no' => 11, 'judul' => 'Mengevaluasi Hasil Karya Desain'],
             ['no' => 12, 'judul' => 'Mempresentasikan Karya Desain'],
             ['no' => 13, 'judul' => 'Membuat Materi Siap Produksi'],
         ],
 
-        'rekomendasi'          => '', // 'kompeten' atau 'belum_kompeten'
-        'tindak_lanjut'        => '',
-        'komentar_observasi'   => '',
+        'rekomendasi' => '', // 'kompeten' atau 'belum_kompeten'
+        'tindak_lanjut' => '',
+        'komentar_observasi' => '',
 
-        'asesi_nama'         => '',
-        'asesi_ttd_tanggal'  => '',
-        'asesor_nama'        => '',
-        'asesor_no_reg'      => '',
+        'asesi_nama' => '',
+        'asesi_ttd_tanggal' => '',
+        'asesor_nama' => '',
+        'asesor_no_reg' => '',
         'asesor_ttd_tanggal' => '',
     ];
 
@@ -1120,12 +1234,12 @@ Route::get('/ak02/preview', function () {
 
 Route::get('/ak03/preview', function () {
     $data = [
-        'judul'           => 'AHLI DESAIN GRAFIS',
-        'nomor'           => 'SUK-SKS-REV1-L007',
-        'tuk'             => 'Sewaktu/Tempat Kerja/Mandiri',
-        'nama_asesor'     => '',
-        'nama_asesi'      => '',
-        'tanggal_mulai'   => '',
+        'judul' => 'AHLI DESAIN GRAFIS',
+        'nomor' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
+        'nama_asesor' => '',
+        'nama_asesi' => '',
+        'tanggal_mulai' => '',
         'tanggal_selesai' => '',
 
         'komponen' => [
@@ -1141,11 +1255,11 @@ Route::get('/ak03/preview', function () {
             'Asesor menggunakan keterampilan komunikasi yang efektif selama asesmen',
         ],
 
-        'catatan_lainnya'    => '',
-        'asesi_nama'         => '',
-        'asesi_ttd_tanggal'  => '',
-        'asesor_nama'        => '',
-        'asesor_no_reg'      => '',
+        'catatan_lainnya' => '',
+        'asesi_nama' => '',
+        'asesi_ttd_tanggal' => '',
+        'asesor_nama' => '',
+        'asesor_no_reg' => '',
         'asesor_ttd_tanggal' => '',
     ];
 
@@ -1157,11 +1271,11 @@ Route::get('/ak03/preview', function () {
 
 Route::get('/ak05/preview', function () {
     $data = [
-        'judul'       => 'AHLI DESAIN GRAFIS',
-        'nomor'       => 'SUK-SKS-REV1-L007',
-        'tuk'         => 'Sewaktu/Tempat Kerja/Mandiri',
+        'judul' => 'AHLI DESAIN GRAFIS',
+        'nomor' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
         'nama_asesor' => '',
-        'tanggal'     => '',
+        'tanggal' => '',
 
         'asesi' => [
             ['no' => 1, 'nama' => '', 'keterangan' => ''],
@@ -1170,13 +1284,13 @@ Route::get('/ak05/preview', function () {
             ['no' => 4, 'nama' => '', 'keterangan' => ''],
         ],
 
-        'aspek_negatif_positif'      => '',
-        'pencatatan_penolakan'        => '',
-        'saran_perbaikan'             => '',
+        'aspek_negatif_positif' => '',
+        'pencatatan_penolakan' => '',
+        'saran_perbaikan' => '',
 
-        'catatan'          => '',
-        'asesor_nama'      => '',
-        'asesor_no_reg'    => '',
+        'catatan' => '',
+        'asesor_nama' => '',
+        'asesor_no_reg' => '',
         'asesor_ttd_tanggal' => '',
     ];
 
@@ -1188,21 +1302,21 @@ Route::get('/ak05/preview', function () {
 
 Route::get('/ak06/preview', function () {
     $data = [
-        'judul'       => 'AHLI DESAIN GRAFIS',
-        'nomor'       => 'SUK-SKS-REV1-L007',
-        'tuk'         => 'Sewaktu/Tempat Kerja/Mandiri',
+        'judul' => 'AHLI DESAIN GRAFIS',
+        'nomor' => 'SUK-SKS-REV1-L007',
+        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
         'nama_asesor' => '',
-        'tanggal'     => '',
+        'tanggal' => '',
 
         // Tabel 1: Kesesuaian dengan prinsip asesmen
         // Kolom: validitas, reliabel, fleksibel, adil
         // Baris "Keputusan asesmen" dan "Umpan balik asesmen" -> fleksibel di-disable (gelap)
         'prosedur_asesmen' => [
-            ['label' => 'Rencana asesmen',      'disabled' => []],
-            ['label' => 'Persiapan asesmen',     'disabled' => []],
-            ['label' => 'Implementasi asesmen',  'disabled' => []],
-            ['label' => 'Keputusan asesmen',     'disabled' => ['fleksibel']],
-            ['label' => 'Umpan balik asesmen',   'disabled' => ['fleksibel']],
+            ['label' => 'Rencana asesmen', 'disabled' => []],
+            ['label' => 'Persiapan asesmen', 'disabled' => []],
+            ['label' => 'Implementasi asesmen', 'disabled' => []],
+            ['label' => 'Keputusan asesmen', 'disabled' => ['fleksibel']],
+            ['label' => 'Umpan balik asesmen', 'disabled' => ['fleksibel']],
         ],
         'rekomendasi_prinsip' => '',
 
@@ -1210,8 +1324,8 @@ Route::get('/ak06/preview', function () {
         'rekomendasi_dimensi' => '',
 
         // Tabel 3: Lead Asesor/Asesor
-        'lead_asesor_nama'   => '',
-        'lead_asesor_ttd'    => '',
+        'lead_asesor_nama' => '',
+        'lead_asesor_ttd' => '',
         'lead_asesor_komentar' => '',
     ];
 
@@ -1223,80 +1337,80 @@ Route::get('/ak06/preview', function () {
 
 Route::get('/mkva/preview', function () {
     $data = [
-        'nama_skema'  => 'AHLI DESAIN GRAFIS',
+        'nama_skema' => 'AHLI DESAIN GRAFIS',
         'nomor_skema' => 'SUK-SKS-REV1-L007',
 
         'tim_validasi' => ['', '', ''],
-        'periode'      => '', // 'sebelum' | 'pada_saat' | 'setelah'
+        'periode' => '', // 'sebelum' | 'pada_saat' | 'setelah'
         'hari_tanggal' => '',
-        'tempat'       => '',
+        'tempat' => '',
 
         // Bagian 1 - Tujuan & Fokus Validasi (checkable)
         'tujuan_fokus' => [
             ['label' => 'Bagian dari Proses Penjaminan Mutu Organisasi', 'checked' => false],
-            ['label' => 'Mengantisipasi Risiko',                          'checked' => false],
-            ['label' => 'Memenuhi Persyaratan BNSP',                      'checked' => false],
-            ['label' => 'Memastikan Kesesuaian Bukti',                    'checked' => false],
-            ['label' => 'Meningkatkan Kualitas Asesmen',                  'checked' => false],
-            ['label' => 'Mengevaluasi Kualitas Perangkat Asesmen',        'checked' => false],
-            ['label' => '...',                                             'checked' => false],
+            ['label' => 'Mengantisipasi Risiko', 'checked' => false],
+            ['label' => 'Memenuhi Persyaratan BNSP', 'checked' => false],
+            ['label' => 'Memastikan Kesesuaian Bukti', 'checked' => false],
+            ['label' => 'Meningkatkan Kualitas Asesmen', 'checked' => false],
+            ['label' => 'Mengevaluasi Kualitas Perangkat Asesmen', 'checked' => false],
+            ['label' => '...', 'checked' => false],
         ],
 
         // Konteks Validasi
         'konteks_validasi' => [
-            ['label' => 'Internal Organisasi',                             'checked' => false],
-            ['label' => 'Eksternal Organisasi',                            'checked' => false],
-            ['label' => 'Proses Lisensi/ Re lisensi',                     'checked' => false],
-            ['label' => 'Dengan Kolega Asesor',                           'checked' => false],
-            ['label' => 'Kolega dari Organisasi Pelatihan atau Asesmen',  'checked' => false],
-            ['label' => '...',                                             'checked' => false],
-            ['label' => '...',                                             'checked' => false],
+            ['label' => 'Internal Organisasi', 'checked' => false],
+            ['label' => 'Eksternal Organisasi', 'checked' => false],
+            ['label' => 'Proses Lisensi/ Re lisensi', 'checked' => false],
+            ['label' => 'Dengan Kolega Asesor', 'checked' => false],
+            ['label' => 'Kolega dari Organisasi Pelatihan atau Asesmen', 'checked' => false],
+            ['label' => '...', 'checked' => false],
+            ['label' => '...', 'checked' => false],
         ],
 
         // Pendekatan Validasi
         'pendekatan_validasi' => [
-            ['label' => 'Panel asesmen',                                           'checked' => false],
-            ['label' => 'Pertemuan moderasi',                                      'checked' => false],
-            ['label' => 'Mengkaji perangkat asesmen',                              'checked' => false],
-            ['label' => 'Acuan pembanding',                                        'checked' => false],
-            ['label' => 'Pengujian lapangan dan uji coba perangkat asesmen',       'checked' => false],
-            ['label' => 'Umpan balik dari klien',                                  'checked' => false],
-            ['label' => 'Mengkaji bukti-bukti',                                    'checked' => false],
+            ['label' => 'Panel asesmen', 'checked' => false],
+            ['label' => 'Pertemuan moderasi', 'checked' => false],
+            ['label' => 'Mengkaji perangkat asesmen', 'checked' => false],
+            ['label' => 'Acuan pembanding', 'checked' => false],
+            ['label' => 'Pengujian lapangan dan uji coba perangkat asesmen', 'checked' => false],
+            ['label' => 'Umpan balik dari klien', 'checked' => false],
+            ['label' => 'Mengkaji bukti-bukti', 'checked' => false],
         ],
 
         // Orang yang Relevan
         'orang_relevan' => [
             ['label' => 'Asesor Kompetensi (wajib)', 'nama' => '', 'hasil' => '', 'checked' => false],
-            ['label' => 'Lead Asesor [Ketua TUK]',   'nama' => '', 'hasil' => '', 'checked' => false],
-            ['label' => 'Manager, Supervisor',        'nama' => '', 'hasil' => '', 'checked' => false],
-            ['label' => 'Tenaga Ahli di bidangnya',   'nama' => '', 'hasil' => '', 'checked' => false],
-            ['label' => 'Koordinator Pelatihan',      'nama' => '', 'hasil' => '', 'checked' => false],
+            ['label' => 'Lead Asesor [Ketua TUK]', 'nama' => '', 'hasil' => '', 'checked' => false],
+            ['label' => 'Manager, Supervisor', 'nama' => '', 'hasil' => '', 'checked' => false],
+            ['label' => 'Tenaga Ahli di bidangnya', 'nama' => '', 'hasil' => '', 'checked' => false],
+            ['label' => 'Koordinator Pelatihan', 'nama' => '', 'hasil' => '', 'checked' => false],
             ['label' => 'Anggota Asosiasi Industry Profesi', 'nama' => '', 'hasil' => '', 'checked' => false],
         ],
 
         // Acuan Pembanding
         'acuan_pembanding' => [
             ['label' => 'Standar Kompetensi (SKKNI/SKKK/SKI)', 'checked' => false],
-            ['label' => 'Skema Sertifikasi',                    'checked' => false],
-            ['label' => 'SOP/IK',                               'checked' => false],
-            ['label' => 'Manual Instruction / Book Manual',     'checked' => false],
-            ['label' => 'Standar Kinerja',                      'checked' => false],
-            ['label' => '...',                                   'checked' => false],
+            ['label' => 'Skema Sertifikasi', 'checked' => false],
+            ['label' => 'SOP/IK', 'checked' => false],
+            ['label' => 'Manual Instruction / Book Manual', 'checked' => false],
+            ['label' => 'Standar Kinerja', 'checked' => false],
+            ['label' => '...', 'checked' => false],
         ],
 
         // Dokumen Terkait
         'dokumen_terkait' => [
-            ['label' => 'Perangkat Asesmen',         'checked' => false],
-            ['label' => 'Peraturan / Pedoman',        'checked' => false],
-            ['label' => 'Bukti-bukti hasil asesmen',  'checked' => false],
-            ['label' => '...',                         'checked' => false],
+            ['label' => 'Perangkat Asesmen', 'checked' => false],
+            ['label' => 'Peraturan / Pedoman', 'checked' => false],
+            ['label' => 'Bukti-bukti hasil asesmen', 'checked' => false],
+            ['label' => '...', 'checked' => false],
         ],
 
         // Bagian 2 - Keterampilan komunikasi
         'komunikasi' => [
-            ['label' => 'PRO AKTIF',        'checked' => false],
+            ['label' => 'PRO AKTIF', 'checked' => false],
             ['label' => 'ACTIVE LISTENING', 'checked' => false],
-            ['label' => 'Empasi',           'checked' => false],
+            ['label' => 'Empasi', 'checked' => false],
         ],
 
         // Aspek Dalam Kegiatan Validasi

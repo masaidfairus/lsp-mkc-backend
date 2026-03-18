@@ -88,18 +88,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(PeerValidation::class, 'peer_assessor_id', 'id');
     }
 
-    public function evidence()
+    public function userFile()
     {
-        return $this->hasMany(Apl01Evidence::class);
+        return $this->hasMany(FileProfile::class, 'user_id', 'id');
     }
 
-    public function portfolios()
+    public function adminFileValidation()
     {
-        return $this->hasMany(Portfolio::class);
-    }
-
-    public function portfolioTypes()
-    {
-        return $this->hasMany(PortfolioType::class);
+        return $this->hasMany(FileProfile::class, 'verified_by', 'id');
     }
 }

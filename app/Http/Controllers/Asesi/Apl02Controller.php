@@ -8,7 +8,8 @@ use App\Enums\Apl02Status;
 use App\Enums\PaymentStatus;
 use App\Models\Apl02Portfolio;
 use App\Models\AssessmentRegistration;
-use App\Models\Portfolio;
+use App\Models\FileProfile;
+use App\Models\PortfolioScheme;
 use App\Models\SelfAssessment;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -39,22 +40,22 @@ class Apl02Controller extends Controller
             'competencyUnits.competencyElements.performanceCriteria'
         ]);
 
-        $portfolios = Portfolio::where('user_id', request()->user()->id)
-            ->where(function ($q) use ($registration) {
-                $q->where('scheme_id', $registration->scheme_id)
-                    ->orWhereNull('scheme_id');
-            })
+        $validListIds = PortfolioScheme::where('scheme_id', $registration->scheme_id)
+            ->pluck('list_id')
+            ->toArray();
+
+        $portfolios = FileProfile::where('user_id', request()->user()->id)
+            ->whereIn('list_id', $validListIds)
+            ->with('documentList')
             ->get()
-            ->map(function ($portfolio) use ($registration) {
+            ->map(function ($f) use ($registration) {
                 $apl02Portfolio = Apl02Portfolio::where([
                     'registration_id' => $registration->id,
-                    'portfolio_id' => $portfolio->id,
+                    'file_profile_id' => $f->id,
                 ])->first();
 
-                $portfolio->is_active = $apl02Portfolio
-                    ? $apl02Portfolio->is_active
-                    : true;
-                return $portfolio;
+                $f->is_active = $apl02Portfolio ? $apl02Portfolio->is_active : true;
+                return $f;
             });
 
         return $this->successResponse([
@@ -91,30 +92,11 @@ class Apl02Controller extends Controller
         $validated = $request->validate([
             'is_declared' => ['required', 'accepted'],
             'portfolio_ids' => ['nullable', 'array'],
-            'portfolio_ids.*' => ['integer', 'exists:portfolios,id'],
+            'portfolio_ids.*' => ['integer', 'exists:file_profiles,id'],
             'answers' => ['required', 'array', 'min:1'],
             'answers.*.element_id' => ['required', 'integer'],
             'answers.*.is_competent' => ['required', 'boolean'],
         ]);
-
-        Apl02Portfolio::where('registration_id', $registration->id)->delete();
-        foreach ($validated['portfolio_ids'] as $pid) {
-            Apl02Portfolio::create([
-                'registration_id' => $registration->id,
-                'portfolio_id' => $pid,
-                'is_active' => true,
-            ]);
-        }
-
-        foreach ($validated['answers'] as $answer) {
-            SelfAssessment::updateOrCreate(
-                [
-                    'registration_id' => $registration->id,
-                    'element_id' => $answer['element_id']
-                ],
-                ['is_competent' => $answer['is_competent']]
-            );
-        }
 
         $validElementIds = $registration->scheme
             ->competencyUnits()
@@ -138,11 +120,19 @@ class Apl02Controller extends Controller
         }
 
         DB::transaction(function () use ($validated, $registration) {
+            Apl02Portfolio::where('registration_id', $registration->id)->delete();
+            foreach ($validated['portfolio_ids'] ?? [] as $fileProfileId) {
+                Apl02Portfolio::create([
+                    'registration_id' => $registration->id,
+                    'file_profile_id' => $fileProfileId,
+                    'is_active' => true,
+                ]);
+            }
+
             $rows = array_map(fn($answer) => [
                 'registration_id' => $registration->id,
                 'element_id' => $answer['element_id'],
                 'is_competent' => $answer['is_competent'],
-                'portfolio_ids' => json_encode($answer['portfolio_ids'] ?? []),
                 'created_at' => now(),
                 'updated_at' => now(),
             ], $validated['answers']);
@@ -150,7 +140,7 @@ class Apl02Controller extends Controller
             SelfAssessment::upsert(
                 $rows,
                 ['registration_id', 'element_id'],
-                ['is_competent', 'portfolio_ids', 'updated_at']
+                ['is_competent', 'updated_at']
             );
 
             $registration->update(['status_apl02' => Apl02Status::SUBMITTED]);
@@ -160,5 +150,29 @@ class Apl02Controller extends Controller
             ['total_answers' => count($validated['answers'])],
             'APL.02 berhasil disubmit.'
         );
+    }
+
+    public function toogleActive(Request $request, AssessmentRegistration $registration)
+    {
+        if ($registration->user_id !== $request->user()->id) {
+            return $this->errorResponse('E1005', 403);
+        }
+
+        $validated = $request->validate([
+            "file_profile_id" => ['required', 'integer'],
+            "is_active" => ['required', 'boolean'],
+        ]);
+
+        $updated = Apl02Portfolio::where('registration_id', $registration->id)
+            ->where('file_profile_id', $validated['file_profile_id'])
+            ->update([
+                'is_active' => $validated['is_active']
+            ]);
+
+        if (!$updated) {
+            return $this->errorResponse('E2016', 404);
+        }
+
+        return $this->successResponse([], 'Status berhasil diperbarui');
     }
 }

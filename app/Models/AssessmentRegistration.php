@@ -39,11 +39,6 @@ class AssessmentRegistration extends Model
         return $this->belongsTo(Scheme::class, 'scheme_id');
     }
 
-    public function evidence()
-    {
-        return $this->hasMany(Apl01Evidence::class, 'registration_id');
-    }
-
     public function evaluations()
     {
         return $this->hasMany(AssessorEvaluation::class);
@@ -67,16 +62,6 @@ class AssessmentRegistration extends Model
     public function appeals()
     {
         return $this->hasMany(Appeal::class);
-    }
-
-    public function apl02Portolio()
-    {
-        return $this->hasMany(Apl02Portfolio::class);
-    }
-
-    public function adminEvidence()
-    {
-        return $this->hasMany(AdministrativeEvidence::class, 'registration_id');
     }
 
     public function payments()

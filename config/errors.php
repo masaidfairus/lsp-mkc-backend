@@ -28,6 +28,11 @@ return [
     'E2010' => 'Pembayaran belum lunas.',
     'E2011' => 'Element tidak sesuai dengan skema pendaftaran',
     'E2012' => 'Masih ada elemen yang belum dijawab',
+    'E2013' => 'Dokumen wajib diunggah karena belum tersedia di profil Anda.',
+    'E2014' => 'Salah satu dokumen dalam kategori ini harus dilengkapi.',
+    'E2015' => 'Masih ada dokumen wajib yang belum diunggah. Silakan periksa kembali kelengkapan berkas Anda.',
+    'E2016' => 'Data tidak ditemukan atau gagal update',
+    'E2017' => 'Data ini tidak bisa diubah lagi.',
 
     'E3001' => 'Link verifikasi tidak valid atau kadaluarsa',
     'E3002' => 'Link verifikasi sudah digunakan',

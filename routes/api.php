@@ -3,14 +3,13 @@
 use App\Http\Controllers\Asesi\SchemeController;
 use App\Http\Controllers\Asesi\Apl01Controller;
 use App\Http\Controllers\Asesi\Apl02Controller;
-use App\Http\Controllers\Asesi\PortfolioController;
 use App\Http\Controllers\Asesi\ProfileController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Asesi\BankAccountController;
+use App\Http\Controllers\Asesi\DocumentProfileController;
 use App\Http\Controllers\PDF\PdfApl01Controller;
 use App\Http\Controllers\PDF\PdfApl02Controller;
-use App\Http\Controllers\Asesi\PortfolioTypeController;
 use App\Http\Middleware\EnsureApiKeyIsValid;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
@@ -51,14 +50,15 @@ Route::middleware('auth:sanctum')->group(function () {
         'show'
     ]);
 
-    Route::get('portfolio-types', [PortfolioTypeController::class, 'index', 'show']);
-
-    // Portfolio Asesi
-    Route::apiResource('portfolios', PortfolioController::class)->only([
+    // Upload File Asesi
+    Route::apiResource('document-profile', DocumentProfileController::class)->only([
         'index',
         'store',
         'update'
     ]);
+
+    // Show All Document List
+    Route::get('document_lists', [DocumentProfileController::class, 'showDocumentLists']);
 
     // APL-01
     Route::post('apl01/{step}', [Apl01Controller::class, 'store']);
@@ -66,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // APL-02
     Route::get('registrations/{registration}/apl02-form', [Apl02Controller::class, 'form']);
+    Route::patch('registrations/{registration}/apl02-portfolios', [Apl02Controller::class, 'toogleActive']);
     Route::post('registrations/{registration}/self-assessments', [Apl02Controller::class, 'submit']);
 
     // PDF Generate

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('apl02_portfolios', function (Blueprint $table) {
             $table->id();
             $table->foreignId('registration_id')->constrained('assessment_registrations')->cascadeOnDelete();
-            $table->foreignId('portfolio_id')->constrained('portfolios')->cascadeOnDelete();
+            $table->foreignId('file_profile_id')->constrained('file_profiles')->cascadeOnDelete();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

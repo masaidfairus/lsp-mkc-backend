@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call([
-            SchemeSeeder::class
+            SchemeSeeder::class,
+            DocumentSeeder::class,
         ]);
 
         User::create([

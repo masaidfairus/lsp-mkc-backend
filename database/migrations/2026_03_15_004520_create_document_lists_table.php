@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('portfolio_types', function (Blueprint $table) {
+        Schema::create('document_lists', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('created_by')->constrained('users');
-            $table->string('name');
-            $table->string('description')->nullable();
+            $table->string('title');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('portfolio_types');
+        Schema::dropIfExists('document_lists');
     }
 };

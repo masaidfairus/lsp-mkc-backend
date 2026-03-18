@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SchemeRequirement extends Model
+class BasicRequirementProof extends Model
 {
     protected $fillable = [
         'scheme_id',
-        'requirement_name',
+        'list_id',
         'is_mandatory',
+        'or_group',
     ];
 
     protected $casts = [
@@ -21,8 +22,8 @@ class SchemeRequirement extends Model
         return $this->belongsTo(Scheme::class);
     }
 
-    public function evidence()
+    public function documentList()
     {
-        return $this->hasMany(Apl01Evidence::class);
+        return $this->belongsTo(DocumentList::class, 'list_id');
     }
 }
