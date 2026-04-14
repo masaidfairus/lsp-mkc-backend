@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->boolean('is_competent')->default(false);
             $table->boolean('is_verified_by_assessor')->default(false);
             $table->text('assessor_notes')->nullable();
+            $table->string('file_path')->nullable();
+            $table->string('file_url')->nullable();
             $table->timestamps();
             $table->unique(['registration_id', 'element_id'], 'unique_kuk_response');
         });

@@ -8,6 +8,7 @@ enum Apl01Status: string
     case PENDING = 'pending';
     case PAID = 'paid';
     case APPROVED = 'approved';
+    case REJECTED = 'rejected';
 
     public function getLabel(): ?string
     {

@@ -48,10 +48,12 @@ Route::middleware('auth:sanctum')->group(function () {
     ]);
 
     // Skema Publik
-    route::apiResource('schemes', SchemeController::class)->only([
+    Route::apiResource('schemes', SchemeController::class)->only([
         'index',
         'show'
     ]);
+
+    Route::get('apl01/{registration}/pdf', [PdfApl01Controller::class, 'show']);
 
     // Upload File Asesi
     Route::apiResource('document-profiles', DocumentProfileController::class)->only([

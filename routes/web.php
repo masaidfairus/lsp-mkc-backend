@@ -27,7 +27,16 @@ Route::get('/logout', [AuthController::class, 'logout']);
 // ============================================================
 // APL01
 // ============================================================
+// Route::prefix('preview')->name('preview.')->group(function () {
+//     Route::get('/apl01/{apl01}', [PdfPreviewController::class, 'apl01'])->name('apl01');
+//     nanti tambah form lain di sini
+// });
+
+// Route::prefix('download')->name('download.')->group(function () {
+//     Route::get('/apl01/{apl01}', [PdfPreviewController::class, 'apl01Download'])->name('apl01');
+// });
 Route::get('/apl01', [PdfApl01Controller::class, 'index'])->name('apl01.form');
+
 Route::post('/apl01/generate', [PdfApl01Controller::class, 'generate'])->name('apl01.generate');
 
 Route::get('/apl01/preview', function () {
@@ -73,7 +82,7 @@ Route::get('/apl01/preview', function () {
         'status_terima' => 'Diterima',
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.apl01', $data)->setPaper('a4', 'portrait');
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.APL.apl01', $data)->setPaper('a4', 'portrait');
     return $pdf->stream('preview.pdf');
 });
 
@@ -108,7 +117,7 @@ Route::get('/apl02/preview', function () {
         ],
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.apl02', $data)->setPaper('a4', 'portrait');
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.APL.apl02', $data)->setPaper('a4', 'portrait');
     return $pdf->stream('apl02-preview.pdf');
 });
 
@@ -249,28 +258,10 @@ Route::get('/invoice/preview', function () {
 
         'items' => [
             [
-                'uraian' => 'Biaya Pendaftaran Sertifikasi',
-                'keterangan' => '',
-                'qty' => 1,
-                'harga' => 150000,
-            ],
-            [
-                'uraian' => 'Biaya Asesmen Kompetensi',
-                'keterangan' => 'Skema Ahli Desain Grafis (13 Unit Kompetensi)',
-                'qty' => 1,
-                'harga' => 1500000,
-            ],
-            [
-                'uraian' => 'Biaya Penerbitan Sertifikat',
-                'keterangan' => '',
-                'qty' => 1,
-                'harga' => 200000,
-            ],
-            [
-                'uraian' => 'Biaya Administrasi',
-                'keterangan' => '',
-                'qty' => 1,
-                'harga' => 100000,
+                'uraian'      => 'Biaya Sertifikasi',
+                'keterangan'  => '',
+                'qty'         => 1,
+                'harga'       => 150000,
             ],
         ],
 
