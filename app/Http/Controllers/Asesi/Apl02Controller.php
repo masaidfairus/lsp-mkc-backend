@@ -60,7 +60,7 @@ class Apl02Controller extends Controller
 
         return $this->successResponse([
             'registration_id' => $registration->id,
-            'asesi_type' => $registration->asesi_type,
+            'asesi_type' => $registration->candidate->profile->asesi_type,
             'portfolios' => $portfolios,
             'scheme' => [
                 'id' => $scheme->id,

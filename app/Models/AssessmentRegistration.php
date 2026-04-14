@@ -12,6 +12,7 @@ class AssessmentRegistration extends Model
         'user_id',
         'scheme_id',
         'assessor_id',
+        'tuk',
         'status_apl01',
         'status_apl02',
         'final_result',
@@ -51,7 +52,7 @@ class AssessmentRegistration extends Model
 
     public function plannings()
     {
-        return $this->hasMany(AssessmentPlanning::class);
+        return $this->hasMany(AssessmentPlanning::class, 'registration_id');
     }
 
     public function feedback()

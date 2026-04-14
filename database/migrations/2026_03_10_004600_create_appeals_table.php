@@ -15,9 +15,8 @@ return new class extends Migration
         Schema::create('appeals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('registration_id')->constrained('assessment_registrations')->cascadeOnDelete();
-            $table->text('appeal_reason');
+            $table->json('ak04_data')->nullable();
             $table->string('status')->default(AppealStatus::PENDING);
-            $table->text('admin_notes')->nullable();
             $table->timestamps();
         });
     }

@@ -23,13 +23,16 @@ class ProfileController extends Controller
 
         $validated = $request->validate([
             'gender' => ['required', new Enum(Gender::class)],
+            'place_of_birth' => ['required', 'string', 'max:1000'],
             'date_of_birth' => ['required', 'date', 'before:today'],
             'address' => ['required', 'string', 'max:1000'],
+            'home_postal_code' => ['required', 'numeric', 'digits:5', 'between:10000,99999'],
             'phone_number' => ['required', 'string', 'regex:/^(\+62|0)8[1-9][0-9]{6,10}$/'],
             'education_qualifications' => ['required', 'string', 'max:255'],
             'company_name' => ['required', 'string', 'max:255'],
             'job_title' => ['required', 'string', 'max:255'],
             'company_address' => ['required', 'string', 'max:1000'],
+            'company_postal_code' => ['required', 'numeric', 'digits:5', 'between:10000,99999'],
             'company_contact' => ['required', 'string', 'max:20'],
             'asesi_type' => ['required', 'in:pribadi,institusi'],
             'institution_name' => ['required_if:asesi_type,institusi', 'nullable', 'string', 'max:255'],

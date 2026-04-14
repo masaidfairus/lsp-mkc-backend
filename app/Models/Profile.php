@@ -19,6 +19,9 @@ class Profile extends Model
         'company_contact',
         'asesi_type',
         'institution_name',
+        'place_of_birth',
+        'home_postal_code',
+        'company_postal_code'
     ];
 
     protected $casts = [
