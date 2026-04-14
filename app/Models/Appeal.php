@@ -9,13 +9,13 @@ class Appeal extends Model
 {
     protected $fillable = [
         'registration_id',
-        'appeal_reason',
+        'ak04_data',
         'status',
-        'admin_notes',
     ];
 
     protected $casts = [
-        'status' => AppealStatus::class
+        'status' => AppealStatus::class,
+        'ak04_data' => 'array'
     ];
 
     public function registration()

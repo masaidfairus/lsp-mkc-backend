@@ -44,4 +44,9 @@ class Scheme extends Model
     {
         return $this->hasMany(AdministrativeProof::class);
     }
+
+    public function portfolios()
+    {
+        return $this->hasMany(PortfolioScheme::class);
+    }
 }

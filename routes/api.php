@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Asesi\Ak01Controller;
+use App\Http\Controllers\Asesi\Ak04Controller;
+use App\Http\Controllers\Asesi\Ak07Controller;
 use App\Http\Controllers\Asesi\SchemeController;
 use App\Http\Controllers\Asesi\Apl01Controller;
 use App\Http\Controllers\Asesi\Apl02Controller;
@@ -51,7 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     ]);
 
     // Upload File Asesi
-    Route::apiResource('document-profile', DocumentProfileController::class)->only([
+    Route::apiResource('document-profiles', DocumentProfileController::class)->only([
         'index',
         'store',
         'update'
@@ -61,13 +64,25 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('document_lists', [DocumentProfileController::class, 'showDocumentLists']);
 
     // APL-01
-    Route::post('apl01/{step}', [Apl01Controller::class, 'store']);
     Route::get('registrations/{registration}/apl01', [Apl01Controller::class, 'show']);
+    Route::post('apl01/{step}', [Apl01Controller::class, 'store']);
 
     // APL-02
-    Route::get('registrations/{registration}/apl02-form', [Apl02Controller::class, 'form']);
-    Route::patch('registrations/{registration}/apl02-portfolios', [Apl02Controller::class, 'toogleActive']);
-    Route::post('registrations/{registration}/self-assessments', [Apl02Controller::class, 'submit']);
+    Route::get('registrations/{registration}/apl02', [Apl02Controller::class, 'form']);
+    Route::post('registrations/{registration}/apl02', [Apl02Controller::class, 'submit']);
+    Route::patch('registrations/{registration}/apl02', [Apl02Controller::class, 'toogleActive']);
+
+    // AK-01
+    Route::get('registrations/{registration}/ak01', [Ak01Controller::class, 'show']);
+    Route::post('registrations/{registration}/ak01', [Ak01Controller::class, 'store']);
+
+    // AK-04
+    Route::get('registrations/{registration}/ak04', [Ak04Controller::class, 'show']);
+    Route::post('registrations/{registration}/ak04', [Ak04Controller::class, 'store']);
+
+    // AK-07
+    Route::get('registrations/{registration}/ak07', [Ak07Controller::class, 'show']);
+    Route::post('registrations/{registration}/ak07', [Ak07Controller::class, 'store']);
 
     // PDF Generate
     Route::prefix('pdf')->group(function () {

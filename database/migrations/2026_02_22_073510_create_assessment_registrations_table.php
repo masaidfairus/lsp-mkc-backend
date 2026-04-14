@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('scheme_id')->nullable()->constrained('schemes')->onDelete('restrict');
             $table->foreignId('assessor_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->string('tuk')->default('TUK Sewaktu');
             $table->string('certification_purpose')->default(CertificationPurpose::SERTIFIKASI);
             $table->string('status_apl01')->default(Apl01Status::NOT_STARTED)->index();
             $table->string('status_apl02')->default(Apl02Status::NOT_STARTED)->index();

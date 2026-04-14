@@ -33,6 +33,8 @@ return [
     'E2015' => 'Masih ada dokumen wajib yang belum diunggah. Silakan periksa kembali kelengkapan berkas Anda.',
     'E2016' => 'Data tidak ditemukan atau gagal update',
     'E2017' => 'Data ini tidak bisa diubah lagi.',
+    'E2018' => 'APL-02 belum disetujui.',
+    'E2019' => 'Asesor belum ditugaskan',
 
     'E3001' => 'Link verifikasi tidak valid atau kadaluarsa',
     'E3002' => 'Link verifikasi sudah digunakan',
