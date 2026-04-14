@@ -28,14 +28,24 @@ class Ak01Controller extends Controller
             return $this->errorResponse('E2019', 403);
         }
 
-        return $this->successResponse([
-            $registration->plannings->first()->ak01_data
-        ]);
+        return $this->successResponse($registration->plannings->first()->ak01_data);
     }
     public function store(Request $request, AssessmentRegistration $registration)
     {
-        if ($registration->user_id !== $request->user()->id) {
+        if ($registration->user_id !== request()->user()->id) {
             return $this->errorResponse('E1005', 403);
+        }
+
+        if ($registration->status_apl01 !== Apl01Status::APPROVED) {
+            return $this->errorResponse('E2009', 403);
+        }
+
+        if ($registration->status_apl02 !== Apl02Status::APPROVED) {
+            return $this->errorResponse('E2018', 403);
+        }
+
+        if (!$registration->assessor_id) {
+            return $this->errorResponse('E2019', 403);
         }
 
         $validated = $request->validate([
@@ -57,7 +67,7 @@ class Ak01Controller extends Controller
         $record->save();
 
         return $this->successResponse(
-            $record,
+            $record->ak01_data,
             'Data AK.01 berhasil disimpan'
         );
     }

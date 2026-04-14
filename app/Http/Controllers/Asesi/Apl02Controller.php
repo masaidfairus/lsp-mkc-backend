@@ -8,6 +8,7 @@ use App\Enums\Apl02Status;
 use App\Enums\PaymentStatus;
 use App\Models\Apl02Portfolio;
 use App\Models\AssessmentRegistration;
+use App\Models\DocumentList;
 use App\Models\FileProfile;
 use App\Models\PortfolioScheme;
 use App\Models\SelfAssessment;
@@ -89,6 +90,8 @@ class Apl02Controller extends Controller
             return $this->errorResponse('E1005', 403);
         }
 
+        $user = $registration->candidate;
+
         $validated = $request->validate([
             'is_declared' => ['required', 'accepted'],
             'portfolio_ids' => ['nullable', 'array'],
@@ -97,6 +100,24 @@ class Apl02Controller extends Controller
             'answers.*.element_id' => ['required', 'integer'],
             'answers.*.is_competent' => ['required', 'boolean'],
         ]);
+
+        $mandatoryIds = $registration->scheme->portfolios
+            ->where('is_mandatory', true)
+            ->pluck('list_id');
+
+        if ($mandatoryIds->isNotEmpty()) {
+            $userFileIds = $user->userFile->pluck('list_id');
+
+            $missingFiles = $mandatoryIds->diff($userFileIds);
+
+            if ($missingFiles->isNotEmpty()) {
+                $missingFilesName = DocumentList::whereIn('id', $missingFiles)->pluck('title');
+
+                return $this->errorResponse('E2013', 403, [
+                    'missing_files' => $missingFilesName,
+                ]);
+            }
+        }
 
         $validElementIds = $registration->scheme
             ->competencyUnits()

@@ -12,6 +12,10 @@ class PortfolioScheme extends Model
         'is_mandatory'
     ];
 
+    protected $casts = [
+        'is_mandatory' => 'boolean'
+    ];
+
     public function scheme()
     {
         return $this->belongsTo(Scheme::class);
