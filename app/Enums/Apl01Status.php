@@ -2,7 +2,10 @@
 
 namespace App\Enums;
 
-enum Apl01Status: string
+use Filament\Support\Contracts\HasLabel;
+use Filament\Support\Contracts\HasColor;
+
+enum Apl01Status: string implements HasLabel, HasColor
 {
     case NOT_STARTED = 'not_started';
     case PENDING = 'pending';
@@ -13,11 +16,22 @@ enum Apl01Status: string
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::NOT_STARTED => 'Not Started',
-            self::PENDING => 'Pending',
-            self::PAID => 'Paid',
-            self::APPROVED => 'Approved',
+            self::NOT_STARTED => 'Belum Dimulai',
+            self::PENDING => 'Belum Ditinjau',
+            self::PAID => 'Telah Dibayar',
+            self::APPROVED => 'Diterima',
+            self::REJECTED => 'Tidak Diterima',
         };
     }
 
+    public function getColor(): string|array|null
+    {
+        return match ($this) {
+            self::NOT_STARTED => 'gray',
+            self::PENDING => 'warning',
+            self::PAID => 'info',
+            self::APPROVED => 'success',
+            self::REJECTED => 'danger',
+        };
+    }
 }
