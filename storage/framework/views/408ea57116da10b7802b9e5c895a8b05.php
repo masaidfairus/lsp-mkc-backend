@@ -32,21 +32,17 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars, $__key, $__value); ?>
 
-<?php
-    $renderHookScopes = $livewire?->getRenderHookScopes();
-?>
-
 <!DOCTYPE html>
 <html
     lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>"
     dir="<?php echo e(__('filament-panels::layout.direction') ?? 'ltr'); ?>"
     class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-        'fi',
+        'fi min-h-screen',
         'dark' => filament()->hasDarkModeForced(),
     ]); ?>"
 >
     <head>
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::HEAD_START, scopes: $renderHookScopes)); ?>
+        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::HEAD_START, scopes: $livewire?->getRenderHookScopes())); ?>
 
 
         <meta charset="utf-8" />
@@ -58,20 +54,16 @@ unset($__defined_vars, $__key, $__value); ?>
         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
         <?php
-            $title = trim(strip_tags($livewire?->getTitle() ?? ''));
+            $title = trim(strip_tags(($livewire ?? null)?->getTitle() ?? ''));
             $brandName = trim(strip_tags(filament()->getBrandName()));
         ?>
 
         <title>
-            <?php echo e(filled($title) ? $title : null); ?>
-
-            <?php echo e(filled($brandName) && filled($title) ? ' - ' : null); ?>
-
-            <?php echo e(filled($brandName) ? $brandName : null); ?>
+            <?php echo e(filled($title) ? "{$title} - " : null); ?> <?php echo e($brandName); ?>
 
         </title>
 
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::STYLES_BEFORE, scopes: $renderHookScopes)); ?>
+        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::STYLES_BEFORE, scopes: $livewire?->getRenderHookScopes())); ?>
 
 
         <style>
@@ -79,10 +71,6 @@ unset($__defined_vars, $__key, $__value); ?>
             [x-cloak='x-cloak'],
             [x-cloak='1'] {
                 display: none !important;
-            }
-
-            [x-cloak='inline-flex'] {
-                display: inline-flex !important;
             }
 
             @media (max-width: 1023px) {
@@ -102,24 +90,12 @@ unset($__defined_vars, $__key, $__value); ?>
 
         <?php echo e(filament()->getTheme()->getHtml()); ?>
 
-        <?php echo e(filament()->getFontPreloadHtml()); ?>
-
-        <?php echo e(filament()->getMonoFontPreloadHtml()); ?>
-
-        <?php echo e(filament()->getSerifFontPreloadHtml()); ?>
-
         <?php echo e(filament()->getFontHtml()); ?>
-
-        <?php echo e(filament()->getMonoFontHtml()); ?>
-
-        <?php echo e(filament()->getSerifFontHtml()); ?>
 
 
         <style>
             :root {
                 --font-family: '<?php echo filament()->getFontFamily(); ?>';
-                --mono-font-family: '<?php echo filament()->getMonoFontFamily(); ?>';
-                --serif-font-family: '<?php echo filament()->getSerifFontFamily(); ?>';
                 --sidebar-width: <?php echo e(filament()->getSidebarWidth()); ?>;
                 --collapsed-sidebar-width: <?php echo e(filament()->getCollapsedSidebarWidth()); ?>;
                 --default-theme-mode: <?php echo e(filament()->getDefaultThemeMode()->value); ?>;
@@ -128,7 +104,7 @@ unset($__defined_vars, $__key, $__value); ?>
 
         <?php echo $__env->yieldPushContent('styles'); ?>
 
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::STYLES_AFTER, scopes: $renderHookScopes)); ?>
+        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::STYLES_AFTER, scopes: $livewire?->getRenderHookScopes())); ?>
 
 
         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(! filament()->hasDarkMode()): ?>
@@ -160,20 +136,21 @@ unset($__defined_vars, $__key, $__value); ?>
             </script>
         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::HEAD_END, scopes: $renderHookScopes)); ?>
+        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::HEAD_END, scopes: $livewire?->getRenderHookScopes())); ?>
 
     </head>
 
     <body
         <?php echo e($attributes
-                ->merge($livewire?->getExtraBodyAttributes() ?? [], escape: false)
+                ->merge(($livewire ?? null)?->getExtraBodyAttributes() ?? [], escape: false)
                 ->class([
                     'fi-body',
                     'fi-panel-' . filament()->getId(),
+                    'min-h-screen bg-gray-50 font-normal text-gray-950 antialiased dark:bg-gray-950 dark:text-white',
                 ])); ?>
 
     >
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::BODY_START, scopes: $renderHookScopes)); ?>
+        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::BODY_START, scopes: $livewire?->getRenderHookScopes())); ?>
 
 
         <?php echo e($slot); ?>
@@ -185,28 +162,23 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split(Filament\Livewire\Notifications::class);
 
-$__keyOuter = $__key ?? null;
-
 $__key = null;
-$__componentSlots = [];
 
 $__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-1691913442-0', $__key);
 
-$__html = app('livewire')->mount($__name, $__params, $__key, $__componentSlots);
+$__html = app('livewire')->mount($__name, $__params, $__key);
 
 echo $__html;
 
 unset($__html);
 unset($__key);
-$__key = $__keyOuter;
-unset($__keyOuter);
 unset($__name);
 unset($__params);
-unset($__componentSlots);
 unset($__split);
+if (isset($__slots)) unset($__slots);
 ?>
 
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SCRIPTS_BEFORE, scopes: $renderHookScopes)); ?>
+        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SCRIPTS_BEFORE, scopes: $livewire?->getRenderHookScopes())); ?>
 
 
         <?php echo \Filament\Support\Facades\FilamentAsset::renderScripts(withCore: true) ?>
@@ -227,10 +199,10 @@ unset($__split);
 
         <?php echo $__env->yieldPushContent('scripts'); ?>
 
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SCRIPTS_AFTER, scopes: $renderHookScopes)); ?>
+        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SCRIPTS_AFTER, scopes: $livewire?->getRenderHookScopes())); ?>
 
 
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::BODY_END, scopes: $renderHookScopes)); ?>
+        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::BODY_END, scopes: $livewire?->getRenderHookScopes())); ?>
 
     </body>
 </html>

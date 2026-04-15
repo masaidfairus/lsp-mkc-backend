@@ -4,9 +4,36 @@
         ob_start();
     ?>
         <script>
-            setUpUnsavedActionChangesAlert({
-                resolveLivewireComponentUsing: () => window.Livewire.find('<?php echo e($_instance->getId()); ?>'),
-                $wire,
+            window.addEventListener('beforeunload', (event) => {
+                if (typeof window.Livewire.find('<?php echo e($_instance->getId()); ?>') === 'undefined') {
+                    return
+                }
+
+                if (
+                    [
+                        ...(<?php echo \Illuminate\Support\Js::from($this instanceof \Filament\Actions\Contracts\HasActions)->toHtml() ?> ? ($wire.mountedActions ?? []) : []),
+                        ...(<?php echo \Illuminate\Support\Js::from($this instanceof \Filament\Forms\Contracts\HasForms)->toHtml() ?>
+                            ? ($wire.mountedFormComponentActions ?? [])
+                            : []),
+                        ...(<?php echo \Illuminate\Support\Js::from($this instanceof \Filament\Infolists\Contracts\HasInfolists)->toHtml() ?>
+                            ? ($wire.mountedInfolistActions ?? [])
+                            : []),
+                        ...(<?php echo \Illuminate\Support\Js::from($this instanceof \Filament\Tables\Contracts\HasTable)->toHtml() ?>
+                            ? [
+                                  ...($wire.mountedTableActions ?? []),
+                                  ...($wire.mountedTableBulkAction
+                                      ? [$wire.mountedTableBulkAction]
+                                      : []),
+                              ]
+                            : []),
+                    ].length &&
+                    !$wire?.__instance?.effects?.redirect
+                ) {
+                    event.preventDefault()
+                    event.returnValue = true
+
+                    return
+                }
             })
         </script>
         <?php

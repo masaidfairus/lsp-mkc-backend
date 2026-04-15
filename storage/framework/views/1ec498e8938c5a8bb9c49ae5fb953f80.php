@@ -1,14 +1,7 @@
 <?php
-    use Filament\Support\Enums\Width;
+    use Filament\Support\Enums\MaxWidth;
 
     $livewire ??= null;
-
-    $renderHookScopes = $livewire?->getRenderHookScopes();
-    $maxContentWidth ??= (filament()->getSimplePageMaxContentWidth() ?? Width::Large);
-
-    if (is_string($maxContentWidth)) {
-        $maxContentWidth = Width::tryFrom($maxContentWidth) ?? $maxContentWidth;
-    }
 ?>
 
 <?php if (isset($component)) { $__componentOriginale960ae7ad1b1ce9e3596e483505fadc9 = $component; } ?>
@@ -21,8 +14,6 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['livewire' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($livewire)]); ?>
-<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
-
     <?php $attributes ??= new \Illuminate\View\ComponentAttributeBag;
 
 $__newAttributes = [];
@@ -61,80 +52,90 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars, $__key, $__value); ?>
 
-    <div class="fi-simple-layout">
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SIMPLE_LAYOUT_START, scopes: $renderHookScopes)); ?>
-
-
+    <div class="fi-simple-layout flex min-h-screen flex-col items-center">
         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(($hasTopbar ?? true) && filament()->auth()->check()): ?>
-            <div class="fi-simple-layout-header">
+            <div
+                class="absolute end-0 top-0 flex h-16 items-center gap-x-4 pe-4 md:pe-6 lg:pe-8"
+            >
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(filament()->hasDatabaseNotifications()): ?>
                     <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
 };
-[$__name, $__params] = $__split(filament()->getDatabaseNotificationsLivewireComponent(), [
-                        'lazy' => filament()->hasLazyLoadedDatabaseNotifications(),
-                        'position' => \Filament\Enums\DatabaseNotificationsPosition::Topbar,
+[$__name, $__params] = $__split(Filament\Livewire\DatabaseNotifications::class, [
+                        'lazy' => filament()->hasLazyLoadedDatabaseNotifications()
                     ]);
 
-$__keyOuter = $__key ?? null;
-
 $__key = null;
-$__componentSlots = [];
 
 $__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-2127460727-0', $__key);
 
-$__html = app('livewire')->mount($__name, $__params, $__key, $__componentSlots);
+$__html = app('livewire')->mount($__name, $__params, $__key);
 
 echo $__html;
 
 unset($__html);
 unset($__key);
-$__key = $__keyOuter;
-unset($__keyOuter);
 unset($__name);
 unset($__params);
-unset($__componentSlots);
 unset($__split);
+if (isset($__slots)) unset($__slots);
 ?>
                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(filament()->hasUserMenu()): ?>
-                    <?php
-$__split = function ($name, $params = []) {
-    return [$name, $params];
-};
-[$__name, $__params] = $__split(Filament\Livewire\SimpleUserMenu::class);
-
-$__keyOuter = $__key ?? null;
-
-$__key = null;
-$__componentSlots = [];
-
-$__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-2127460727-1', $__key);
-
-$__html = app('livewire')->mount($__name, $__params, $__key, $__componentSlots);
-
-echo $__html;
-
-unset($__html);
-unset($__key);
-$__key = $__keyOuter;
-unset($__keyOuter);
-unset($__name);
-unset($__params);
-unset($__componentSlots);
-unset($__split);
-?>
-                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                <?php if (isset($component)) { $__componentOriginalf72c4437b846e6919081d8fc29939c50 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalf72c4437b846e6919081d8fc29939c50 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-panels::components.user-menu','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('filament-panels::user-menu'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalf72c4437b846e6919081d8fc29939c50)): ?>
+<?php $attributes = $__attributesOriginalf72c4437b846e6919081d8fc29939c50; ?>
+<?php unset($__attributesOriginalf72c4437b846e6919081d8fc29939c50); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalf72c4437b846e6919081d8fc29939c50)): ?>
+<?php $component = $__componentOriginalf72c4437b846e6919081d8fc29939c50; ?>
+<?php unset($__componentOriginalf72c4437b846e6919081d8fc29939c50); ?>
+<?php endif; ?>
             </div>
         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        <div class="fi-simple-main-ctn">
+        <div
+            class="fi-simple-main-ctn flex w-full flex-grow items-center justify-center"
+        >
             <main
                 class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                    'fi-simple-main',
-                    ($maxContentWidth instanceof Width) ? "fi-width-{$maxContentWidth->value}" : $maxContentWidth,
+                    'fi-simple-main my-16 w-full bg-white px-6 py-12 shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10 sm:rounded-xl sm:px-12',
+                    match ($maxWidth ??= (filament()->getSimplePageMaxContentWidth() ?? MaxWidth::Large)) {
+                        MaxWidth::ExtraSmall, 'xs' => 'max-w-xs',
+                        MaxWidth::Small, 'sm' => 'max-w-sm',
+                        MaxWidth::Medium, 'md' => 'max-w-md',
+                        MaxWidth::Large, 'lg' => 'max-w-lg',
+                        MaxWidth::ExtraLarge, 'xl' => 'max-w-xl',
+                        MaxWidth::TwoExtraLarge, '2xl' => 'max-w-2xl',
+                        MaxWidth::ThreeExtraLarge, '3xl' => 'max-w-3xl',
+                        MaxWidth::FourExtraLarge, '4xl' => 'max-w-4xl',
+                        MaxWidth::FiveExtraLarge, '5xl' => 'max-w-5xl',
+                        MaxWidth::SixExtraLarge, '6xl' => 'max-w-6xl',
+                        MaxWidth::SevenExtraLarge, '7xl' => 'max-w-7xl',
+                        MaxWidth::Full, 'full' => 'max-w-full',
+                        MaxWidth::MinContent, 'min' => 'max-w-min',
+                        MaxWidth::MaxContent, 'max' => 'max-w-max',
+                        MaxWidth::FitContent, 'fit' => 'max-w-fit',
+                        MaxWidth::Prose, 'prose' => 'max-w-prose',
+                        MaxWidth::ScreenSmall, 'screen-sm' => 'max-w-screen-sm',
+                        MaxWidth::ScreenMedium, 'screen-md' => 'max-w-screen-md',
+                        MaxWidth::ScreenLarge, 'screen-lg' => 'max-w-screen-lg',
+                        MaxWidth::ScreenExtraLarge, 'screen-xl' => 'max-w-screen-xl',
+                        MaxWidth::ScreenTwoExtraLarge, 'screen-2xl' => 'max-w-screen-2xl',
+                        default => $maxWidth,
+                    },
                 ]); ?>"
             >
                 <?php echo e($slot); ?>
@@ -142,10 +143,7 @@ unset($__split);
             </main>
         </div>
 
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::FOOTER, scopes: $renderHookScopes)); ?>
-
-
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SIMPLE_LAYOUT_END, scopes: $renderHookScopes)); ?>
+        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::FOOTER, scopes: $livewire?->getRenderHookScopes())); ?>
 
     </div>
  <?php echo $__env->renderComponent(); ?>

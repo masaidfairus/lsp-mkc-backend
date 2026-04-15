@@ -6,47 +6,48 @@
 <div>
     <div
         class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-            'fi-no',
-            'fi-align-' . static::$alignment->value,
-            'fi-vertical-align-' . static::$verticalAlignment->value,
+            'fi-no pointer-events-none fixed inset-4 z-50 mx-auto flex gap-3',
+            match (static::$alignment) {
+                Alignment::Start, Alignment::Left => 'items-start',
+                Alignment::Center => 'items-center',
+                Alignment::End, Alignment::Right => 'items-end',
+                default => null,
+            },
+            match (static::$verticalAlignment) {
+                VerticalAlignment::Start => 'flex-col-reverse justify-end',
+                VerticalAlignment::End => 'flex-col justify-end',
+                VerticalAlignment::Center => 'flex-col justify-center',
+            },
         ]); ?>"
         role="status"
     >
-        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $notifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $notifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <?php echo e($notification); ?>
 
-        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     </div>
 
     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($broadcastChannel = $this->getBroadcastChannel()): ?>
-            <?php
-        $__scriptKey = '1598871897-0';
-        ob_start();
-    ?>
-            <script>
-                window.addEventListener('EchoLoaded', () => {
-                    window.Echo.private(<?php echo \Illuminate\Support\Js::from($broadcastChannel)->toHtml() ?>).notification(
-                        (notification) => {
-                            setTimeout(
-                                () =>
-                                    $wire.handleBroadcastNotification(
-                                        notification,
-                                    ),
-                                500,
-                            )
-                        },
-                    )
-                })
-
-                if (window.Echo) {
-                    window.dispatchEvent(new CustomEvent('EchoLoaded'))
-                }
-            </script>
-            <?php
-        $__output = ob_get_clean();
-
-        \Livewire\store($this)->push('scripts', $__output, $__scriptKey)
-    ?>
+        <?php if (isset($component)) { $__componentOriginal40a2401e895531715a66e1631dec94aa = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal40a2401e895531715a66e1631dec94aa = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-notifications::components.echo','data' => ['channel' => $broadcastChannel]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('filament-notifications::echo'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['channel' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($broadcastChannel)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal40a2401e895531715a66e1631dec94aa)): ?>
+<?php $attributes = $__attributesOriginal40a2401e895531715a66e1631dec94aa; ?>
+<?php unset($__attributesOriginal40a2401e895531715a66e1631dec94aa); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal40a2401e895531715a66e1631dec94aa)): ?>
+<?php $component = $__componentOriginal40a2401e895531715a66e1631dec94aa; ?>
+<?php unset($__componentOriginal40a2401e895531715a66e1631dec94aa); ?>
+<?php endif; ?>
     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 </div>
 <?php /**PATH /Users/macbook/Herd/lsp-mkc-backend/vendor/filament/notifications/resources/views/notifications.blade.php ENDPATH**/ ?>

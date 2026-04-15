@@ -3,8 +3,8 @@
 $__newAttributes = [];
 $__propNames = \Illuminate\View\ComponentAttributeBag::extractPropNames(([
     'alias' => null,
+    'class' => '',
     'icon' => null,
-    'size' => null,
 ]));
 
 foreach ($attributes->all() as $__key => $__value) {
@@ -22,8 +22,8 @@ unset($__newAttributes);
 
 foreach (array_filter(([
     'alias' => null,
+    'class' => '',
     'icon' => null,
-    'size' => null,
 ]), 'is_string', ARRAY_FILTER_USE_KEY) as $__key => $__value) {
     $$__key = $$__key ?? $__value;
 }
@@ -36,6 +36,25 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars, $__key, $__value); ?>
 
-<?php echo e(\Filament\Support\generate_icon_html($icon, $alias, $attributes, $size)); ?>
+<?php
+    $icon = ($alias ? \Filament\Support\Facades\FilamentIcon::resolve($alias) : null) ?: ($icon ?? $slot);
+?>
 
+<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($icon instanceof \Illuminate\Contracts\Support\Htmlable): ?>
+    <span <?php echo e($attributes->class($class)); ?>>
+        <?php echo e($icon); ?>
+
+    </span>
+<?php elseif(str_contains($icon, '/')): ?>
+    <img
+        <?php echo e($attributes
+                ->merge(['src' => $icon])
+                ->class($class)); ?>
+
+    />
+<?php else: ?>
+    <?php echo e(svg($icon,
+        $class,
+        array_filter($attributes->getAttributes()),)); ?>
+<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 <?php /**PATH /Users/macbook/Herd/lsp-mkc-backend/vendor/filament/support/resources/views/components/icon.blade.php ENDPATH**/ ?>

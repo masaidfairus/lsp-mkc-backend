@@ -1,5 +1,3 @@
-
-
 <?php $attributes ??= new \Illuminate\View\ComponentAttributeBag;
 
 $__newAttributes = [];
@@ -42,13 +40,16 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars, $__key, $__value); ?>
 
-<?php
-    if (is_array($columns)) {
-        $columns['lg'] ??= ($columns ? (is_array($columns) ? null : $columns) : 2);
-    }
-?>
-
-<div <?php echo e($attributes->grid($columns)->class(['fi-wi'])); ?>>
+<?php if (isset($component)) { $__componentOriginal30dbd75eb120a380110a2b340cd88f46 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal30dbd75eb120a380110a2b340cd88f46 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.grid.index','data' => ['default' => $columns['default'] ?? 1,'sm' => $columns['sm'] ?? null,'md' => $columns['md'] ?? null,'lg' => $columns['lg'] ?? ($columns ? (is_array($columns) ? null : $columns) : 2),'xl' => $columns['xl'] ?? null,'twoXl' => $columns['2xl'] ?? null,'attributes' => \Filament\Support\prepare_inherited_attributes($attributes)->class('fi-wi gap-6')]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('filament::grid'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['default' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns['default'] ?? 1),'sm' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns['sm'] ?? null),'md' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns['md'] ?? null),'lg' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns['lg'] ?? ($columns ? (is_array($columns) ? null : $columns) : 2)),'xl' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns['xl'] ?? null),'two-xl' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($columns['2xl'] ?? null),'attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Filament\Support\prepare_inherited_attributes($attributes)->class('fi-wi gap-6'))]); ?>
     <?php
         $normalizeWidgetClass = function (string | Filament\Widgets\WidgetConfiguration $widget): string {
             if ($widget instanceof \Filament\Widgets\WidgetConfiguration) {
@@ -59,7 +60,7 @@ unset($__defined_vars, $__key, $__value); ?>
         };
     ?>
 
-    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $widgets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $widgetKey => $widget): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoop($loop->index); ?><?php endif; ?>
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $widgets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $widgetKey => $widget): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <?php
             $widgetClass = $normalizeWidgetClass($widget);
         ?>
@@ -71,26 +72,30 @@ $__split = function ($name, $params = []) {
 [$__name, $__params] = $__split($widgetClass,
             [...(($widget instanceof \Filament\Widgets\WidgetConfiguration) ? [...$widget->widget::getDefaultProperties(), ...$widget->getProperties()] : $widget::getDefaultProperties()), ...$data],);
 
-$__keyOuter = $__key ?? null;
-
 $__key = "{$widgetClass}-{$widgetKey}";
-$__componentSlots = [];
 
 $__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-2918642188-0', $__key);
 
-$__html = app('livewire')->mount($__name, $__params, $__key, $__componentSlots);
+$__html = app('livewire')->mount($__name, $__params, $__key);
 
 echo $__html;
 
 unset($__html);
 unset($__key);
-$__key = $__keyOuter;
-unset($__keyOuter);
 unset($__name);
 unset($__params);
-unset($__componentSlots);
 unset($__split);
+if (isset($__slots)) unset($__slots);
 ?>
-    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
-</div>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal30dbd75eb120a380110a2b340cd88f46)): ?>
+<?php $attributes = $__attributesOriginal30dbd75eb120a380110a2b340cd88f46; ?>
+<?php unset($__attributesOriginal30dbd75eb120a380110a2b340cd88f46); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal30dbd75eb120a380110a2b340cd88f46)): ?>
+<?php $component = $__componentOriginal30dbd75eb120a380110a2b340cd88f46; ?>
+<?php unset($__componentOriginal30dbd75eb120a380110a2b340cd88f46); ?>
+<?php endif; ?>
 <?php /**PATH /Users/macbook/Herd/lsp-mkc-backend/vendor/filament/widgets/resources/views/components/widgets.blade.php ENDPATH**/ ?>

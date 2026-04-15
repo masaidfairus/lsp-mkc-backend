@@ -1,205 +1,197 @@
 <?php
-    use Filament\Support\Enums\Width;
+    use Filament\Support\Enums\MaxWidth;
 
+    $navigation = filament()->getNavigation();
     $livewire ??= null;
-
-    $hasTopbar = filament()->hasTopbar();
-    $isSidebarCollapsibleOnDesktop = filament()->isSidebarCollapsibleOnDesktop();
-    $isSidebarFullyCollapsibleOnDesktop = filament()->isSidebarFullyCollapsibleOnDesktop();
-    $hasTopNavigation = filament()->hasTopNavigation();
-    $hasNavigation = filament()->hasNavigation();
-    $renderHookScopes = $livewire?->getRenderHookScopes();
-    $maxContentWidth ??= (filament()->getMaxContentWidth() ?? Width::SevenExtraLarge);
-
-    if (is_string($maxContentWidth)) {
-        $maxContentWidth = Width::tryFrom($maxContentWidth) ?? $maxContentWidth;
-    }
 ?>
 
 <?php if (isset($component)) { $__componentOriginale960ae7ad1b1ce9e3596e483505fadc9 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginale960ae7ad1b1ce9e3596e483505fadc9 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-panels::components.layout.base','data' => ['livewire' => $livewire,'class' => \Illuminate\Support\Arr::toCssClasses([
-        'fi-body-has-navigation' => $hasNavigation,
-        'fi-body-has-sidebar-collapsible-on-desktop' => $isSidebarCollapsibleOnDesktop,
-        'fi-body-has-sidebar-fully-collapsible-on-desktop' => $isSidebarFullyCollapsibleOnDesktop,
-        'fi-body-has-topbar' => $hasTopbar,
-        'fi-body-has-top-navigation' => $hasTopNavigation,
-    ])]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-panels::components.layout.base','data' => ['livewire' => $livewire]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('filament-panels::layout.base'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['livewire' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($livewire),'class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses([
-        'fi-body-has-navigation' => $hasNavigation,
-        'fi-body-has-sidebar-collapsible-on-desktop' => $isSidebarCollapsibleOnDesktop,
-        'fi-body-has-sidebar-fully-collapsible-on-desktop' => $isSidebarFullyCollapsibleOnDesktop,
-        'fi-body-has-topbar' => $hasTopbar,
-        'fi-body-has-top-navigation' => $hasTopNavigation,
-    ]))]); ?>
-<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
-
-    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($hasTopbar): ?>
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::TOPBAR_BEFORE, scopes: $renderHookScopes)); ?>
-
-
-        <?php
-$__split = function ($name, $params = []) {
-    return [$name, $params];
-};
-[$__name, $__params] = $__split(filament()->getTopbarLivewireComponent());
-
-$__keyOuter = $__key ?? null;
-
-$__key = null;
-$__componentSlots = [];
-
-$__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-3347238579-0', $__key);
-
-$__html = app('livewire')->mount($__name, $__params, $__key, $__componentSlots);
-
-echo $__html;
-
-unset($__html);
-unset($__key);
-$__key = $__keyOuter;
-unset($__keyOuter);
-unset($__name);
-unset($__params);
-unset($__componentSlots);
-unset($__split);
-?>
-
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::TOPBAR_AFTER, scopes: $renderHookScopes)); ?>
-
-    <?php elseif($hasNavigation): ?>
+<?php $component->withAttributes(['livewire' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($livewire)]); ?>
+    
+    <div
+        class="fi-layout flex min-h-screen w-full flex-row-reverse overflow-x-clip"
+    >
         <div
-            <?php if($isSidebarFullyCollapsibleOnDesktop): ?>
+            <?php if(filament()->isSidebarCollapsibleOnDesktop()): ?>
                 x-data="{}"
-                x-bind:class="{ 'lg:fi-hidden': $store.sidebar.isOpen }"
+                x-bind:class="{
+                    'fi-main-ctn-sidebar-open': $store.sidebar.isOpen,
+                }"
+                x-bind:style="'display: flex; opacity:1;'" 
+            <?php elseif(filament()->isSidebarFullyCollapsibleOnDesktop()): ?>
+                x-data="{}"
+                x-bind:class="{
+                    'fi-main-ctn-sidebar-open': $store.sidebar.isOpen,
+                }"
+                x-bind:style="'display: flex; opacity:1;'" 
+            <?php elseif(! (filament()->isSidebarCollapsibleOnDesktop() || filament()->isSidebarFullyCollapsibleOnDesktop() || filament()->hasTopNavigation() || (! filament()->hasNavigation()))): ?>
+                x-data="{}"
+                x-bind:style="'display: flex; opacity:1;'" 
             <?php endif; ?>
             class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                'fi-layout-sidebar-toggle-btn-ctn',
-                'lg:fi-hidden' => ! $isSidebarFullyCollapsibleOnDesktop,
+                'fi-main-ctn w-screen flex-1 flex-col',
+                'h-full opacity-0 transition-all' => filament()->isSidebarCollapsibleOnDesktop() || filament()->isSidebarFullyCollapsibleOnDesktop(),
+                'opacity-0' => ! (filament()->isSidebarCollapsibleOnDesktop() || filament()->isSidebarFullyCollapsibleOnDesktop() || filament()->hasTopNavigation() || (! filament()->hasNavigation())),
+                'flex' => filament()->hasTopNavigation() || (! filament()->hasNavigation()),
             ]); ?>"
         >
-            <?php if (isset($component)) { $__componentOriginalf0029cce6d19fd6d472097ff06a800a1 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.icon-button','data' => ['color' => 'gray','icon' => \Filament\Support\Icons\Heroicon::OutlinedBars3,'iconAlias' => \Filament\View\PanelsIconAlias::SIDEBAR_EXPAND_BUTTON,'iconSize' => 'lg','label' => __('filament-panels::layout.actions.sidebar.expand.label'),'xCloak' => true,'xData' => '{}','xOn:click' => '$store.sidebar.open()','class' => 'fi-layout-sidebar-toggle-btn']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('filament::icon-button'); ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(filament()->hasTopbar()): ?>
+                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::TOPBAR_BEFORE, scopes: $livewire?->getRenderHookScopes())); ?>
+
+
+                <?php if (isset($component)) { $__componentOriginal3730a29838011bd2ea530ae9e3b87bdd = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal3730a29838011bd2ea530ae9e3b87bdd = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-panels::components.topbar.index','data' => ['navigation' => $navigation]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('filament-panels::topbar'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['color' => 'gray','icon' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Filament\Support\Icons\Heroicon::OutlinedBars3),'icon-alias' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Filament\View\PanelsIconAlias::SIDEBAR_EXPAND_BUTTON),'icon-size' => 'lg','label' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-panels::layout.actions.sidebar.expand.label')),'x-cloak' => true,'x-data' => '{}','x-on:click' => '$store.sidebar.open()','class' => 'fi-layout-sidebar-toggle-btn']); ?>
-<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
-
+<?php $component->withAttributes(['navigation' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($navigation)]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalf0029cce6d19fd6d472097ff06a800a1)): ?>
-<?php $attributes = $__attributesOriginalf0029cce6d19fd6d472097ff06a800a1; ?>
-<?php unset($__attributesOriginalf0029cce6d19fd6d472097ff06a800a1); ?>
+<?php if (isset($__attributesOriginal3730a29838011bd2ea530ae9e3b87bdd)): ?>
+<?php $attributes = $__attributesOriginal3730a29838011bd2ea530ae9e3b87bdd; ?>
+<?php unset($__attributesOriginal3730a29838011bd2ea530ae9e3b87bdd); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalf0029cce6d19fd6d472097ff06a800a1)): ?>
-<?php $component = $__componentOriginalf0029cce6d19fd6d472097ff06a800a1; ?>
-<?php unset($__componentOriginalf0029cce6d19fd6d472097ff06a800a1); ?>
+<?php if (isset($__componentOriginal3730a29838011bd2ea530ae9e3b87bdd)): ?>
+<?php $component = $__componentOriginal3730a29838011bd2ea530ae9e3b87bdd; ?>
+<?php unset($__componentOriginal3730a29838011bd2ea530ae9e3b87bdd); ?>
 <?php endif; ?>
+
+                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::TOPBAR_AFTER, scopes: $livewire?->getRenderHookScopes())); ?>
+
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::CONTENT_BEFORE, scopes: $livewire?->getRenderHookScopes())); ?>
+
+
+            <main
+                class="<?php echo \Illuminate\Support\Arr::toCssClasses([
+                    'fi-main mx-auto h-full w-full px-4 md:px-6 lg:px-8',
+                    match ($maxContentWidth ??= (filament()->getMaxContentWidth() ?? MaxWidth::SevenExtraLarge)) {
+                        MaxWidth::ExtraSmall, 'xs' => 'max-w-xs',
+                        MaxWidth::Small, 'sm' => 'max-w-sm',
+                        MaxWidth::Medium, 'md' => 'max-w-md',
+                        MaxWidth::Large, 'lg' => 'max-w-lg',
+                        MaxWidth::ExtraLarge, 'xl' => 'max-w-xl',
+                        MaxWidth::TwoExtraLarge, '2xl' => 'max-w-2xl',
+                        MaxWidth::ThreeExtraLarge, '3xl' => 'max-w-3xl',
+                        MaxWidth::FourExtraLarge, '4xl' => 'max-w-4xl',
+                        MaxWidth::FiveExtraLarge, '5xl' => 'max-w-5xl',
+                        MaxWidth::SixExtraLarge, '6xl' => 'max-w-6xl',
+                        MaxWidth::SevenExtraLarge, '7xl' => 'max-w-7xl',
+                        MaxWidth::Full, 'full' => 'max-w-full',
+                        MaxWidth::MinContent, 'min' => 'max-w-min',
+                        MaxWidth::MaxContent, 'max' => 'max-w-max',
+                        MaxWidth::FitContent, 'fit' => 'max-w-fit',
+                        MaxWidth::Prose, 'prose' => 'max-w-prose',
+                        MaxWidth::ScreenSmall, 'screen-sm' => 'max-w-screen-sm',
+                        MaxWidth::ScreenMedium, 'screen-md' => 'max-w-screen-md',
+                        MaxWidth::ScreenLarge, 'screen-lg' => 'max-w-screen-lg',
+                        MaxWidth::ScreenExtraLarge, 'screen-xl' => 'max-w-screen-xl',
+                        MaxWidth::ScreenTwoExtraLarge, 'screen-2xl' => 'max-w-screen-2xl',
+                        default => $maxContentWidth,
+                    },
+                ]); ?>"
+            >
+                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::CONTENT_START, scopes: $livewire?->getRenderHookScopes())); ?>
+
+
+                <?php echo e($slot); ?>
+
+
+                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::CONTENT_END, scopes: $livewire?->getRenderHookScopes())); ?>
+
+            </main>
+
+            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::CONTENT_AFTER, scopes: $livewire?->getRenderHookScopes())); ?>
+
+
+            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::FOOTER, scopes: $livewire?->getRenderHookScopes())); ?>
+
         </div>
-    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    <div class="fi-layout">
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::LAYOUT_START, scopes: $renderHookScopes)); ?>
-
-
-        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($hasNavigation): ?>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(filament()->hasNavigation()): ?>
             <div
                 x-cloak
                 x-data="{}"
                 x-on:click="$store.sidebar.close()"
                 x-show="$store.sidebar.isOpen"
                 x-transition.opacity.300ms
-                class="fi-sidebar-close-overlay"
+                class="fi-sidebar-close-overlay fixed inset-0 z-30 bg-gray-950/50 transition duration-500 dark:bg-gray-950/75 lg:hidden"
             ></div>
 
-            <?php
-$__split = function ($name, $params = []) {
-    return [$name, $params];
-};
-[$__name, $__params] = $__split(filament()->getSidebarLivewireComponent());
+            <?php if (isset($component)) { $__componentOriginal507b9338c225a118b42b83ae4f73ad2b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal507b9338c225a118b42b83ae4f73ad2b = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-panels::components.sidebar.index','data' => ['navigation' => $navigation,'class' => 'fi-main-sidebar']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('filament-panels::sidebar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['navigation' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($navigation),'class' => 'fi-main-sidebar']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal507b9338c225a118b42b83ae4f73ad2b)): ?>
+<?php $attributes = $__attributesOriginal507b9338c225a118b42b83ae4f73ad2b; ?>
+<?php unset($__attributesOriginal507b9338c225a118b42b83ae4f73ad2b); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal507b9338c225a118b42b83ae4f73ad2b)): ?>
+<?php $component = $__componentOriginal507b9338c225a118b42b83ae4f73ad2b; ?>
+<?php unset($__componentOriginal507b9338c225a118b42b83ae4f73ad2b); ?>
+<?php endif; ?>
 
-$__keyOuter = $__key ?? null;
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    setTimeout(() => {
+                        let activeSidebarItem = document.querySelector(
+                            '.fi-main-sidebar .fi-sidebar-item.fi-active',
+                        )
 
-$__key = null;
-$__componentSlots = [];
+                        if (
+                            !activeSidebarItem ||
+                            activeSidebarItem.offsetParent === null
+                        ) {
+                            activeSidebarItem = document.querySelector(
+                                '.fi-main-sidebar .fi-sidebar-group.fi-active',
+                            )
+                        }
 
-$__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-3347238579-1', $__key);
+                        if (
+                            !activeSidebarItem ||
+                            activeSidebarItem.offsetParent === null
+                        ) {
+                            return
+                        }
 
-$__html = app('livewire')->mount($__name, $__params, $__key, $__componentSlots);
+                        const sidebarWrapper = document.querySelector(
+                            '.fi-main-sidebar .fi-sidebar-nav',
+                        )
 
-echo $__html;
+                        if (!sidebarWrapper) {
+                            return
+                        }
 
-unset($__html);
-unset($__key);
-$__key = $__keyOuter;
-unset($__keyOuter);
-unset($__name);
-unset($__params);
-unset($__componentSlots);
-unset($__split);
-?>
+                        sidebarWrapper.scrollTo(
+                            0,
+                            activeSidebarItem.offsetTop -
+                                window.innerHeight / 2,
+                        )
+                    }, 10)
+                })
+            </script>
         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-
-        <div
-            <?php if($isSidebarCollapsibleOnDesktop): ?>
-                x-data="{}"
-                x-bind:class="{
-                    'fi-main-ctn-sidebar-open': $store.sidebar.isOpen,
-                }"
-                x-bind:style="'display: flex; opacity:1;'"
-                
-            <?php elseif($isSidebarFullyCollapsibleOnDesktop): ?>
-                x-data="{}"
-                x-bind:class="{
-                    'fi-main-ctn-sidebar-open': $store.sidebar.isOpen,
-                }"
-                x-bind:style="'display: flex; opacity:1;'"
-                
-            <?php elseif(! ($isSidebarCollapsibleOnDesktop || $isSidebarFullyCollapsibleOnDesktop || $hasTopNavigation || (! $hasNavigation))): ?>
-                x-data="{}"
-                x-bind:style="'display: flex; opacity:1;'" 
-            <?php endif; ?>
-            class="fi-main-ctn"
-        >
-            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::CONTENT_BEFORE, scopes: $renderHookScopes)); ?>
-
-
-            <main
-                class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                    'fi-main',
-                    ($maxContentWidth instanceof Width) ? "fi-width-{$maxContentWidth->value}" : $maxContentWidth,
-                ]); ?>"
-            >
-                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::CONTENT_START, scopes: $renderHookScopes)); ?>
-
-
-                <?php echo e($slot); ?>
-
-
-                <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::CONTENT_END, scopes: $renderHookScopes)); ?>
-
-            </main>
-
-            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::CONTENT_AFTER, scopes: $renderHookScopes)); ?>
-
-
-            <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::FOOTER, scopes: $renderHookScopes)); ?>
-
-        </div>
-
-        <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::LAYOUT_END, scopes: $renderHookScopes)); ?>
-
     </div>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>

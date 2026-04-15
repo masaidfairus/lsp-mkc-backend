@@ -34,30 +34,21 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars, $__key, $__value); ?>
 
-<?php
-    $heading ??= $this->getHeading();
-    $subheading ??= $this->getSubHeading();
-    $hasLogo = $this->hasLogo();
-?>
-
 <div <?php echo e($attributes->class(['fi-simple-page'])); ?>>
     <?php echo e(\Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SIMPLE_PAGE_START, scopes: $this->getRenderHookScopes())); ?>
 
 
-    <div class="fi-simple-page-content">
-        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(filled($heading) || $hasLogo || filled($subheading)): ?>
-            <?php if (isset($component)) { $__componentOriginal2a251355e952c89de8b30f2844a671a7 = $component; } ?>
+    <section class="grid auto-cols-fr gap-y-6">
+        <?php if (isset($component)) { $__componentOriginal2a251355e952c89de8b30f2844a671a7 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal2a251355e952c89de8b30f2844a671a7 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-panels::components.header.simple','data' => ['heading' => $heading,'logo' => $hasLogo,'subheading' => $subheading]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament-panels::components.header.simple','data' => ['heading' => $heading ??= $this->getHeading(),'logo' => $this->hasLogo(),'subheading' => $subheading ??= $this->getSubHeading()]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('filament-panels::header.simple'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['heading' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($heading),'logo' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($hasLogo),'subheading' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($subheading)]); ?>
-<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
-
+<?php $component->withAttributes(['heading' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($heading ??= $this->getHeading()),'logo' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($this->hasLogo()),'subheading' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($subheading ??= $this->getSubHeading())]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal2a251355e952c89de8b30f2844a671a7)): ?>
@@ -68,11 +59,10 @@ unset($__defined_vars, $__key, $__value); ?>
 <?php $component = $__componentOriginal2a251355e952c89de8b30f2844a671a7; ?>
 <?php unset($__componentOriginal2a251355e952c89de8b30f2844a671a7); ?>
 <?php endif; ?>
-        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
         <?php echo e($slot); ?>
 
-    </div>
+    </section>
 
     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(! $this instanceof \Filament\Tables\Contracts\HasTable): ?>
         <?php if (isset($component)) { $__componentOriginal028e05680f6c5b1e293abd7fbe5f9758 = $component; } ?>
@@ -85,8 +75,6 @@ unset($__defined_vars, $__key, $__value); ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
-<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
-
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal028e05680f6c5b1e293abd7fbe5f9758)): ?>

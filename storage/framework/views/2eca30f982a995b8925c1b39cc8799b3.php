@@ -32,14 +32,9 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars, $__key, $__value); ?>
 
-<?php
-    $src = filament()->getUserAvatarUrl($user);
-    $alt = __('filament-panels::layout.avatar.alt', ['name' => filament()->getUserName($user)]);
-?>
-
 <?php if (isset($component)) { $__componentOriginal7aa0b6b1aa4a6b63824d7be5e541d1cb = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal7aa0b6b1aa4a6b63824d7be5e541d1cb = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.avatar','data' => ['src' => $src,'alt' => $alt,'attributes' => 
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'filament::components.avatar','data' => ['src' => filament()->getUserAvatarUrl($user),'alt' => __('filament-panels::layout.avatar.alt', ['name' => filament()->getUserName($user)]),'attributes' => 
         \Filament\Support\prepare_inherited_attributes($attributes)
             ->class(['fi-user-avatar'])
     ]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -49,12 +44,10 @@ unset($__defined_vars, $__key, $__value); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['src' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($src),'alt' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($alt),'attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
+<?php $component->withAttributes(['src' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(filament()->getUserAvatarUrl($user)),'alt' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(__('filament-panels::layout.avatar.alt', ['name' => filament()->getUserName($user)])),'attributes' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(
         \Filament\Support\prepare_inherited_attributes($attributes)
             ->class(['fi-user-avatar'])
     )]); ?>
-<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
-
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal7aa0b6b1aa4a6b63824d7be5e541d1cb)): ?>
