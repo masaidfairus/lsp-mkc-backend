@@ -22,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::policy(AssessmentRegistration::class, RegistrationPolicy::class);
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('super_admin') ? true : null;
+        });
+
+        \App\Models\UserSignature::observe(\App\Observers\UserSignatureObserver::class);
     }
 }

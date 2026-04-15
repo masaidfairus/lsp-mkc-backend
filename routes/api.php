@@ -52,4 +52,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('registrations/{registration}/apl02-form',        [AssessmentRegistrationController::class, 'form']);
     Route::post('registrations/{registration}/apl02-evidence',   [AssessmentRegistrationController::class, 'uploadBuktiRelevan']);
     Route::post('registrations/{registration}/self-assessments', [AssessmentRegistrationController::class, 'submitAnswers']);
+    Route::post('registrations/{registration}/ak01',             [AssessmentRegistrationController::class, 'storeAk01']);
 });

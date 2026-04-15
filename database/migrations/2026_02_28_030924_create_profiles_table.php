@@ -5,8 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,13 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('gender')->default(Gender::MALE);
+            $table->string('place_of_birth');        // ← TAMBAH
             $table->date('date_of_birth');
             $table->text('address');
+            $table->string('home_postal_code');       // ← TAMBAH
             $table->string('phone_number')->index();
             $table->string('education_qualifications');
             $table->string('company_name');
             $table->string('job_title');
             $table->text('company_address');
+            $table->string('company_postal_code');    // ← TAMBAH
             $table->string('company_contact');
             $table->timestamps();
         });

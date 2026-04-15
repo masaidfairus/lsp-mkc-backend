@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\EvidenceStatus;
+use App\Enums\ValidationResult;
 
 class Apl01Evidence extends Model
 {
@@ -12,13 +13,14 @@ class Apl01Evidence extends Model
     protected $fillable = [
         'registration_id', 'requirement_id',
         'file_path', 'is_valid_admin', 'admin_notes',
-        'status', 'verified_by', 'verified_at',
+        'status', 'validation_result', 'verified_by', 'verified_at',
     ];
 
     protected $casts = [
         'is_valid_admin' => 'boolean',
         'verified_at'    => 'datetime',
         'status' => EvidenceStatus::class,
+        'validation_result' => ValidationResult::class,
     ];
 
     public function apl01Data()
