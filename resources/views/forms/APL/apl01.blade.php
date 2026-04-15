@@ -184,9 +184,7 @@
     <tr>
         <td class="lbl">Jenis kelamin</td>
         <td class="colon">:</td>
-        <td class="val">
-            {{ $jenis_kelamin }}
-        </td>
+        <td class="val">{{ $jenis_kelamin }}</td>
     </tr>
     <tr class="spacer"><td colspan="3"></td></tr>
 
@@ -197,26 +195,26 @@
     </tr>
     <tr class="spacer"><td colspan="3"></td></tr>
 
-    {{-- Alamat: baris 1 --}}
+    {{-- Alamat baris 1 - FIX: vertical-align top supaya teks wrap ke bawah, bukan ngangkat --}}
     <tr>
-        <td class="lbl">Alamat rumah</td>
-        <td class="colon"></td>
-        <td class="val">{{ $alamat }}</td>
+        <td class="lbl" style="vertical-align:top; padding-top:3px;">Alamat rumah</td>
+        <td class="colon" style="vertical-align:top; padding-top:3px;">:</td>
+        <td class="val" style="vertical-align:top; padding-top:3px;">{{ $alamat }}</td>
     </tr>
-    {{-- Alamat: baris 2 --}}
+    {{-- Alamat baris 2 --}}
     <tr>
-        <td class="lbl"></td>
-        <td class="colon"></td>
-        <td class="val">{{ $rt_rw ? 'RT/RW '.$rt_rw.', ' : '' }}{{ $kelurahan }}, {{ $kecamatan }}</td>
+        <td class="lbl" style="vertical-align:top; padding-top:3px;"></td>
+        <td class="colon" style="vertical-align:top; padding-top:3px;"></td>
+        <td class="val" style="vertical-align:top; padding-top:3px;">{{ $rt_rw ? 'RT/RW '.$rt_rw.', ' : '' }}{{ $kelurahan }}, {{ $kecamatan }}</td>
     </tr>
-    {{-- Alamat: baris 3 + kode pos --}}
+    {{-- Alamat baris 3 + kode pos --}}
     <tr>
-        <td class="lbl"></td>
-        <td class="colon">:</td>
-        <td style="vertical-align:bottom; padding-bottom:0;">
+        <td class="lbl" style="vertical-align:top; padding-top:3px;"></td>
+        <td class="colon" style="vertical-align:top; padding-top:3px;">:</td>
+        <td style="vertical-align:top; padding-top:3px; padding-bottom:0;">
             <table style="width:100%; border-collapse:collapse;">
                 <tr>
-                    <td style="width:52%; border-bottom:2px solid #000; padding-bottom:2px; font-size:9.5pt;">
+                    <td style="width:52%; border-bottom:2px solid #000; padding-bottom:2px; font-size:9.5pt; vertical-align:top; word-wrap:break-word;">
                         {{ $kabupaten }}, {{ $provinsi }}
                     </td>
                     <td style="width:2%;"></td>
@@ -282,7 +280,7 @@
     <tr>
         <td class="lbl">Alamat Kantor</td>
         <td class="colon">:</td>
-        <td class="val">{{ $alamat_instansi ?? '' }}</td>
+        <td class="val" style="vertical-align:top; padding-top:3px;">{{ $alamat_instansi ?? '' }}</td>
     </tr>
     {{-- Baris 2 alamat kantor + kode pos --}}
     <tr>
@@ -362,19 +360,19 @@
                 </tr>
                 <tr>
                     <td style="padding:6px 4px; border: 0px solid #000;">
-                        <span class="{{ ($tujuan_asesmen ?? '') == 'PKT' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                        <span class="{{ ($tujuan_asesmen ?? '') == 'pengakuan_kompetensi_terkini' ? 'checkbox-checked' : 'checkbox' }}"></span>
                         Pengakuan Kompetensi Terkini (PKT)
                     </td>
                 </tr>
                 <tr>
                     <td style="padding:6px 4px; border: 0px solid #000;">
-                        <span class="{{ ($tujuan_asesmen ?? '') == 'RPL' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                        <span class="{{ ($tujuan_asesmen ?? '') == 'rekognisi_pembelajaran_lampau' ? 'checkbox-checked' : 'checkbox' }}"></span>
                         Rekognisi Pembelajaran Lampau (RPL)
                     </td>
                 </tr>
                 <tr>
                     <td style="padding:6px 4px; border: 0px solid #000;">
-                        <span class="{{ ($tujuan_asesmen ?? '') == 'Lainnya' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                        <span class="{{ ($tujuan_asesmen ?? '') == 'lainnya' ? 'checkbox-checked' : 'checkbox' }}"></span>
                         Lainnya
                     </td>
                 </tr>
@@ -439,20 +437,20 @@
     <tbody>
         @if(!empty($persyaratan_dasar))
             @foreach($persyaratan_dasar as $i => $syarat)
-<tr>
-    <td class="center">{{ $i + 1 }}.</td>
-    <td>{{ $syarat['nama'] }}</td>
-    <td class="center">
-        <span class="{{ $syarat['status']->value === 'valid' ? 'checkbox-checked' : 'checkbox' }}"></span>
-    </td>
-    <td class="center">
-        <span class="{{ $syarat['status']->value === 'invalid' ? 'checkbox-checked' : 'checkbox' }}"></span>
-    </td>
-    <td class="center">
-        <span class="{{ $syarat['status']->value === 'pending' ? 'checkbox-checked' : 'checkbox' }}"></span>
-    </td>
-</tr>
-@endforeach
+            <tr>
+                <td class="center">{{ $i + 1 }}.</td>
+                <td>{{ $syarat['nama'] }}</td>
+                <td class="center">
+                    <span class="{{ $syarat['status']->value === 'valid' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                </td>
+                <td class="center">
+                    <span class="{{ $syarat['status']->value === 'invalid' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                </td>
+                <td class="center">
+                    <span class="{{ $syarat['status']->value === 'pending' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                </td>
+            </tr>
+            @endforeach
         @else
         <tr>
             <td class="center">1.</td>
@@ -489,21 +487,21 @@
     </thead>
     <tbody>
         @if(!empty($bukti_administratif))
-           @foreach($bukti_administratif as $i => $bukti)
-<tr>
-    <td class="center">{{ $i + 1 }}.</td>
-    <td>{{ $bukti['nama'] }}</td>
-    <td class="center">
-        <span class="{{ $bukti['status']->value === 'valid' ? 'checkbox-checked' : 'checkbox' }}"></span>
-    </td>
-    <td class="center">
-        <span class="{{ $bukti['status']->value === 'invalid' ? 'checkbox-checked' : 'checkbox' }}"></span>
-    </td>
-    <td class="center">
-        <span class="{{ $bukti['status']->value === 'pending' ? 'checkbox-checked' : 'checkbox' }}"></span>
-    </td>
-</tr>
-@endforeach
+            @foreach($bukti_administratif as $i => $bukti)
+            <tr>
+                <td class="center">{{ $i + 1 }}.</td>
+                <td>{{ $bukti['nama'] }}</td>
+                <td class="center">
+                    <span class="{{ $bukti['status']->value === 'valid' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                </td>
+                <td class="center">
+                    <span class="{{ $bukti['status']->value === 'invalid' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                </td>
+                <td class="center">
+                    <span class="{{ $bukti['status']->value === 'pending' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                </td>
+            </tr>
+            @endforeach
         @else
         <tr>
             <td class="center">1.</td>
@@ -569,7 +567,6 @@
             </table>
         </td>
     </tr>
-
 </table>
 
 </body>
