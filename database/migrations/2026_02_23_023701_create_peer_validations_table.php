@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PeerValidationStatus;
 use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -17,7 +18,7 @@ return new class extends Migration
             $table->foreignId('scheme_id')->constrained('schemes')->cascadeOnDelete();
             $table->foreignId('main_assessor_id')->constrained('users');
             $table->foreignId('peer_assessor_id')->constrained('users');
-            $table->string('status')->default(Status::PENDING)->index();
+            $table->string('status')->default(PeerValidationStatus::PENDING)->index();
             $table->text('notes')->nullable();
             $table->timestamp('validated_at')->nullable();
             $table->timestamps();

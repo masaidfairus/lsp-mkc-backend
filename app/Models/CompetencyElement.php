@@ -23,6 +23,6 @@ class CompetencyElement extends Model
 
     public function selfAssessments()
     {
-        return $this->hasMany(SelfAssessment::class);
+        return $this->hasMany(SelfAssessment::class, 'element_id');
     }
 }

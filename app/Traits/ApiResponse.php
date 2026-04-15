@@ -17,7 +17,7 @@ trait ApiResponse
         ], $code);
     }
 
-    protected function errorResponse($errorCode, $httpStatus = 400): JsonResponse
+    protected function errorResponse($errorCode, $httpStatus = 400, $data = []): JsonResponse
     {
         $message = config("errors.$errorCode") ?? 'Terjadi kesalahan sistem';
 
@@ -26,7 +26,7 @@ trait ApiResponse
                 'code' => $errorCode,
                 'message' => $message
             ],
-            'response' => (object)[]
+            'response' => $data
         ], $httpStatus);
     }
 }

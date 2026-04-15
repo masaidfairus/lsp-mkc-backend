@@ -8,24 +8,20 @@ class AssessmentPlanning extends Model
 {
     protected $fillable = [
         'registration_id',
-        'ak01_data',
         'mapa01_data',
         'mapa02_data',
+        'ak01_data',
         'ak07_data',
-        'methods',
-        'is_ak01_confirmed',
-        'confirmed_at',
         'version',
+        'confirmed_at',
     ];
 
     protected $casts = [
-        'is_ak01_confirmed' => 'boolean',
-        'confirmed_at' => 'datetime',
-        'methods' => 'array',
-        'ak01_data' => 'array',
         'mapa01_data' => 'array',
         'mapa02_data' => 'array',
+        'ak01_data' => 'array',
         'ak07_data' => 'array',
+        'confirmed_at' => 'datetime',
     ];
 
     public function registration()

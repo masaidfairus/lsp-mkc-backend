@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,8 +15,6 @@ return new class extends Migration
             $table->foreignId('registration_id')->constrained('assessment_registrations')->cascadeOnDelete();
             $table->foreignId('element_id')->constrained('competency_elements')->cascadeOnDelete();
             $table->boolean('is_competent')->default(false);
-            $table->foreignId('evidence_id')->nullable()->constrained('apl01_evidence')->nullOnDelete();
-
             $table->boolean('is_verified_by_assessor')->default(false);
             $table->text('assessor_notes')->nullable();
             $table->string('file_path')->nullable();

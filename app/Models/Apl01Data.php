@@ -23,6 +23,9 @@ class Apl01Data extends Model
         'company_address',
         'company_postal_code',
         'company_contact',
+        'place_of_birth',
+        'home_postal_code',
+        'company_postal_code'
     ];
 
     protected $casts = [

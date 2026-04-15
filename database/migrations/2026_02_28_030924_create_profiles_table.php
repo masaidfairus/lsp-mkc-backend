@@ -15,17 +15,19 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('gender')->default(Gender::MALE);
-            $table->string('place_of_birth');        // ← TAMBAH
+            $table->string('place_of_birth');
             $table->date('date_of_birth');
             $table->text('address');
-            $table->string('home_postal_code');       // ← TAMBAH
+            $table->date('home_postal_code');
             $table->string('phone_number')->index();
             $table->string('education_qualifications');
             $table->string('company_name');
             $table->string('job_title');
             $table->text('company_address');
-            $table->string('company_postal_code');    // ← TAMBAH
+            $table->text('company_postal_code');
             $table->string('company_contact');
+            $table->string('asesi_type')->default('pribadi');
+            $table->string('institution_name')->nullable();
             $table->timestamps();
         });
     }
