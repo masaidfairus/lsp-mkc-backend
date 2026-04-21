@@ -35,7 +35,7 @@ Route::get('/logout', [AuthController::class, 'logout']);
 // Route::prefix('download')->name('download.')->group(function () {
 //     Route::get('/apl01/{apl01}', [PdfPreviewController::class, 'apl01Download'])->name('apl01');
 // });
-Route::get('/apl01', [PdfApl01Controller::class, 'index'])->name('apl01.form');
+Route::get('/apl01/{registration}', [PdfApl01Controller::class, 'show'])->name('apl01.form');
 
 Route::post('/apl01/generate', [PdfApl01Controller::class, 'generate'])->name('apl01.generate');
 
@@ -63,6 +63,7 @@ Route::get('/apl01/preview', function () {
         'pekerjaan' => '',
         'instansi' => '',
         'alamat_instansi' => '',
+        'kode_pos_kantor' => '',
         'nama_skema' => '',
         'kode_skema' => '',
         'tujuan_asesmen' => '',
@@ -89,7 +90,8 @@ Route::get('/apl01/preview', function () {
 // ============================================================
 // APL02
 // ============================================================
-Route::post('/apl02/generate', [PdfApl02Controller::class, 'generate'])->name('apl02.generate');
+// Route::post('/apl02/generate', [PdfApl02Controller::class, 'generate'])->name('apl02.generate');
+Route::get('/apl02/{registration}', [PdfApl02Controller::class, 'show'])->name('apl02.form');
 
 Route::get('/apl02/preview', function () {
     $data = [

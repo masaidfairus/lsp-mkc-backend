@@ -26,7 +26,7 @@ class SelfAssessment extends Model
     
     public function element()
     {
-        return $this->belongsTo(CompetencyElement::class, 'element_id');
+        return $this->belongsTo(CompetencyElement::class);
     }
 
     public function registration()

@@ -4,26 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DocumentList extends Model
+class   DocumentList extends Model
 {
     protected $fillable = [
         'title',
         'description',
     ];
 
-    public function basicRequirementProofs()
+    public function basicRequirementProof()
     {
-        return $this->hasMany(BasicRequirementProof::class, 'list_id');
+        return $this->hasOne(BasicRequirementProof::class, 'list_id');
     }
 
-    public function administrativeProofs()
+    public function administrativeProof()
     {
-        return $this->hasMany(AdministrativeProof::class, 'list_id');
+        return $this->hasOne(AdministrativeProof::class, 'list_id');
     }
 
     public function portfolioScheme()
     {
-        return $this->hasMany(PortfolioScheme::class, 'list_id');
+        return $this->hasOne(PortfolioScheme::class, 'list_id');
     }
 
     public function fileProfile()

@@ -8,8 +8,8 @@ class PerformanceCriterion extends Model
 {
     protected $fillable = [
         'element_id',
+        'name',
         'description',
-        'sort_order',
     ];
 
     public function element()

@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Enums\Apl01Status;
 use App\Filament\Resources\Apl01Resource\Pages;
 use App\Filament\Resources\Apl01Resource\RelationManagers;
+use App\Models\Apl01;
 use App\Models\AssessmentRegistration;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -17,7 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Apl01Resource extends Resource
 {
-    protected static ?string $model = \App\Models\Apl01::class;
+    protected static ?string $model = Apl01::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'APL-01';
@@ -54,9 +55,9 @@ class Apl01Resource extends Resource
                             ->schema([
                                 Forms\Components\Select::make('assessor_id')
                                     ->relationship('assessor', 'name', function (Builder $query) {
-                                        return $query->where('role', Role::ADMIN->value);
+                                        return $query->where('role', Role::ASESOR->value);
                                     })
-                                    ->label('Admin Bertugas')
+                                    ->label('Asesi Bertugas')
                                     ->searchable()
                                     ->preload(),
                                 Forms\Components\Select::make('status_apl01')

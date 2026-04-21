@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\EvidenceStatus;
 use App\Enums\ValidationResult;
+use Illuminate\Support\Facades\Storage;
 
 class Apl01Evidence extends Model
 {
