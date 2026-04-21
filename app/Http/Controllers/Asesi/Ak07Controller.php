@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Asesi;
 use App\Enums\Apl01Status;
 use App\Enums\Apl02Status;
 use App\Http\Controllers\Controller;
-use App\Models\AssessmentPlanning;
 use App\Models\AssessmentRegistration;
 use Illuminate\Http\Request;
 
 class Ak07Controller extends Controller
 {
+    /**
+     * GET /api/registrations/{registration}/ak07
+     * Returns the full ak07_data for the given registration.
+     */
     public function show(AssessmentRegistration $registration)
     {
         if ($registration->user_id !== request()->user()->id) {
@@ -25,9 +28,19 @@ class Ak07Controller extends Controller
             return $this->errorResponse('E2018', 403);
         }
 
-        return $this->successResponse($registration->plannings->first()->ak07_data);
+        $record = $registration->plannings->first();
+
+        if (!$record) {
+            return $this->errorResponse('E2020', 404);
+        }
+
+        return $this->successResponse($record->ak07_data);
     }
 
+    /**
+     * POST /api/registrations/{registration}/ak07
+     * Asesi submits only their signature from the mobile device.
+     */
     public function store(Request $request, AssessmentRegistration $registration)
     {
         if ($registration->user_id !== $request->user()->id) {
@@ -43,17 +56,23 @@ class Ak07Controller extends Controller
         }
 
         $validated = $request->validate([
-            'name' => ['required', 'string'],
-            'date' => ['required', 'date'],
+            'name'      => ['required', 'string'],
+            'date'      => ['required', 'date'],
             'signature' => ['required', 'string'],
         ]);
 
         $record = $registration->plannings->first();
+
+        if (!$record) {
+            return $this->errorResponse('E2020', 404);
+        }
+
+        // Patch only the asesi signature — all other ak07_data written by admin panel
         $data = $record->ak07_data ?? [];
 
         $data['signatures']['asesi'] = [
-            'name' => $validated['name'],
-            'date' => $validated['date'],
+            'name'      => $validated['name'],
+            'date'      => $validated['date'],
             'signature' => $validated['signature'],
         ];
 
@@ -62,7 +81,7 @@ class Ak07Controller extends Controller
 
         return $this->successResponse(
             $record->ak07_data,
-            'Data AK.07 berhasil disimpan'
+            'Tanda tangan AK.07 berhasil disimpan'
         );
     }
 }

@@ -9,12 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::table('apl01_evidence', function (Blueprint $table) {
+   public function up(): void
+{
+    Schema::table('apl01_evidence', function (Blueprint $table) {
+        if (!Schema::hasColumn('apl01_evidence', 'validation_result')) {
             $table->string('validation_result')->default('pending')->after('status');
-        });
-    }
+        }
+    });
+}
 
     /**
      * Reverse the migrations.

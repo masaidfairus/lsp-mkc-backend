@@ -24,6 +24,10 @@ use App\Http\Controllers\PDF\PdfApl02Controller;
 
 Route::get('/logout', [AuthController::class, 'logout']);
 
+Route::get('/signature/verify', function () {
+    return view('signature.verify');
+})->name('signature.verify');
+
 // ============================================================
 // APL01
 // ============================================================

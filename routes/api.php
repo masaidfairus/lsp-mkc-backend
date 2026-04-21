@@ -40,6 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/change-password', [ResetPasswordController::class, 'changePassword']);
 
+    Route::get('registrations', [App\Http\Controllers\Asesi\RegistrationController::class, 'index']);
+
     // Profil Asesi
     Route::apiResource('profile', ProfileController::class)->only([
         'show',

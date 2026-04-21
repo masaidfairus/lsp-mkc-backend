@@ -51,6 +51,8 @@ class ProfileController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
+            // ✅ Tambahkan validasi name
+            'name' => ['sometimes', 'string', 'max:255'],
             'gender' => ['sometimes', new Enum(Gender::class)],
             'date_of_birth' => ['sometimes', 'date', 'before:today'],
             'address' => ['sometimes', 'string', 'max:1000'],
@@ -64,6 +66,13 @@ class ProfileController extends Controller
             'institution_name' => ['required_if:asesi_type,institusi', 'nullable', 'string', 'max:255'],
         ]);
 
+        // ✅ Pisahkan field user dari field profile
+        if (isset($validated['name'])) {
+            $user->update(['name' => $validated['name']]);
+            unset($validated['name']); // Hapus dari payload supaya tidak masuk ke profiles
+        }
+
+        // Update tabel profiles (tanpa name)
         $user->profile()->update($validated);
 
         return $this->successResponse(

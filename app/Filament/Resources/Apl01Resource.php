@@ -81,6 +81,10 @@ class Apl01Resource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('registration_id')
+                    ->label('Registration ID')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')
                     ->searchable()
@@ -122,7 +126,7 @@ class Apl01Resource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\EvidenceRelationManager::class,
+            // RelationManagers\EvidenceRelationManager::class,
         ];
     }
 

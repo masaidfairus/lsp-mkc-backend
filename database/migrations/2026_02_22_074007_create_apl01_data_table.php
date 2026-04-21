@@ -16,21 +16,13 @@ return new class extends Migration
             $table->string('place_of_birth');
             $table->date('date_of_birth');
             $table->text('address');
-<<<<<<<< HEAD:database/migrations/2026_02_22_074007_create_apl01_data_table.php
-            $table->date('home_postal_code');
-========
-            $table->string('home_postal_code');
->>>>>>>> front-end:database/migrations/2026_02_22_172007_create_apl01_data_table.php
+            $table->string('home_postal_code', 10);
             $table->string('phone_number')->index();
             $table->string('education_qualifications');
             $table->string('company_name');
             $table->string('job_title');
             $table->text('company_address');
-<<<<<<<< HEAD:database/migrations/2026_02_22_074007_create_apl01_data_table.php
-            $table->text('company_postal_code');
-========
             $table->string('company_postal_code');
->>>>>>>> front-end:database/migrations/2026_02_22_172007_create_apl01_data_table.php
             $table->string('company_contact');
             $table->timestamps();
         });
