@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\Apl01Status;
+use App\Enums\EvidenceStatus;
+use App\Enums\ValidationResult;
 use Illuminate\Database\Eloquent\Model;
 
 class FileProfile extends Model
@@ -10,10 +13,17 @@ class FileProfile extends Model
         'user_id',
         'list_id',
         'upload_document',
+        'status',
+        'validation_result',
+        'admin_notes',
+        'verified_at',
+        'verified_by',
     ];
 
     protected $casts = [
-        'is_valid_admin' => 'boolean'
+        'status' => EvidenceStatus::class,
+        'validation_result' => ValidationResult::class,
+        'verified_at' => 'datetime',
     ];
 
     public function documentList()

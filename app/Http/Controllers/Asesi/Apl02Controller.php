@@ -12,6 +12,7 @@ use App\Models\DocumentList;
 use App\Models\FileProfile;
 use App\Models\PortfolioScheme;
 use App\Models\SelfAssessment;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -164,7 +165,7 @@ class Apl02Controller extends Controller
                 ['is_competent', 'updated_at']
             );
 
-            $registration->update(['status_apl02' => Apl02Status::SUBMITTED]);
+            $registration->update(['status_apl02' => Apl02Status::SUBMITTED, 'assessed_at' => Carbon::now()]);
         });
 
         return $this->successResponse(

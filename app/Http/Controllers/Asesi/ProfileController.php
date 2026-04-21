@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules\Enum;
 
 class ProfileController extends Controller
 {
-    public function show(Request $request)
+    public function index(Request $request)
     {
         return $this->successResponse(
             $request->user()->profile,

@@ -77,14 +77,6 @@
         .form-table tr.spacer td { height: 5px; border: none; }
 
         /* ===== CHECKBOX ===== */
-        .checkbox {
-            display: inline-block;
-            width: 11px;
-            height: 11px;
-            border: 1px solid #000;
-            margin-right: 6px;
-            vertical-align: middle;
-        }
         .checkbox-checked {
             display: inline-block;
             width: 11px;
@@ -92,7 +84,19 @@
             border: 1px solid #000;
             margin-right: 6px;
             vertical-align: middle;
-            background: #000;
+            position: relative;
+        }
+
+        .checkbox-checked::after {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 0px;
+            width: 3px;
+            height: 6px;
+            border: solid black;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
         }
 
         /* ===== TABEL BORDER (Bagian 2 & 3) ===== */
@@ -139,9 +143,9 @@
 <body>
 
     @php
-    $unit_kompetensi     = $unit_kompetensi ?? [];
-    $persyaratan_dasar   = $persyaratan_dasar ?? [];
-    $bukti_administratif = $bukti_administratif ?? [];
+$unit_kompetensi = $unit_kompetensi ?? [];
+$persyaratan_dasar = $persyaratan_dasar ?? [];
+$bukti_administratif = $bukti_administratif ?? [];
     @endphp
 {{-- ============================================================ --}}
 {{-- JUDUL UTAMA --}}
@@ -205,7 +209,7 @@
     <tr>
         <td class="lbl" style="vertical-align:top; padding-top:3px;"></td>
         <td class="colon" style="vertical-align:top; padding-top:3px;"></td>
-        <td class="val" style="vertical-align:top; padding-top:3px;">{{ $rt_rw ? 'RT/RW '.$rt_rw.', ' : '' }}{{ $kelurahan }}, {{ $kecamatan }}</td>
+        <td class="val" style="vertical-align:top; padding-top:3px;">{{ $rt_rw ? 'RT/RW ' . $rt_rw . ', ' : '' }}{{ $kelurahan }}, {{ $kecamatan }}</td>
     </tr>
     {{-- Alamat baris 3 + kode pos --}}
     <tr>

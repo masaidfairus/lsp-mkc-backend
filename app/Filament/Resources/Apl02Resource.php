@@ -5,7 +5,9 @@ namespace App\Filament\Resources;
 use App\Enums\Role;
 use App\Enums\Apl02Status;
 use App\Filament\Resources\Apl02Resource\Pages;
-use App\Models\AssessmentRegistration;
+use App\Filament\Resources\Apl02Resource\RelationManagers\PortfolioFilesRelationManager;
+use App\Filament\Resources\Apl02Resource\RelationManagers\SelfAssessmentRelationManager;
+use App\Models\Apl02;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,8 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Apl02Resource extends Resource
 {
-    protected static ?string $model = \App\Models\Apl02::class;
-
+    protected static ?string $model = Apl02::class;
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
     protected static ?string $navigationLabel = 'APL-02';
     protected static ?string $modelLabel = 'APL-02';
@@ -85,6 +86,14 @@ class Apl02Resource extends Resource
             ->bulkActions([
                 //
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            SelfAssessmentRelationManager::class,
+            PortfolioFilesRelationManager::class
+        ];
     }
 
     public static function getPages(): array

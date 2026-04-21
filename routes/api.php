@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Asesi\BankAccountController;
 use App\Http\Controllers\Asesi\DocumentProfileController;
+use App\Http\Controllers\Asesi\PaymentController;
 use App\Http\Controllers\PDF\PdfApl01Controller;
 use App\Http\Controllers\PDF\PdfApl02Controller;
 use App\Http\Middleware\EnsureApiKeyIsValid;
@@ -40,9 +41,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/change-password', [ResetPasswordController::class, 'changePassword']);
 
+    // Invoice
+    Route::get('registrations/{registration}/invoice', [PaymentController::class, 'show']);
+
     // Profil Asesi
     Route::apiResource('profile', ProfileController::class)->only([
-        'show',
+        'index',
         'store',
         'update'
     ]);
@@ -53,7 +57,6 @@ Route::middleware('auth:sanctum')->group(function () {
         'show'
     ]);
 
-    Route::get('apl01/{registration}/pdf', [PdfApl01Controller::class, 'show']);
 
     // Upload File Asesi
     Route::apiResource('document-profiles', DocumentProfileController::class)->only([
@@ -87,6 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('registrations/{registration}/ak07', [Ak07Controller::class, 'store']);
 
     // PDF Generate
+    Route::get('apl01/{registration}/pdf', [PdfApl01Controller::class, 'show']);
     Route::prefix('pdf')->group(function () {
         Route::post('apl01', [PdfApl01Controller::class, 'generate']);
         Route::post('apl02', [PdfApl02Controller::class, 'generate']);

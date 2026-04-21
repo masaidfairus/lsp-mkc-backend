@@ -297,7 +297,9 @@ class Apl01Controller extends Controller
 
     public function show(AssessmentRegistration $registration)
     {
-        $this->authorize('view', $registration);
+        if ($registration->user_id !== request()->user()->id) {
+            return $this->errorResponse('E1005', 403);
+        }
 
         $buktiDasarListIds = BasicRequirementProof::where('scheme_id', $registration->scheme_id)
             ->pluck('list_id');
