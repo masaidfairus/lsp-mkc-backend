@@ -9,12 +9,13 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
 
 class EvidenceRelationManager extends RelationManager
 {
-    protected static string $relationship = 'evidence'; // Belongs to AssessmentRegistration::evidence()
+    protected static string $relationship = 'filteredUserFiles'; // Belongs to AssessmentRegistration::evidence()
 
-    protected static ?string $title = 'Dokumen Persyaratan (Evidences)';
+    protected static ?string $title = 'Dokumen Persyaratan';
 
     public function form(Form $form): Form
     {
@@ -44,16 +45,16 @@ class EvidenceRelationManager extends RelationManager
     {
         return $table
             ->paginated(false)
-            ->recordTitleAttribute('requirement.requirement_name')
+            ->recordTitleAttribute('documentList.title')      
             ->columns([
-                Tables\Columns\TextColumn::make('requirement.requirement_name')
+                Tables\Columns\TextColumn::make('documentList.title')
                     ->label('Nama Persyaratan')
                     ->wrap()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('file_path')
-                    ->label('File')
-                    ->formatStateUsing(fn ($state) => $state ? 'Download / View' : 'Tidak Ada File')
-                    ->url(fn ($record) => $record->file_path ? \Illuminate\Support\Facades\Storage::url($record->file_path) : null)
+                Tables\Columns\TextColumn::make('upload_document')
+                    ->label('Berkas')
+                    ->formatStateUsing(fn ($state) => $state ? 'Lihat Dokumen' : 'Tidak Ada File')
+                    ->url(fn ($record) => $record->upload_document ? Storage::url($record->upload_document) : null)
                     ->openUrlInNewTab()
                     ->color('primary'),
                 Tables\Columns\TextColumn::make('status')

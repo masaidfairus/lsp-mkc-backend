@@ -37,6 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Admin',
                 'Mastering Data',
+                'Dokumen',
                 'APL',
                 'AK',
                 'Filament Shield',

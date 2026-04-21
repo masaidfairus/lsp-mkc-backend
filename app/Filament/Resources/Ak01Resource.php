@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Ak01Resource extends Resource
 {
-    protected static ?string $model = \App\Models\Ak01::class;
+    protected static ?string $model = Ak01::class;
     protected static ?string $navigationIcon = 'heroicon-o-document-check';
     protected static ?string $navigationGroup = 'AK';
     protected static ?string $navigationLabel = 'AK.01';

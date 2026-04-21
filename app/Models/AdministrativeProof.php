@@ -12,6 +12,6 @@ class AdministrativeProof extends Model
 
     public function documentList()
     {
-        return $this->belongsTo(DocumentList::class, 'list_id');
+        return $this->belongsTo(DocumentList::class);
     }
 }

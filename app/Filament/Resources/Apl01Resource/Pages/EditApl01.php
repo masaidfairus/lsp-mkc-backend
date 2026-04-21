@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Apl01Resource\Pages;
 
 use App\Filament\Resources\Apl01Resource;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\EditRecord;
 
 class EditApl01 extends EditRecord
@@ -29,5 +30,20 @@ class EditApl01 extends EditRecord
                 ->visible(fn (\App\Models\AssessmentRegistration $record) => $record->status_apl01 !== \App\Enums\Apl01Status::REJECTED),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getSaveFormAction()->label('Simpan perubahan'),
+
+            Action::make('generate')
+                ->label('Cetak PDF APL01')
+                ->color('success')
+                ->url(fn() => route('apl01.form', ['registration' => $this->record]))
+                ->openUrlInNewTab(),
+
+            $this->getCancelFormAction()->label('Kembali'),
+        ];  
     }
 }

@@ -47,7 +47,7 @@ class AssessmentRegistration extends Model
         return $this->hasMany(AssessorEvaluation::class);
     }
 
-    public function selfAssessment()
+    public function selfAssessments()
     {
         return $this->hasMany(SelfAssessment::class, 'registration_id');
     }
