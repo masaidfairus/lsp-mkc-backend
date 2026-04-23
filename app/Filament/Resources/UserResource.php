@@ -89,6 +89,8 @@ class UserResource extends Resource
                         'super_admin' => 'danger',
                         'admin' => 'warning',
                         'asesor' => 'success',
+                        'penyusun' => 'info',
+                        'validator' => 'primary',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('identity_number')

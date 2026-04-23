@@ -13,7 +13,13 @@ class ManageAk07s extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->using(function (array $data, string $model): \App\Models\Ak07 {
+                    return \App\Models\Ak07::updateOrCreate(
+                        ['registration_id' => $data['registration_id']],
+                        $data
+                    );
+                }),
         ];
     }
 }

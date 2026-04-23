@@ -19,11 +19,13 @@ class AssessmentRegistration extends Model
         'status_apl02',
         'final_result',
         'assessed_at',
+        'certification_purpose',
     ];
 
     protected $casts = [
         'status_apl01' => Apl01Status::class,
         'status_apl02' => Apl02Status::class,
+        'certification_purpose' => CertificationPurpose::class,
         'assessed_at' => 'datetime',
     ];
 

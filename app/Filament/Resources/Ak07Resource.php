@@ -18,6 +18,7 @@ class Ak07Resource extends Resource
     protected static ?string $navigationLabel = 'AK.07';
     protected static ?string $modelLabel = 'AK.07';
     protected static ?string $pluralModelLabel = 'AK.07';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
@@ -326,6 +327,7 @@ class Ak07Resource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->whereNotNull('ak07_data'))
             ->columns([
                 Tables\Columns\TextColumn::make('registration_id')
                     ->label('Registration ID')

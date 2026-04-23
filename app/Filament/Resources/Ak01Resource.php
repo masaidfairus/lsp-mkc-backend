@@ -17,6 +17,7 @@ class Ak01Resource extends Resource
     protected static ?string $navigationLabel = 'AK.01';
     protected static ?string $modelLabel = 'AK.01';
     protected static ?string $pluralModelLabel = 'AK.01';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -30,11 +31,15 @@ class Ak01Resource extends Resource
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
                                     ->options(function () {
-                                        return \App\Models\AssessmentRegistration::with('candidate')
-                                            ->get()
-                                            ->mapWithKeys(fn ($reg) => [
-                                                $reg->id => ($reg->candidate?->name ?? 'Unknown') . ' — #' . $reg->id
-                                            ]);
+                                        $registrations = \App\Models\AssessmentRegistration::with(['candidate', 'scheme'])->get();
+                                        $occurrences   = [];
+                                        return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
+                                            $key          = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
+                                            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
+                                            $candidate    = $reg->candidate?->name ?? 'Unknown';
+                                            $scheme       = $reg->scheme?->name ?? 'Tanpa Skema';
+                                            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
+                                        });
                                     })
                                     ->required()
                                     ->searchable()
@@ -51,6 +56,14 @@ class Ak01Resource extends Resource
                                                 }
                                                 // 2. Auto fill nama asesi (read only)
                                                 $set('ak01_data.asesi_name', $reg->candidate?->name ?? '');
+
+                                                // 3. Auto fill TUK and Asesor
+                                                if ($reg->tuk) {
+                                                    $set('ak01_data.tuk', $reg->tuk);
+                                                }
+                                                if ($reg->assessor) {
+                                                    $set('ak01_data.asesor_name', $reg->assessor->name);
+                                                }
                                             }
                                         }
                                     }),
@@ -169,6 +182,7 @@ class Ak01Resource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('ak01_data'))
             ->columns([
                 Tables\Columns\TextColumn::make('registration_id')
                     ->label('Registration ID')

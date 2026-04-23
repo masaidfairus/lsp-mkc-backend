@@ -25,7 +25,7 @@ class Apl01Resource extends Resource
     protected static ?string $modelLabel = 'APL-01';
     protected static ?string $pluralModelLabel = 'APL-01';
     protected static ?string $navigationGroup = 'APL';
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
 
     public static function getEloquentQuery(): Builder

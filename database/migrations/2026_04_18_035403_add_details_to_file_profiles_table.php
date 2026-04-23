@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('file_profiles', function (Blueprint $table) {
-            $table->string('status')->default(EvidenceStatus::Pending)->after('file_path');
+            $table->string('status')->default(EvidenceStatus::Pending)->after('upload_document');
             $table->string('validation_result')->default(ValidationResult::Pending)->after('status');
             $table->text('admin_notes')->nullable()->after('validation_result');
             $table->timestamp('verified_at')->nullable()->after('admin_notes');

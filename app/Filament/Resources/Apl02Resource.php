@@ -24,15 +24,15 @@ class Apl02Resource extends Resource
     protected static ?string $modelLabel = 'APL-02';
     protected static ?string $pluralModelLabel = 'APL-02';
     protected static ?string $navigationGroup = 'APL';
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
 
 
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->where('assessor_id', Auth::id());
-    }
+    // public static function getEloquentQuery(): Builder
+    // {
+    //     // return parent::getEloquentQuery()
+    //     //     ->where('assessor_id', Auth::id());
+    // }
 
     public static function form(Form $form): Form
     {
