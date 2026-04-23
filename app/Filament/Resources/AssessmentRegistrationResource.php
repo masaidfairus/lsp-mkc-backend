@@ -4,8 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Enums\Role;
 use App\Enums\Apl01Status;
-use App\Filament\Resources\Apl01Resource\Pages;
-use App\Filament\Resources\Apl01Resource\RelationManagers;
+use App\Enums\Apl02Status;
+use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\PortfolioFilesRelationManager;
+use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\SelfAssessmentRelationManager;
+use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\EvidenceRelationManager;
+use App\Filament\Resources\AssessmentRegistrationResource\Pages;
+use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\AplDataRelationManager;
 use App\Models\Apl01;
 use App\Models\AssessmentRegistration;
 use Filament\Forms;
@@ -16,16 +20,15 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 
-class Apl01Resource extends Resource
+class AssessmentRegistrationResource extends Resource
 {
-    protected static ?string $model = Apl01::class;
+    protected static ?string $model = AssessmentRegistration::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-    protected static ?string $navigationLabel = 'APL-01';
-    protected static ?string $modelLabel = 'APL-01';
-    protected static ?string $pluralModelLabel = 'APL-01';
-    protected static ?string $navigationGroup = 'APL';
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationLabel = 'Pendaftaran Sertifikasi';
+    protected static ?string $modelLabel = 'Pendaftaran Sertifikasi';
+    protected static ?string $pluralModelLabel = 'Pendaftaran Sertifikasi';
+    protected static ?string $navigationGroup = 'Pendaftaran';
 
 
     public static function getEloquentQuery(): Builder
@@ -54,9 +57,7 @@ class Apl01Resource extends Resource
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\Select::make('assessor_id')
-                                    ->relationship('assessor', 'name', function (Builder $query) {
-                                        return $query->where('role', Role::ASESOR->value);
-                                    })
+                                    ->relationship('assessor', 'name', fn(Builder $query) => $query->where('role', Role::ASESOR->value))
                                     ->label('Asesi Bertugas')
                                     ->searchable()
                                     ->preload(),
@@ -75,8 +76,41 @@ class Apl01Resource extends Resource
                             ->rows(3)
                             ->columnSpanFull(),
                     ]),
+                Forms\Components\Section::make('Validasi Evaluasi Mandiri (APL-02)')
+                    ->schema([
+                        Forms\Components\Select::make('user_id')
+                            ->relationship('candidate', 'name')
+                            ->label('Asesi')
+                            ->disabled(),
+                        Forms\Components\Select::make('scheme_id')
+                            ->relationship('scheme', 'name')
+                            ->label('Skema')
+                            ->disabled(),
+                        Forms\Components\Select::make('status_apl02')
+                            ->options(Apl02Status::class)
+                            ->label('Status APL-02')
+                            ->required(),
+                    ])->columns(2),
+                Forms\Components\Section::make('Mencetak Dokumen Asesi')
+                    ->schema([
+                        Forms\Components\Actions::make([
+                            Forms\Components\Actions\Action::make('generate_pdf')
+                                ->label('Cetak Dokumen APL.01')
+                                ->color('success')
+                                ->icon('heroicon-o-printer')
+                                ->url(fn($record) => $record ? route('apl01.form', ['registration' => $record->id]) : '#')
+                                ->openUrlInNewTab(),
+                            Forms\Components\Actions\Action::make('generate_pdf')
+                                ->label('Cetak Dokumen APL.02')
+                                ->color('success')
+                                ->icon('heroicon-o-printer')
+                                ->url(fn($record) => $record ? route('apl02.form', ['registration' => $record->id]) : '#')
+                                ->openUrlInNewTab(),
+                        ])->columnSpanFull(), // Agar tombol mengambil lebar penuh jika perlu
+                    ])->columns(2),
             ]);
     }
+
 
     public static function table(Table $table): Table
     {
@@ -94,10 +128,6 @@ class Apl01Resource extends Resource
                     ->label('Catatan Admin')
                     ->placeholder('Tambah catatan...')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('status_apl01')
-                    ->label('Status APL-01')
-                    ->badge()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Daftar')
                     ->dateTime()
@@ -123,15 +153,18 @@ class Apl01Resource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\EvidenceRelationManager::class,
+            AplDataRelationManager::class,
+            EvidenceRelationManager::class,
+            PortfolioFilesRelationManager::class,
+            SelfAssessmentRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListApl01s::route('/'),
-            'edit' => Pages\EditApl01::route('/{record}/edit'),
+            'index' => Pages\ListAssessmentRegistrations::route('/'),
+            'edit' => Pages\EditAssessmentRegistration::route('/{record}/edit'),
         ];
     }
 }

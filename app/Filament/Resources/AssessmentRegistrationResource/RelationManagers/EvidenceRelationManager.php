@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Apl02Resource\RelationManagers;
+namespace App\Filament\Resources\AssessmentRegistrationResource\RelationManagers;
 
 use App\Enums\EvidenceStatus;
 use App\Enums\ValidationResult;
@@ -9,15 +9,13 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 
-class PortfolioFilesRelationManager extends RelationManager
+class EvidenceRelationManager extends RelationManager
 {
-    protected static string $relationship = 'portfolioFiles';
-
-    protected static ?string $title = 'Dokumen Portofolio Skema';
+    protected static string $relationship = 'filteredUserFiles';
+    
+    protected static ?string $title = 'Dokumen Persyaratan - APL.01';
 
     public function form(Form $form): Form
     {
@@ -49,7 +47,10 @@ class PortfolioFilesRelationManager extends RelationManager
             ->paginated(false)
             ->recordTitleAttribute('documentList.title')
             ->columns([
-                Tables\Columns\TextColumn::make('documentList.title')->label('Portofolio Skema'),
+                Tables\Columns\TextColumn::make('documentList.title')
+                    ->label('Nama Persyaratan')
+                    ->wrap()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('upload_document')
                     ->label('Berkas')
                     ->formatStateUsing(fn($state) => $state ? 'Lihat Dokumen' : 'Tidak Ada File')
@@ -85,12 +86,10 @@ class PortfolioFilesRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->label('Verifikasi')
-                    ->icon('heroicon-o-check-badge'),
+                    ->icon('heroicon-o-check-badge')
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                //
             ]);
     }
 }

@@ -1,0 +1,106 @@
+{
+    "mapa02_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_code": "SUK-SKS-REV1-L007",
+            "assessment_date": "15-04-2026"
+        },
+        "assessment_instruments_section": [
+            {
+                "work_group": "Menerapkan Pengetahuan Desain", // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                "competency_units": [ // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                    {
+                        "unit_code": "M.74100.001.02", // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                        "unit_title": "Mengaplikasikan Prinsip Dasar Desain" // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                    },
+                    {
+                        "unit_code": "M.74100.001.02", // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                        "unit_title": "Mengaplikasikan Prinsip Dasar Desain" // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                    }
+                ],
+                "assessment_instruments": [
+                    {
+                        "method": "FR.IA.01.  CL - Ceklis Observasi Aktivitas Di Tempat Kerja atau Tempat Kerja Simulasi",
+                        "answer": 1
+                    },
+                    {
+                        "method": "FR.IA.02.  TPD - Tugas Praktik Demonstrasi",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.03. PMO - Pertanyaan Untuk Mendukung Observasi",
+                        "answer": 4
+                    },
+                    {
+                        "method": "FR.IA.04A. DIT - Daftar Instruksi Terstruktur (Penjelasan Singkat Proyek Terkait Pekerjaan/Kegiatan Terstruktur Lainnya)",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.04B. DIT – Penilaian Proyek Singkat atau Kegiatan Terstruktur Lainnya",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.05. DPT - Daftar Pertanyaan Tertulis Pilihan Ganda",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.06. DPT – Daftar Pertanyaan Tertulis Pilihan Esai",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.07. DPL – Daftar Pertanyaan Lisan",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.08. CVP - Ceklis Verifikasi Portofolio",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.09. PW - Pertanyaan Wawancara",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.10. VPK - Verifikasi Pihak Ketiga",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.11. CRP - Ceklis Reviu Produk",
+                        "answer": null
+                    }
+                ]
+            }
+        ],
+        "compiler_and_validator": {
+            "compiler": [
+                {
+                    "name": "Budi Santoso, ST.",
+                    "reg_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                },
+                {
+                    "name": "Budi Santoso, ST.",
+                    "reg_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                }
+            ],
+            "validator": [
+                {
+                    "name": "Budi Santoso, ST.",
+                    "reg_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                },
+                {
+                    "name": "Budi Santoso, ST.",
+                    "reg_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                }
+            ]
+        }
+    }
+}
+
+

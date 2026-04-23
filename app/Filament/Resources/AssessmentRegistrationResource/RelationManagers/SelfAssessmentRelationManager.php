@@ -1,22 +1,18 @@
 <?php
 
-namespace App\Filament\Resources\Apl02Resource\RelationManagers;
+namespace App\Filament\Resources\AssessmentRegistrationResource\RelationManagers;
 
 use App\Models\SelfAssessment;
 use Filament\Forms;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SelfAssessmentRelationManager extends RelationManager
 {
     protected static string $relationship = 'selfAssessments';
-    protected static ?string $title = 'Asesmen Mandiri';
+    protected static ?string $title = 'Asesmen Mandiri - APL.02';
 
     public function form(Form $form): Form
     {
