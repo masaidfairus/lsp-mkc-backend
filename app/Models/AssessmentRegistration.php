@@ -19,7 +19,7 @@ class AssessmentRegistration extends Model
         'status_apl02',
         'final_result',
         'assessed_at',
-        'certification_purpose',
+        'admin_notes',
     ];
 
     protected $casts = [
@@ -44,11 +44,6 @@ class AssessmentRegistration extends Model
         return $this->belongsTo(Scheme::class, 'scheme_id');
     }
 
-    public function evaluations()
-    {
-        return $this->hasMany(AssessorEvaluation::class);
-    }
-
     public function selfAssessments()
     {
         return $this->hasMany(SelfAssessment::class, 'registration_id');
@@ -57,11 +52,6 @@ class AssessmentRegistration extends Model
     public function plannings()
     {
         return $this->hasMany(AssessmentPlanning::class, 'registration_id');
-    }
-
-    public function feedback()
-    {
-        return $this->hasMany(AssessmentFeedback::class);
     }
 
     public function appeals()
@@ -77,5 +67,33 @@ class AssessmentRegistration extends Model
     public function aplData()
     {
         return $this->hasOne(Apl01Data::class, 'registration_id');
+    }
+
+    public function filteredUserFiles()
+    {
+        return $this->hasMany(FileProfile::class, 'user_id', 'user_id')
+            ->where(function ($query) {
+                $query->whereHas('documentList.basicRequirementProof', function ($q) {
+                    $q->where('scheme_id', $this->scheme_id);
+                })
+                    ->orWhereHas('documentList.administrativeProof'); // Dan semua yang tipe administratif
+            });
+    }
+
+    public function filteredAplUserFiles()
+    {
+        return $this->hasMany(FileProfile::class, 'user_id', 'user_id')
+            ->whereHas('documentList', function ($query) {
+                $query->has('basicRequirementProof')
+                    ->orHas('administrativeProof');
+            });
+    }
+
+    public function portfolioFiles()
+    {
+        return $this->hasMany(FileProfile::class, 'user_id', 'user_id')
+            ->whereHas('documentList.portfolioScheme', function ($query) {
+                $query->where('scheme_id', $this->scheme_id);
+            });
     }
 }

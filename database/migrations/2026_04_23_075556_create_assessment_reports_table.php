@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('assessment_feedback', function (Blueprint $table) {
+        Schema::create('assessment_reports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('registration_id')->constrained('assessment_registrations')->cascadeOnDelete();
-            $table->json('feedback_json');
+            $table->string('document_type');
+            $table->json('main_data')->nullable();
+            $table->json('validation_data')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('assessment_feedback');
+        Schema::dropIfExists('assessment_reports');
     }
 };

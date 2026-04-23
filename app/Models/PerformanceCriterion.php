@@ -16,9 +16,4 @@ class PerformanceCriterion extends Model
     {
         return $this->belongsTo(CompetencyElement::class);
     }
-
-    public function evaluations()
-    {
-        return $this->hasMany(AssessorEvaluation::class);
-    }
 }

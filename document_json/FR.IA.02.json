@@ -1,0 +1,77 @@
+{
+    "fria02_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_code": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri",
+            "assessor_name": "", // Input dinamis
+            "assessee_name": "", // Input dinamis
+            "assessment_date": "" // Input dinamis
+        },
+
+        // Bagian A. Petunjuk biasanya berupa teks statis (hardcoded di frontend)
+        // jadi tidak perlu dimasukkan ke dalam payload JSON kecuali bisa diubah-ubah oleh admin LSP.
+
+        "demonstration_tasks": [
+            // LOOPING 1: Mulai looping berdasarkan "Kelompok Pekerjaan" yang diujikan secara praktik
+            {
+                "work_group": "Menerapkan pengetahuan tentang desain", // Dinamis sesuai nama kelompok pekerjaan
+                "units": [
+                    // LOOPING 2: Looping "Unit Kompetensi" yang ada di dalam Kelompok Pekerjaan ini
+                    {
+                        "unit_code": "M.74100.001.02", // Dinamis
+                        "unit_title": "Mengaplikasikan Prinsip Dasar Desain" // Dinamis
+                    },
+                    {
+                        "unit_code": "M.74100.002.02", // Dinamis
+                        "unit_title": "Menerapkan Prinsip Dasar Komunikasi" // Dinamis
+                    }
+                    // Unit berikutnya di-looping di sini...
+                ],
+                "scenario": "", // Input/Data dinamis (teks panjang): Skenario Tugas Praktik Demonstrasi untuk kelompok pekerjaan ini
+                "equipments": [
+                    // LOOPING 3: Looping daftar perlengkapan dan peralatan
+                    "", // Input dinamis item 1 (misal: "Komputer/Laptop")
+                    "" // Input dinamis item 2 (misal: "Software Desain")
+                ],
+                "time_allocation": "" // Input dinamis (teks): Waktu pengerjaan (contoh: "120 Menit")
+            }
+            // Kelompok pekerjaan berikutnya (misal: "Menerapkan proses produksi") di-looping di sini...
+        ],
+
+        "signatures": {
+            "assessee": {
+                "name": "", // Input dinamis
+                "date": "", // Input dinamis
+                "signature": "data:image/png;base64,..." // Input dinamis (base64 image atau URL)
+            },
+            "assessor": {
+                "name": "", // Input dinamis
+                "reg_number": "", // Input dinamis
+                "date": "", // Input dinamis
+                "signature": "data:image/png;base64,..." // Input dinamis (base64 image atau URL)
+            }
+        },
+
+        "document_control": {
+            "compilers": [
+                // LOOPING 4: Looping Penyusun (biasanya ada 2 baris sesuai tabel)
+                {
+                    "name": "", // Input dinamis
+                    "met_number": "", // Input dinamis: Nomor MET
+                    "date": "", // Input dinamis
+                    "signature": "data:image/png;base64,..." // Input dinamis
+                }
+            ],
+            "validators": [
+                // LOOPING 5: Looping Validator (biasanya ada 2 baris sesuai tabel)
+                {
+                    "name": "", // Input dinamis
+                    "met_number": "", // Input dinamis: Nomor MET
+                    "date": "", // Input dinamis
+                    "signature": "data:image/png;base64,..." // Input dinamis
+                }
+            ]
+        }
+    }
+}
