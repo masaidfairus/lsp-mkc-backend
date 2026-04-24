@@ -6,26 +6,25 @@ use App\Models\UserSignature;
 
 class UserSignatureObserver
 {
-    public function saving(UserSignature $userSignature): void
-    {
-        if ($userSignature->isDirty(['signature_image', 'signature_shape', 'name'])) {
-            $data = [
-                'n' => $userSignature->name,
-                'd' => now()->toDateTimeString(),
-                's' => base64_encode(gzcompress($userSignature->signature_shape ?? '')),
-            ];
+   public function saving(UserSignature $userSignature): void
+{
+    // Pastikan model punya ID atau UUID sebelum membuat QR
+    // Lebih aman menggunakan event "created" atau "updated" daripada "saving" 
+    // jika kamu butuh ID yang sudah ter-generate (jika pakai auto-increment)
+    
+    if ($userSignature->isDirty(['signature_image', 'signature_shape', 'name'])) {
+        
+        // Cukup masukkan ID unik model ini ke dalam URL
+        $qrContent = route('signature.verify', ['id' => $userSignature->id]);
 
-            $qrContent = json_encode($data);
-            
-            // Generate QR as base64 image
-            $qrImage = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
-                ->size(300)
-                ->margin(1)
-                ->generate($qrContent);
-            
-            $userSignature->qr_code = 'data:image/svg+xml;base64,' . base64_encode($qrImage);
-        }
+        $qrImage = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
+            ->size(300)
+            ->margin(1)
+            ->generate($qrContent);
+
+        $userSignature->qr_code = 'data:image/svg+xml;base64,' . base64_encode($qrImage);
     }
+}
 
     /**
      * Handle the UserSignature "updated" event.

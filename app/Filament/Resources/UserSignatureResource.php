@@ -26,10 +26,12 @@ class UserSignatureResource extends Resource
             ->schema([
                 Forms\Components\Section::make('Create Your Signature')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        Forms\Components\Select::make('name')
                             ->label('Name/Identifier')
+                            ->options(\App\Models\User::pluck('name', 'name'))
+                            ->searchable()
                             ->required()
-                            ->placeholder('e.g. Budi Signature 1'),
+                            ->placeholder('Select user name'),
                         
                         Forms\Components\ViewField::make('signature_image')
                             ->view('filament.forms.components.signature-pad')

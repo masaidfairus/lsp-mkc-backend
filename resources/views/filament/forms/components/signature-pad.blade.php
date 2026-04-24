@@ -5,7 +5,7 @@
     <div 
         x-data="{
             signaturePad: null,
-            state: @entangle($getStatePath()).live,
+            state: @entangle($getStatePath()),
             isDrawing: false,
             isLocked: false,
             isUpdatingState: false,
@@ -144,6 +144,7 @@
 
         <div
             x-ref="container"
+            wire:ignore
             class="border rounded shadow-inner"
             style="height: 300px; width: 100%; background-color: white;"
         >

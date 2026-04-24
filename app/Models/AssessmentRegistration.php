@@ -25,6 +25,7 @@ class AssessmentRegistration extends Model
     protected $casts = [
         'status_apl01' => Apl01Status::class,
         'status_apl02' => Apl02Status::class,
+        'certification_purpose' => CertificationPurpose::class,
         'assessed_at' => 'datetime',
     ];
 

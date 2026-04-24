@@ -45,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Ambil semua data pendaftaran
     Route::get('registrations', [RegistrationController::class, 'index']);
 
+    Route::get('registrations', [App\Http\Controllers\Asesi\RegistrationController::class, 'index']);
     // Invoice
     Route::get('registrations/{registration}/invoice', [PaymentController::class, 'show']);
 

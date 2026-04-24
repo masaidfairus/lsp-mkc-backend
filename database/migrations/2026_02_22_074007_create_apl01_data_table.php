@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('place_of_birth');
             $table->date('date_of_birth');
             $table->text('address');
-            $table->string('home_postal_code');
+            $table->string('home_postal_code', 10);
             $table->string('phone_number')->index();
             $table->string('education_qualifications');
             $table->string('company_name');

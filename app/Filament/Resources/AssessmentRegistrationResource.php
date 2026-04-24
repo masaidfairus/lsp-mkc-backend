@@ -116,6 +116,10 @@ class AssessmentRegistrationResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('registration_id')
+                    ->label('Registration ID')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')
                     ->searchable()

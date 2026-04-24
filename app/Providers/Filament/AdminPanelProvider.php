@@ -24,6 +24,7 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
+            ->spa()
             ->id('admin')
             ->path('admin')
             ->login()
@@ -39,6 +40,7 @@ class AdminPanelProvider extends PanelProvider
                 'Dokumen',
                 'APL',
                 'AK',
+                'MAPA',
                 'Filament Shield',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

@@ -27,4 +27,9 @@ class CompetencyUnit extends Model
     {
         return $this->hasMany(CompetencyElement::class, 'competency_unit_id');
     }
+
+    public function workGroup()
+    {
+        return $this->belongsTo(WorkGroup::class);
+    }
 }
