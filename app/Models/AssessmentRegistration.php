@@ -95,4 +95,19 @@ class AssessmentRegistration extends Model
                 $query->where('scheme_id', $this->scheme_id);
             });
     }
+
+    public function reports()
+    {
+        return $this->hasMany(AssessmentReport::class, 'registration_id');
+    }
+
+    public function instruments()
+    {
+        return $this->hasMany(AssessmentInstrument::class, 'registration_id');
+    }
+
+    public function results()
+    {
+        return $this->hasMany(AssessmentResult::class, 'registration_id');
+    }
 }

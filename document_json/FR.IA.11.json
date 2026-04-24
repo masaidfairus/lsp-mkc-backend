@@ -1,0 +1,140 @@
+{
+    "fria11_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_number": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri*",
+            "assessor_name": "", // Dinamis
+            "assessee_name": "", // Dinamis
+            "assessment_date": "" // Dinamis
+        },
+        "product_details": {
+            //
+            "product_name": "", // Nama produk yang dihasilkan
+            "industry_standard": "", // Standar Industri atau tempat kerja
+            "general_specifications": {
+                // Spesifikasi produk secara umum
+                "dimensions": [""], // Array string untuk list dimensi
+                "material": "", // Bahan produk
+                "weight": "" // Berat produk
+            },
+            "technical_specifications": [
+                // Spesifikasi produk secara teknis
+                "" // Array string untuk data teknis
+            ],
+            "usage_date": "", // Tanggal pengoperasian/penggunaan
+            "product_image_url": "" // Gambar produk (jika ada) - Base64 atau URL
+        },
+        "product_reviews": [
+            // LOOPING 1: Kategori Spesifikasi dan Performa Produk
+            {
+                "category_no": 1,
+                "category_name": "Spesifikasi produk",
+                "review_criteria": [
+                    // LOOPING 2: Hasil Review Produk per Kategori
+                    {
+                        "criterion_text": "Ukuran produk sesuai rencana atau gambar kerja",
+                        "achievement": { "is_yes": false, "is_no": false }
+                    },
+                    {
+                        "criterion_text": "Estetika/penampilan produk",
+                        "achievement": { "is_yes": false, "is_no": false }
+                    },
+                    {
+                        "criterion_text": "Kebersihan dan kerapian permukaan produk",
+                        "achievement": { "is_yes": false, "is_no": false }
+                    }
+                ]
+            },
+            {
+                "category_no": 2,
+                "category_name": "Performa produk atau Karateristik Produk",
+                "review_criteria": [
+                    {
+                        "criterion_text": "Kesesuaian ukuran (dimensi dan/atau berat)",
+                        "achievement": { "is_yes": false, "is_no": false }
+                    },
+                    {
+                        "criterion_text": "Kesesuaian dengan gambar kerja atau bentuk",
+                        "achievement": { "is_yes": false, "is_no": false }
+                    },
+                    {
+                        "criterion_text": "Kerapian dan kerapatan sambungan",
+                        "achievement": { "is_yes": false, "is_no": false }
+                    },
+                    {
+                        "criterion_text": "Pemasangan perlengkapan bahan penolong",
+                        "achievement": { "is_yes": false, "is_no": false }
+                    },
+                    {
+                        "criterion_text": "Kualitas produk sesuai dengan rujukan",
+                        "achievement": { "is_yes": false, "is_no": false }
+                    },
+                    {
+                        "criterion_text": "", // Slot kosong dinamis (...........)
+                        "achievement": { "is_yes": false, "is_no": false }
+                    }
+                ]
+            }
+        ],
+        "assessor_recommendation": {
+            //
+            "is_competent": false, // Rekomendasi KOMPETEN
+            "is_direct_observation": false, // Rekomendasi OBSERVASI LANGSUNG
+            "observation_details": {
+                // Detail jika observasi langsung diperlukan
+                "work_group": "",
+                "unit": "",
+                "element": "",
+                "kuk": ""
+            }
+        },
+        "assessment_notes": "", // Catatan temuan asesmen pencapaian
+        "signatures": {
+            // Digabungkan dari halaman 2 dan 3
+            "assessee": {
+                "name": "",
+                "signature_and_date": ""
+            },
+            "assessor": {
+                "name": "",
+                "reg_number": "",
+                "signature_and_date": ""
+            }
+        },
+        "document_control": {
+            // Konsisten dengan struktur formulir sebelumnya
+            "compilers": [
+                // LOOPING 3: Data Penyusun
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                },
+                {
+                    "no": 2,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ],
+            "validators": [
+                // LOOPING 4: Data Validator
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                },
+                {
+                    "no": 2,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ]
+        }
+        // Catatan ada di atas assessment_notes dan Untuk TTD, Tanggal, Asesi, Asesor ambil dari atas nanti di PDFnya
+    }
+}

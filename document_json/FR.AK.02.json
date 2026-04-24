@@ -1,0 +1,77 @@
+{
+    "frak02_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_code": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri",
+            "assessor_name": "", // Input dinamis
+            "assessee_name": "", // Input dinamis
+            "assessment_date_start": "", // Input dinamis (misal: "2026-02-07")
+            "assessment_date_end": "" // Input dinamis (misal: "2026-02-07")
+        },
+
+        "competency_units": [
+            // LOOPING UTAMA: Looping baris tabel berdasarkan daftar Unit Kompetensi yang diujikan
+            {
+                "unit_sequence": 1, // Nomor urut
+                "unit_title": "Mengaplikasikan Prinsip Dasar Desain", // Dinamis: Judul Unit
+
+                // Objek ini menyimpan status centang (checkbox) untuk setiap metode bukti.
+                // true = dicentang, false/null = tidak dicentang.
+                "evidence_methods": {
+                    "observasi_demonstrasi": true,
+                    "portofolio": false,
+                    "pernyataan_pihak_ketiga": false,
+                    "pertanyaan_wawancara": true,
+                    "pertanyaan_lisan": false,
+                    "pertanyaan_tertulis": false,
+                    "proyek_kerja": false,
+                    "lainnya": false
+                }
+            },
+            {
+                "unit_sequence": 2,
+                "unit_title": "Menerapkan Prinsip Dasar Komunikasi",
+                "evidence_methods": {
+                    "observasi_demonstrasi": true,
+                    "portofolio": false,
+                    "pernyataan_pihak_ketiga": false,
+                    "pertanyaan_wawancara": true,
+                    "pertanyaan_lisan": false,
+                    "pertanyaan_tertulis": false,
+                    "proyek_kerja": false,
+                    "lainnya": false
+                }
+            }
+            // Unit berikutnya di-looping di sini...
+        ],
+
+        "assessment_summary": {
+            "is_competent": true, // Input dinamis (boolean): true jika "Kompeten", false jika "Belum kompeten"
+            "follow_up_action": "", // Input dinamis (teks): Tindak lanjut yang dibutuhkan
+            "assessor_comment": "" // Input dinamis (teks): Komentar/Observasi oleh asesor
+        },
+
+        "signatures": {
+            "assessee": {
+                "name": "", // Input dinamis
+                "date": "", // Input dinamis
+                "signature": "data:image/png;base64,..." // Input dinamis
+            },
+            "assessor": {
+                "name": "", // Input dinamis
+                "reg_number": "", // Input dinamis
+                "date": "", // Input dinamis
+                "signature": "data:image/png;base64,..." // Input dinamis
+            }
+        },
+
+        "attachments": [
+            // Bisa statis (hardcoded di UI) atau dinamis jika admin bisa menambah lampiran
+            "Dokumen APL 01 peserta",
+            "Dokumen APL 02 peserta",
+            "Bukti-bukti berkualitas peserta",
+            "Tinjauan proses asesmen"
+        ]
+    }
+}

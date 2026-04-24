@@ -1,0 +1,106 @@
+{
+    "fria09_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_number": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri*",
+            "assessor_name": "", // Dinamis
+            "assessee_name": "", // Dinamis
+            "date": "" // Dinamis
+        },
+        "portfolio_evidence_list": [
+            // LOOPING 1: Daftar Bukti Portofolio yang dirujuk
+            {
+                "no": 1,
+                "evidence_name": "" // Dinamis
+            },
+            {
+                "no": 2,
+                "evidence_name": ""
+            },
+            {
+                "no": 3,
+                "evidence_name": ""
+            },
+            {
+                "no": 4,
+                "evidence_name": ""
+            }
+        ],
+        "interview_questions": [
+            // LOOPING 2: Daftar Pertanyaan Wawancara
+            {
+                "no": 1,
+                "question": "Sesuai dengan bukti no. ...... yang Anda ajukan, ........", //
+                "assessee_answer_summary": "", // Kesimpulan Jawaban Asesi
+                "achievement": {
+                    "is_yes": false, // Centang Ya
+                    "is_no": false // Centang Tidak
+                }
+            },
+            {
+                "no": 2,
+                "question": "Sesuai dengan bukti no. ...... yang Anda ajukan, ........",
+                "assessee_answer_summary": "",
+                "achievement": {
+                    "is_yes": false,
+                    "is_no": false
+                }
+            },
+            {
+                "no": 3,
+                "question": "Sesuai dengan bukti no. ...... yang Anda ajukan, ........",
+                "assessee_answer_summary": "",
+                "achievement": {
+                    "is_yes": false,
+                    "is_no": false
+                }
+            }
+        ],
+        "signatures": {
+            //
+            "assessee": {
+                "name": "",
+                "signature_and_date": ""
+            },
+            "assessor": {
+                "name": "",
+                "reg_number": "",
+                "signature_and_date": ""
+            }
+        },
+        "document_control": {
+            // Struktur konsisten dengan formulir lainnya
+            "compilers": [
+                // LOOPING 3: Data Penyusun
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                },
+                {
+                    "no": 2,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ],
+            "validators": [
+                // LOOPING 4: Data Validator
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                },
+                {
+                    "no": 2,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ]
+        }
+    }
+}
