@@ -1,0 +1,132 @@
+{
+    "fr_va_data": {
+        "header": {
+            "validation_team": ["Febriantoni", "Abdul Rahim"],
+            "day_date": "Selasa, 27 Januari 2026",
+            "location": "Kantor LSP MKC",
+            "period": {
+                "before_assessment": false,
+                "during_assessment": false,
+                "after_assessment": true
+            },
+            "scheme_name": "JENJANG IV BIDANG KEWIRAUSAHAAN INDUSTRI",
+            "scheme_number": "09-10/SSO/MKC.SKM.010/XI/2023"
+        },
+        "preparation": {
+            "focus_and_purpose": {
+                "quality_assurance": false,
+                "risk_anticipation": false,
+                "bnsp_requirements": false,
+                "evidence_consistency": false,
+                "assessment_quality_improvement": false,
+                "evaluate_instrument_quality": true,
+                "other": null
+            },
+            "context": {
+                "internal_organization": false,
+                "external_organization": false,
+                "licensing_process": false,
+                "with_assessor_colleagues": true,
+                "with_training_colleagues": false,
+                "other": null
+            },
+            "approach": {
+                "assessment_panel": false,
+                "moderation_meeting": false,
+                "review_assessment_tools": true,
+                "benchmarking": false,
+                "field_testing": false,
+                "client_feedback": false,
+                "review_evidence": false
+            },
+            "relevant_persons": [
+                {
+                    "role": "Asesor Kompetensi (wajib)",
+                    "name": "Anita Mediana",
+                    "confirmation_result": "Setuju untuk divalidasi dengan tujuan dan focus mengevaluasi kualitas perangkat asesmen dengan Konteks validasi antar kolega asesor dengan pendekatan mengkaji perangkat asesmen"
+                }
+            ]
+        },
+        "references": {
+            "benchmarks": {
+                "competency_standards": true,
+                "certification_scheme": true,
+                "sop_ik": false,
+                "manual_instruction": false,
+                "performance_standard": false
+            },
+            "materials": {
+                "assessment_instruments": true,
+                "regulations_guidelines": true,
+                "assessment_results_evidence": false
+            }
+        },
+        "communication_skills": {
+            "proactive": true,
+            "active_listening": true,
+            "empathy": false
+        },
+        "validation_matrix": [
+            {
+                "no": 1,
+                "aspect": "Rencana Asesmen",
+                "rules_of_evidence": {
+                    "v": true,
+                    "a": false,
+                    "t": false,
+                    "m": false
+                },
+                "principles_of_assessment": {
+                    "v": false,
+                    "r": false,
+                    "f": false,
+                    "a": false
+                }
+            },
+            {
+                "no": 2,
+                "aspect": "Interpretasi Standar Kompetensi",
+                "rules_of_evidence": {
+                    "v": false,
+                    "a": false,
+                    "t": false,
+                    "m": false
+                },
+                "principles_of_assessment": {
+                    "v": false,
+                    "r": false,
+                    "f": false,
+                    "a": false
+                }
+            },
+            {
+                "no": 4,
+                "aspect": "Proses Asesmen",
+                "rules_of_evidence": {
+                    "v": true,
+                    "a": true,
+                    "t": true,
+                    "m": true
+                },
+                "principles_of_assessment": {
+                    "v": true,
+                    "r": true,
+                    "f": true,
+                    "a": true
+                }
+            }
+        ],
+        "contributions": {
+            "findings": "Validitas rencana asesmen belum dapat dipastikan terbukti pada FR.IA.04B. Penilaian Proyek Singkat atau Kegiatan Terstruktur Lainny Kolom Kesesuaian dengan standar kompetensi kerja (unit/elemen/KUK) tidak diisi",
+            "recommendations": "Pada FR.IA.04B. Penilaian Proyek Singkat atau Kegiatan Terstruktur Lainny Kolom Kesesuaian dengan standar kompetensi kerja (unit/elemen/KUK) diisi unit/elemen/KUK sesuai dengan daftar pertanyaan"
+        },
+        "implementation_plan": [
+            {
+                "no": 1,
+                "activity": "Diskusikan dengan manajer sertifikasi untuk melakukan perubahan FR.IA.04B. Penilaian Proyek Singkat atau Kegiatan Terstruktur Lainny Kolom Kesesuaian dengan standar kompetensi kerja (unit/elemen/KUK) dengan mengisi unit/elemen/KUK sesuai dengan daftar pertanyaan",
+                "completion_time": "28 Januari 2026",
+                "person_in_charge": "Penyusun MUK Anita Mediana dan Anggeh Afelina"
+            }
+        ]
+    }
+}

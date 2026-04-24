@@ -1,0 +1,118 @@
+{
+    "fria07_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_number": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri*",
+            "assessor_name": "", // Dinamis
+            "assessee_name": "", // Dinamis
+            "assessment_date": "" // Dinamis
+        },
+        "work_group_mapping": [
+            // LOOPING 1: Daftar Kelompok Pekerjaan dan Unit Terkait
+            {
+                "group_name": "Menerapkan pengetahuan tentang desain",
+                "units": [
+                    {
+                        "no": 1,
+                        "unit_code": "M.74100.001.02",
+                        "unit_title": "Mengaplikasikan Prinsip Dasar Desain"
+                    },
+                    {
+                        "no": 2,
+                        "unit_code": "M.74100.002.02",
+                        "unit_title": "Menerapkan Prinsip Dasar Komunikasi"
+                    },
+                    {
+                        "no": 3,
+                        "unit_code": "M.74100.003.02",
+                        "unit_title": "Menerapkan Pengetahuan Dasar Desain"
+                    }
+                ]
+            },
+            {
+                "group_name": "Menentukan obyektif dari program desain",
+                "units": [
+                    {
+                        "no": 4,
+                        "unit_code": "M.74100.004.02",
+                        "unit_title": "Menerapkan Project Brief"
+                    },
+                    {
+                        "no": 5,
+                        "unit_code": "M.74100.005.02",
+                        "unit_title": "Menerapkan Design Brief"
+                    },
+                    {
+                        "no": 6,
+                        "unit_code": "M.74100.006.01",
+                        "unit_title": "Mengorganisasikan Informasi Terkait Proyek Desain"
+                    }
+                ]
+            }
+            // Dst sesuai tabel di image_356c63.jpg
+        ],
+        "oral_questions": [
+            // LOOPING 2: Daftar Pertanyaan Lisan
+            {
+                "no": 1,
+                "question_text": "", // Dinamis
+                "answer_key": "", // Kunci Jawaban
+                "assessee_answer": "", // Jawaban Asesi
+                "achievement": {
+                    "is_yes": false, // Centang Ya
+                    "is_no": false // Centang Tidak
+                }
+            }
+        ],
+        "feedback_section": {
+            "assessee_feedback_summary": "", // Umpan balik untuk asesi
+            "knowledge_aspect_status": "", // Pilihan "tercapai" atau "belum tercapai"
+            "unachieved_details": "" // Catatan unit/elemen/KUK jika belum tercapai
+        },
+        "signatures": {
+            "assessee": {
+                "name": "",
+                "signature_and_date": ""
+            },
+            "assessor": {
+                "name": "",
+                "reg_number": "",
+                "signature_and_date": ""
+            }
+        },
+        "document_control": {
+            // Struktur konsisten dengan formulir lainnya
+            "compilers": [
+                // LOOPING 3: Data Penyusun
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                },
+                {
+                    "no": 2,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ],
+            "validators": [
+                // LOOPING 4: Data Validator
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                },
+                {
+                    "no": 2,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ]
+        }
+    }
+}

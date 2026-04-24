@@ -1,0 +1,122 @@
+{
+    "fria05b_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_number": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri*"
+        },
+        "work_groups": [
+            // LOOPING 1: Berdasarkan Kelompok Pekerjaan
+            {
+                "group_name": "Menerapkan pengetahuan tentang desain",
+                "units": [
+                    // LOOPING 2: Unit kompetensi di dalam kelompok tersebut
+                    {
+                        "no": 1,
+                        "unit_code": "M.74100.001.02",
+                        "unit_title": "Mengaplikasikan Prinsip Dasar Desain"
+                    },
+                    {
+                        "no": 2,
+                        "unit_code": "M.74100.002.02",
+                        "unit_title": "Menerapkan Prinsip Dasar Komunikasi"
+                    },
+                    {
+                        "no": 3,
+                        "unit_code": "M.74100.003.02",
+                        "unit_title": "Menerapkan Pengetahuan Dasar Desain"
+                    }
+                ]
+            },
+            {
+                "group_name": "Menentukan obyektif dari program desain",
+                "units": [
+                    {
+                        "no": 4,
+                        "unit_code": "M.74100.004.02",
+                        "unit_title": "Menerapkan Project Brief"
+                    },
+                    {
+                        "no": 5,
+                        "unit_code": "M.74100.005.02",
+                        "unit_title": "Menerapkan Design Brief"
+                    },
+                    {
+                        "no": 6,
+                        "unit_code": "M.74100.006.01",
+                        "unit_title": "Mengorganisasikan Informasi Terkait Proyek Desain"
+                    }
+                ]
+            },
+            {
+                "group_name": "Menerapkan proses desain",
+                "units": [
+                    {
+                        "no": 7,
+                        "unit_code": "M.74100.007.01",
+                        "unit_title": "Menerapkan strategi Desain"
+                    },
+                    {
+                        "no": 8,
+                        "unit_code": "M.74100.008.02",
+                        "unit_title": "Menerapkan Konsep Desain"
+                    },
+                    {
+                        "no": 9,
+                        "unit_code": "M.74100.009.02",
+                        "unit_title": "Mengoperasikan Perangkat Lunak Desain"
+                    },
+                    {
+                        "no": 10,
+                        "unit_code": "M.74100.010.01",
+                        "unit_title": "Menciptakan Karya Desain"
+                    },
+                    {
+                        "no": 11,
+                        "unit_code": "M.74100.011.02",
+                        "unit_title": "Mengevaluasi Hasil Karya Desain"
+                    },
+                    {
+                        "no": 12,
+                        "unit_code": "M.74100.012.02",
+                        "unit_title": "Mempresentasikan Karya Desain"
+                    }
+                ]
+            },
+            {
+                "group_name": "Menerapkan proses produksi",
+                "units": [
+                    {
+                        "no": 13,
+                        "unit_code": "M.74100.013.02",
+                        "unit_title": "Membuat Materi Siap Produksi"
+                    }
+                ]
+            }
+        ],
+        "answer_keys": [
+            // LOOPING 3: Daftar kunci jawaban soal
+            { "question_no": 1, "key": "" },
+            { "question_no": 2, "key": "" },
+            { "question_no": 3, "key": "" },
+            { "question_no": 4, "key": "" },
+            { "question_no": 5, "key": "" },
+            { "question_no": 6, "key": "" },
+            { "question_no": 7, "key": "" },
+            { "question_no": 8, "key": "" },
+            { "question_no": 9, "key": "" }
+        ],
+        "document_control": {
+            "compilers": [
+                // LOOPING 4: Daftar personil penyusun
+                { "no": 1, "name": "", "met_number": "", "date_signature": "" },
+                { "no": 2, "name": "", "met_number": "", "date_signature": "" }
+            ],
+            "validators": [
+                // LOOPING 5: Daftar personil validator
+                { "no": 1, "name": "", "met_number": "", "date_signature": "" },
+                { "no": 2, "name": "", "met_number": "", "date_signature": "" }
+            ]
+        }
+    }
+}

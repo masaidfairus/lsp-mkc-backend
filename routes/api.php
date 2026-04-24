@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Asesi\BankAccountController;
 use App\Http\Controllers\Asesi\DocumentProfileController;
 use App\Http\Controllers\Asesi\PaymentController;
+use App\Http\Controllers\Asesi\RegistrationController;
 use App\Http\Controllers\PDF\PdfApl01Controller;
 use App\Http\Controllers\PDF\PdfApl02Controller;
 use App\Http\Middleware\EnsureApiKeyIsValid;
@@ -24,22 +25,25 @@ Route::get('/verify-email/{id}/{hash}', [AuthController::class, 'verify'])->name
 
 // PUBLIC ROUTES
 Route::middleware(EnsureApiKeyIsValid::class)->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/verify-email/resend', [AuthController::class, 'resend']);
-    Route::post('/check-verification', [AuthController::class, 'checkStatus']);
-    Route::post('/forgot-password', [ResetPasswordController::class, 'forgotPassword']);
-    Route::post('/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
-    Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword']);
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('verify-email/resend', [AuthController::class, 'resend']);
+    Route::post('check-verification', [AuthController::class, 'checkStatus']);
+    Route::post('forgot-password', [ResetPasswordController::class, 'forgotPassword']);
+    Route::post('verify-otp', [ResetPasswordController::class, 'verifyOtp']);
+    Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
 
-    Route::get('/bank-accounts', [BankAccountController::class, 'index']);
+    Route::get('bank-accounts', [BankAccountController::class, 'index']);
 });
 
 // AUTHENTICATED ROUTES
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', fn(Request $request) => new UserResource($request->user()));
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/change-password', [ResetPasswordController::class, 'changePassword']);
+    Route::get('user', fn(Request $request) => new UserResource($request->user()));
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('change-password', [ResetPasswordController::class, 'changePassword']);
+
+    // Ambil semua data pendaftaran
+    Route::get('registrations', [RegistrationController::class, 'index']);
 
     Route::get('registrations', [App\Http\Controllers\Asesi\RegistrationController::class, 'index']);
     // Invoice

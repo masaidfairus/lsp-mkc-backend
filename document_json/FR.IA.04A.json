@@ -1,0 +1,76 @@
+{
+    "fria04a_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_code": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri",
+            "assessor_name": "", // Dinamis
+            "assessee_name": "", // Dinamis
+            "assessment_date": "" // Dinamis
+        },
+        "work_groups": [
+            // LOOPING 1: Berdasarkan "Kelompok Pekerjaan"
+            {
+                "group_id": 1,
+                "group_name": "Menerapkan pengetahuan tentang desain",
+                "units": [
+                    // LOOPING 2: Daftar Unit Kompetensi di dalam kelompok ini
+                    {
+                        "no": 1,
+                        "unit_code": "M.74100.001.02",
+                        "unit_title": "Mengaplikasikan Prinsip Dasar Desain"
+                    },
+                    {
+                        "no": 2,
+                        "unit_code": "M.74100.002.02",
+                        "unit_title": "Menerapkan Prinsip Dasar Komunikasi"
+                    },
+                    {
+                        "no": 3,
+                        "unit_code": "M.74100.003.02",
+                        "unit_title": "Menerapkan Pengetahuan Dasar Desain"
+                    }
+                ],
+                "scenario_instructions": {
+                    "label": "Hal yang harus disiapkan atau dilakukan atau dihasilkan untuk suatu proyek singkat/ kegiatan terstruktur",
+                    "content": "", // Isi skenario dinamis
+                    "time_allocation": "" // Waktu dinamis
+                },
+                "demonstration_items": {
+                    "label": "Hal yang perlu didemonstrasikan",
+                    "content": "", // Hasil studi kasus dinamis
+                    "time_allocation": "" // Waktu dinamis
+                },
+                "assessee_feedback": "" // Umpan balik untuk asesi
+            }
+            // Kelompok Pekerjaan lainnya (misal: Kelompok 4) di-looping di sini
+        ],
+        "signatures": {
+            "assessee": { "name": "", "signature_url": "" },
+            "assessor": { "name": "", "signature_url": "" },
+            "supervisor": { "name": "", "signature_url": "" }
+        },
+        "document_control": {
+            "compilers": [
+                // LOOPING 3: Baris tabel untuk Penyusun
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_no": "",
+                    "date": "",
+                    "signature": ""
+                }
+            ],
+            "validators": [
+                // LOOPING 4: Baris tabel untuk Validator
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_no": "",
+                    "date": "",
+                    "signature": ""
+                }
+            ]
+        }
+    }
+}
