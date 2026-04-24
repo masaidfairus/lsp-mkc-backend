@@ -13,4 +13,11 @@ class CreateMapa02 extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
+    protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
+    {
+        return static::getModel()::updateOrCreate(
+            ['registration_id' => $data['registration_id']],
+            $data
+        );
+    }
 }

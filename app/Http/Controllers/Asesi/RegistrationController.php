@@ -80,7 +80,7 @@ class RegistrationController extends Controller
                             'status' => $ak07Status,
                         ],
                     ],
-                ];
+                ];  
             });
 
         return $this->successResponse(

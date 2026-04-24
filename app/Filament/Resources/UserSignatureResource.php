@@ -38,8 +38,10 @@ class UserSignatureResource extends Resource
                             ->columnSpanFull()
                             ->required(),
 
-                        Forms\Components\Hidden::make('signature_shape'),
-                        
+                        Forms\Components\Hidden::make('signature_shape')
+                            ->live()
+                            ->dehydrated(true),
+
                         Forms\Components\Grid::make(1)
                             ->schema([
                                 Forms\Components\Placeholder::make('qr_preview')

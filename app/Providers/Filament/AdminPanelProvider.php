@@ -38,6 +38,7 @@ class AdminPanelProvider extends PanelProvider
                 'Admin',
                 'Mastering Data',
                 'Dokumen',
+                'Pendaftaran',
                 'APL',
                 'AK',
                 'MAPA',

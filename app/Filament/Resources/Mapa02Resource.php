@@ -156,7 +156,14 @@ class Mapa02Resource extends Resource
                                                                     ])
                                                                     ->inline()
                                                                     ->inlineLabel(false)
-                                                                    ->columnSpan(2),
+                                                                    ->columnSpan(2)
+                                                                    ->hintAction(
+                                                                        Forms\Components\Actions\Action::make('reset')
+                                                                            ->label('Reset')
+                                                                            ->icon('heroicon-m-x-circle')
+                                                                            ->color('danger')
+                                                                            ->action(fn ($set) => $set('answer', null))
+                                                                    ),
                                                             ])
                                                             ->columns(5)
                                                             ->disableItemCreation()
@@ -307,6 +314,7 @@ class Mapa02Resource extends Resource
                             $set('name', null);
                             $set('reg_number', null);
                             $set('signature', null);
+                            $set('qr_code', null);
                             $set('date', null);
                         }
                     }),
@@ -314,6 +322,7 @@ class Mapa02Resource extends Resource
                 Forms\Components\Hidden::make('reg_number'),
                 Forms\Components\Hidden::make('date'),
                 Forms\Components\Hidden::make('signature'),
+                Forms\Components\Hidden::make('qr_code'),
                 
                 Forms\Components\Placeholder::make('sig_preview')
                     ->label('')
@@ -356,43 +365,51 @@ class Mapa02Resource extends Resource
                             $qrImg = "<img src='{$sig->qr_code}' style='max-height: 70px;' />";
                         }
 
-                        return new HtmlString("
-                            <div class='bg-white text-gray-900 p-5 rounded-xl shadow-xl border border-gray-200 mt-2 overflow-hidden' style='font-family: sans-serif; min-width: 360px;'>
-                                <div class='flex justify-between items-start border-b border-gray-100 pb-4 mb-4'>
-                                    <div>
-                                        <div class='text-[10px] uppercase tracking-widest text-gray-400 font-black mb-1'>Nama Lengkap</div>
-                                        <div class='text-base font-bold text-black uppercase' style='letter-spacing: 0.5px;'>{$name}</div>
-                                        
-                                        <div class='mt-4'>
-                                            <div class='text-[10px] uppercase tracking-widest text-gray-400 font-black mb-1'>No. Registrasi MET</div>
-                                            <div class='text-sm font-semibold text-gray-700'>{$regNumber}</div>
-                                        </div>
-                                    </div>
-                                    <div class='bg-gray-50 p-2 rounded-lg border border-gray-100 shadow-inner'>
-                                        {$qrImg}
-                                    </div>
-                                </div>
-                                
-                                <div class='flex items-center justify-between gap-8 mt-2'>
-                                    <div class='flex-1'>
-                                        <div class='text-[10px] uppercase tracking-widest text-gray-400 font-black mb-2'>Tanda Tangan</div>
-                                        <div class='relative h-24 w-full flex items-center justify-center bg-gray-50/80 rounded-lg border-2 border-dashed border-gray-200'>
-                                            <div class='z-10 relative'>
-                                                {$img}
-                                            </div>
-                                            <!-- Signature Line -->
-                                            <div class='absolute bottom-4 left-4 right-4 h-[2px] bg-gray-300 opacity-60' style='border-radius: 1px;'></div>
-                                        </div>
-                                    </div>
-                                    <div class='text-center min-w-[110px]'>
-                                        <div class='text-[10px] uppercase tracking-widest text-gray-400 font-black mb-2'>Tanggal</div>
-                                        <div class='text-sm font-black text-primary-700 bg-primary-50 px-3 py-2 rounded-lg border-2 border-primary-100 shadow-sm' style='display: block;'>
-                                            {$date}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ");
+                       return new HtmlString("
+    <div style='
+        font-family: var(--font-sans, system-ui, sans-serif);
+        background: var(--color-background-primary, #fff);
+        border: 0.5px solid var(--color-border-secondary, #e2e8f0);
+        border-radius: 16px;
+        overflow: hidden;
+        margin-top: 12px;
+        max-width: 460px;
+        color: var(--color-text-primary, #0f172a);
+    '>
+        <div style='padding: 4px 16px; background: var(--color-background-secondary, #f8fafc); border-bottom: 0.5px solid var(--color-border-tertiary, #f1f5f9); display: flex; align-items: center; gap: 6px;'>
+            <span style='font-size: 11px; color: var(--color-text-tertiary, #94a3b8); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500;'>Penyusun / Validator</span>
+        </div>
+        <div style='padding: 20px;'>
+            <div style='display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 0.5px solid var(--color-border-tertiary, #f1f5f9);'>
+                <div style='flex: 1; min-width: 0;'>
+                    <p style='font-size: 11px; color: var(--color-text-tertiary, #94a3b8); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; margin: 0 0 4px;'>Nama lengkap</p>
+                    <p style='font-size: 16px; font-weight: 500; color: var(--color-text-primary, #0f172a); margin: 0 0 14px;'>{$name}</p>
+                    <p style='font-size: 11px; color: var(--color-text-tertiary, #94a3b8); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; margin: 0 0 6px;'>No. registrasi MET</p>
+                    <span style='font-size: 12px; font-weight: 500; color: var(--color-text-secondary, #475569); background: var(--color-background-secondary, #f8fafc); border: 0.5px solid var(--color-border-secondary, #e2e8f0); border-radius: 6px; padding: 4px 10px; display: inline-block; font-family: monospace;'>{$regNumber}</span>
+                </div>
+                <div style='width: 68px; height: 68px; border: 0.5px solid var(--color-border-secondary, #e2e8f0); border-radius: 10px; overflow: hidden; flex-shrink: 0; background: var(--color-background-secondary, #f8fafc); display: flex; align-items: center; justify-content: center;'>
+                    {$qrImg}
+                </div>
+            </div>
+            <div style='display: grid; grid-template-columns: 1fr 120px; gap: 12px;'>
+                <div>
+                    <p style='font-size: 11px; color: var(--color-text-tertiary, #94a3b8); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; margin: 0 0 8px;'>Tanda tangan</p>
+                    <div style='height: 96px; border: 0.5px dashed var(--color-border-secondary, #e2e8f0); border-radius: 10px; background: var(--color-background-secondary, #f8fafc); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;'>
+                        <div style='position: absolute; bottom: 22px; left: 16px; right: 16px; height: 0.5px; background: var(--color-border-secondary, #e2e8f0);'></div>
+                        <div style='position: relative; z-index: 1;'>{$img}</div>
+                    </div>
+                </div>
+                <div>
+                    <p style='font-size: 11px; color: var(--color-text-tertiary, #94a3b8); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; margin: 0 0 8px; text-align: center;'>Tanggal</p>
+                    <div style='height: 96px; border: 0.5px solid var(--color-border-secondary, #e2e8f0); border-radius: 10px; background: var(--color-background-secondary, #f8fafc); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;'>
+                        <p style='font-size: 10px; color: var(--color-text-tertiary, #94a3b8); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; margin: 0;'>Ditetapkan</p>
+                        <p style='font-size: 14px; font-weight: 500; color: var(--color-text-primary, #0f172a); margin: 0; font-family: monospace;'>{$date}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+");
                     })
                     ->visible(fn ($get) => $get('user_id') !== null),
             ]);

@@ -139,24 +139,43 @@
       margin-bottom: 12px;
     }
     .sig-box {
-      background: #f8fafc;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
+      background: #ffffff;
+      background-image: 
+        radial-gradient(#e2e8f0 0.5px, transparent 0.5px),
+        radial-gradient(#e2e8f0 0.5px, #ffffff 0.5px);
+      background-size: 20px 20px;
+      background-position: 0 0, 10px 10px;
+      border: 2px solid #f1f5f9;
+      border-radius: 16px;
       width: 100%;
-      height: 160px;
+      height: 180px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       position: relative;
+      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+    }
+    .sig-box::after {
+      content: "VERIFIED DOCUMENT";
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 9px;
+      font-weight: 800;
+      color: #e2e8f0;
+      letter-spacing: 1px;
+      pointer-events: none;
     }
     .sig-box canvas {
       display: block;
+      z-index: 1;
     }
     .sig-box .no-sig {
       color: var(--muted);
       font-size: 13px;
       text-align: center;
+      z-index: 2;
     }
 
     /* ── Footer ── */
@@ -219,12 +238,18 @@
   <script>
     // ── Helpers ──────────────────────────────────────────────────
     function getQueryData() {
+      // 1. Try to get data from PHP injection (for QR codes with ID)
+      const serverData = @json($sigData ?? null);
+      if (serverData) return serverData;
+
+      // 2. Try to get data from URL parameter (legacy/direct payload)
       const params = new URLSearchParams(window.location.search);
       const raw = params.get('data');
       if (raw) {
         try { return JSON.parse(decodeURIComponent(raw)); } catch {}
       }
-      // DEMO fallback — simulates scanned QR content
+
+      // 3. Fallback to DEMO
       return DEMO_DATA();
     }
 
@@ -268,38 +293,94 @@
       }
 
       const canvas = document.createElement('canvas');
-      canvas.width  = container.offsetWidth  || 420;
-      canvas.height = container.offsetHeight || 160;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = container.getBoundingClientRect();
+      const width = rect.width || 420;
+      const height = rect.height || 160;
+
+      canvas.width  = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width  = width + 'px';
+      canvas.style.height = height + 'px';
+      
       container.appendChild(canvas);
 
       const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
 
-      // Try to parse as JSON array of strokes [{x,y,type}] or plain SVG path
+      // Default styles
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth   = 2.2;
+      ctx.lineCap     = 'round';
+      ctx.lineJoin    = 'round';
+
       let drawn = false;
       try {
-        const strokes = JSON.parse(shapeStr);
-        if (Array.isArray(strokes)) {
-          ctx.strokeStyle = '#1e293b';
-          ctx.lineWidth   = 2.5;
-          ctx.lineCap     = 'round';
-          ctx.lineJoin    = 'round';
-          ctx.beginPath();
-          strokes.forEach(pt => {
-            if (pt.type === 'start' || pt.type === 0) ctx.moveTo(pt.x, pt.y);
-            else ctx.lineTo(pt.x, pt.y);
-          });
-          ctx.stroke();
-          drawn = true;
-        }
-      } catch {}
+        const data = JSON.parse(shapeStr);
+        
+        if (Array.isArray(data) && data.length > 0) {
+          // 1. Calculate Bounding Box
+          let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+          let hasPoints = false;
 
-      // Fallback: treat as SVG path string and draw via Path2D
+          const points = []; // Flattened points for calculation
+          if (data[0].points) {
+            data.forEach(s => s.points.forEach(p => {
+              points.push(p);
+              minX = Math.min(minX, p.x); minY = Math.min(minY, p.y);
+              maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y);
+              hasPoints = true;
+            }));
+          } else if (data[0].x !== undefined) {
+            data.forEach(p => {
+              points.push(p);
+              minX = Math.min(minX, p.x); minY = Math.min(minY, p.y);
+              maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y);
+              hasPoints = true;
+            });
+          }
+
+          if (hasPoints) {
+            const sigW = maxX - minX;
+            const sigH = maxY - minY;
+            const padding = 20;
+            
+            // 2. Calculate Scale & Translation
+            const scale = Math.min((width - padding*2) / sigW, (height - padding*2) / sigH, 1.2);
+            const offsetX = (width - sigW * scale) / 2 - minX * scale;
+            const offsetY = (height - sigH * scale) / 2 - minY * scale;
+
+            ctx.translate(offsetX, offsetY);
+            ctx.scale(scale, scale);
+
+            // 3. Draw
+            if (data[0].points) {
+              data.forEach(stroke => {
+                if (stroke.points.length > 0) {
+                  ctx.beginPath();
+                  ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                  stroke.points.forEach((p, i) => { if(i>0) ctx.lineTo(p.x, p.y); });
+                  ctx.stroke();
+                }
+              });
+            } else {
+              ctx.beginPath();
+              data.forEach(p => {
+                if (p.type === 'start' || p.type === 0 || p.start) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
+              });
+              ctx.stroke();
+            }
+            drawn = true;
+          }
+        }
+      } catch (e) {
+        console.error('Draw error:', e);
+      }
+
+      // Fallback: treat as SVG path string
       if (!drawn) {
         try {
-          ctx.strokeStyle = '#1e293b';
-          ctx.lineWidth   = 2.5;
-          ctx.lineCap     = 'round';
-          ctx.lineJoin    = 'round';
           const path2d = new Path2D(shapeStr);
           ctx.stroke(path2d);
           drawn = true;

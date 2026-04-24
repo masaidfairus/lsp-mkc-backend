@@ -24,8 +24,27 @@ use App\Http\Controllers\PDF\PdfApl02Controller;
 
 Route::get('/logout', [AuthController::class, 'logout']);
 
-Route::get('/signature/verify', function () {
-    return view('signature.verify');
+Route::get('/signature/verify', function (\Illuminate\Http\Request $request) {
+    $id = $request->query('id');
+    $sigData = null;
+
+    if ($id) {
+        $sig = \App\Models\UserSignature::find($id);
+        if ($sig) {
+            // Compress the signature shape (JSON strokes) using zlib (pako equivalent)
+            // The JS expectes a base64 of the compressed string
+            $shape = $sig->signature_shape;
+            $compressed = $shape ? base64_encode(gzcompress($shape, 9)) : null;
+
+            $sigData = [
+                'n' => $sig->name,
+                'd' => $sig->updated_at->format('Y-m-d H:i:s'),
+                's' => $compressed,
+            ];
+        }
+    }
+
+    return view('signature.verify', ['sigData' => $sigData]);
 })->name('signature.verify');
 
 // ============================================================
