@@ -94,19 +94,37 @@ class AssessmentRegistrationResource extends Resource
                 Forms\Components\Section::make('Mencetak Dokumen Asesi')
                     ->schema([
                         Forms\Components\Actions::make([
-                            Forms\Components\Actions\Action::make('generate_pdf')
+                            Forms\Components\Actions\Action::make('generate_apl01_pdf')
                                 ->label('Cetak Dokumen APL.01')
                                 ->color('success')
                                 ->icon('heroicon-o-printer')
                                 ->url(fn($record) => $record ? route('apl01.form', ['registration' => $record->id]) : '#')
                                 ->openUrlInNewTab(),
-                            Forms\Components\Actions\Action::make('generate_pdf')
+                            Forms\Components\Actions\Action::make('generate_apl02_pdf')
                                 ->label('Cetak Dokumen APL.02')
                                 ->color('success')
                                 ->icon('heroicon-o-printer')
                                 ->url(fn($record) => $record ? route('apl02.form', ['registration' => $record->id]) : '#')
                                 ->openUrlInNewTab(),
-                        ])->columnSpanFull(), // Agar tombol mengambil lebar penuh jika perlu
+                            Forms\Components\Actions\Action::make('generate_ak01_pdf')
+                                ->label('Cetak Dokumen AK.01')
+                                ->color('success')
+                                ->icon('heroicon-o-printer')
+                                ->url(fn($record) => $record ? route('ak01.form', ['registration' => $record->id]) : '#')
+                                ->openUrlInNewTab(),
+                            Forms\Components\Actions\Action::make('generate_ak04_pdf')
+                                ->label('Cetak Dokumen AK.04')
+                                ->color('success')
+                                ->icon('heroicon-o-printer')
+                                ->url(fn($record) => $record ? route('ak04.form', ['registration' => $record->id]) : '#')
+                                ->openUrlInNewTab(),
+                            Forms\Components\Actions\Action::make('generate_ak07_pdf')
+                                ->label('Cetak Dokumen AK.07')
+                                ->color('success')
+                                ->icon('heroicon-o-printer')
+                                ->url(fn($record) => $record ? route('ak07.form', ['registration' => $record->id]) : '#')
+                                ->openUrlInNewTab(),
+                        ])->columnSpanFull(),
                     ])->columns(2),
             ]);
     }

@@ -20,11 +20,6 @@ class Scheme extends Model
         'recertification_fee' => 'float',
     ];
 
-    public function peerValidations()
-    {
-        return $this->hasMany(PeerValidation::class);
-    }
-
     public function competencyUnits()
     {
         return $this->hasMany(CompetencyUnit::class);
