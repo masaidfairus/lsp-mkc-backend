@@ -8,7 +8,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Apl01;
 
 class PdfApl01Controller extends Controller
 {
@@ -18,15 +17,12 @@ class PdfApl01Controller extends Controller
      * Stream PDF APL-01 dari data real database.
      * Akses: kandidat pemilik registrasi ATAU admin/assessor.
      */
-    public function show(Request $request, Apl01 $registration)
+    public function show(Request $request, AssessmentRegistration $registration)
     {
         // ── Otorisasi ────────────────────────────────────────────────
         $user = $request->user();
 
-        if (
-            $user->id !== $registration->user_id &&
-            !in_array($user->role, ['admin', 'assessor']) // sesuaikan dengan value Role enum lo
-        ) {
+        if (!in_array($user->role, ['admin', 'asesor'])) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
@@ -51,14 +47,12 @@ class PdfApl01Controller extends Controller
         $files = $registration->filteredAplUserFiles;
 
         // ── Guard: data wajib harus ada ──────────────────────────────
-        if (!$aplData || !$candidate || !$scheme) {
+        if (!$aplData || !$candidate || !$scheme || !$files) {
             return response()->json(['message' => 'Data registrasi tidak lengkap.'], 422);
         }
 
         // ── Bangun array $data untuk blade ───────────────────────────
-// ── Bangun array $data untuk blade ───────────────────────────
         $data = [
-
             // ============================================================
             // BAGIAN 1 — Data Pribadi
             // ============================================================
@@ -110,8 +104,7 @@ class PdfApl01Controller extends Controller
             // BAGIAN 3 — Bukti Kelengkapan
             // ============================================================
 
-            'persyaratan_dasar' => $files->filter(function ($file) use ($registration, $scheme) {
-                // Cek apakah dokumen ini terdaftar sebagai persyaratan dasar untuk skema ini
+            'persyaratan_dasar' => $files->filter(function ($file) use ($scheme) {
                 return $file->documentList?->basicRequirementProof()
                     ->where('scheme_id', $scheme->id)
                     ->exists();
@@ -122,7 +115,6 @@ class PdfApl01Controller extends Controller
 
             // Bagian 3.2: Bukti Administratif
             'bukti_administratif' => $files->filter(function ($file) {
-                // Cek apakah dokumen ini terdaftar sebagai dokumen administratif
                 return $file->documentList?->administrativeProof()->exists();
             })->map(fn($file) => [
                     'nama' => $file->documentList->title,
@@ -143,32 +135,5 @@ class PdfApl01Controller extends Controller
         $filename = 'APL-01_' . str_replace(' ', '_', $candidate->name) . '_' . date('Ymd') . '.pdf';
 
         return $pdf->stream($filename);
-    }
-
-    // ────────────────────────────────────────────────────────────────
-    // Helper
-    // ────────────────────────────────────────────────────────────────
-
-    /**
-     * Ambil daftar nama requirement dari evidence yang sudah diupload kandidat,
-     * difilter berdasarkan kolom `is_mandatory` di tabel scheme_requirements.
-     *
-     * @return array<string>  e.g. ['KTP', 'Pas Foto 3x4 Background Merah']
-     */
-    private function getRequirementNames(
-        AssessmentRegistration $registration,
-        bool $mandatory
-    ): array {
-        return $registration->filteredUserFiles
-            ->filter(fn($e) => $e?->is_mandatory === $mandatory)
-            ->map(fn($e) => 
-            [
-                'nama' => $e->title,
-                'status' => $e->status, // EvidenceStatus enum
-            ]
-            )
-            ->unique('nama')
-            ->values()
-            ->toArray();
     }
 }

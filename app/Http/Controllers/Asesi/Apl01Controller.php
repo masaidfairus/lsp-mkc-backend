@@ -86,17 +86,17 @@ class Apl01Controller extends Controller
                 'institution_name' => $profile->institution_name,
             ]);
 
+            $userFiles = FileProfile::where('user_id', $user->id)->get()->keyBy('list_id');
+
             $buktiDasar = BasicRequirementProof::where('scheme_id', $validated['scheme_id'])
                 ->with('documentList')
                 ->get()
-                ->map(function ($req) use ($user) {
-                    $uploaded = FileProfile::where('user_id', $user->id)
-                        ->where('list_id', $req->list_id)
-                        ->first();
+                ->map(function ($req) use ($userFiles) {
+                    $uploaded = $userFiles->get($req->list_id);
 
                     return [
                         'list_id' => $req->list_id,
-                        'title' => $req->documentList->title,
+                        'title' => $req->documentList?->title ?? 'Dokumen Tidak Ditemukan',
                         'is_mandatory' => $req->is_mandatory,
                         'or_group' => $req->or_group,
                         'is_uploaded' => $uploaded ? true : false,
@@ -107,14 +107,12 @@ class Apl01Controller extends Controller
 
             $buktiAdmin = AdministrativeProof::with('documentList')
                 ->get()
-                ->map(function ($adm) use ($user) {
-                    $uploaded = FileProfile::where('user_id', $user->id)
-                        ->where('list_id', $adm->list_id)
-                        ->first();
+                ->map(function ($adm) use ($userFiles) {
+                    $uploaded = $userFiles->get($adm->list_id);
 
                     return [
                         'list_id' => $adm->list_id,
-                        'title' => $adm->documentList->title,
+                        'title' => $adm->documentList?->title ?? 'Dokumen Tidak Ditemukan',
                         'is_mandatory' => true,
                         'is_uploaded' => $uploaded ? true : false,
                         'file_url' => $uploaded ? asset('storage/' . $uploaded->upload_document) : null,

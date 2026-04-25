@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class   DocumentList extends Model
+class DocumentList extends Model
 {
     protected $fillable = [
         'title',
@@ -29,5 +29,12 @@ class   DocumentList extends Model
     public function fileProfile()
     {
         return $this->hasMany(FileProfile::class, 'list_id');
+    }
+
+    public function scopeForScheme($query, $schemeId, $relation)
+    {
+        return $query->whereHas($relation, function ($q) use ($schemeId) {
+            $q->where('scheme_id', $schemeId);
+        });
     }
 }

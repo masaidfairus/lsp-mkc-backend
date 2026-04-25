@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\PDF\PdfAk01Controller;
+use App\Http\Controllers\PDF\PdfAk04Controller;
+use App\Http\Controllers\PDF\PdfAk07Controller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PDF\PdfApl01Controller;
 use App\Http\Controllers\PDF\PdfApl02Controller;
@@ -31,101 +34,29 @@ Route::get('/signature/verify', function () {
 // ============================================================
 // APL01
 // ============================================================
-// Route::prefix('preview')->name('preview.')->group(function () {
-//     Route::get('/apl01/{apl01}', [PdfPreviewController::class, 'apl01'])->name('apl01');
-//     nanti tambah form lain di sini
-// });
-
-// Route::prefix('download')->name('download.')->group(function () {
-//     Route::get('/apl01/{apl01}', [PdfPreviewController::class, 'apl01Download'])->name('apl01');
-// });
-Route::get('/apl01/{registration}', [PdfApl01Controller::class, 'show'])->name('apl01.form');
-
-Route::post('/apl01/generate', [PdfApl01Controller::class, 'generate'])->name('apl01.generate');
-
-Route::get('/apl01/preview', function () {
-    $data = [
-        'no_registrasi' => '',
-        'tanggal' => '',
-        'nama' => '',
-        'nik' => '',
-        'tempat_lahir' => '',
-        'tanggal_lahir' => '',
-        'jenis_kelamin' => '',
-        'agama' => '',
-        'kebangsaan' => '',
-        'no_telp' => '',
-        'email' => '',
-        'alamat' => '',
-        'rt_rw' => '',
-        'kelurahan' => '',
-        'kecamatan' => '',
-        'kabupaten' => '',
-        'provinsi' => '',
-        'kode_pos' => '',
-        'pendidikan' => '',
-        'pekerjaan' => '',
-        'instansi' => '',
-        'alamat_instansi' => '',
-        'kode_pos_kantor' => '',
-        'nama_skema' => '',
-        'kode_skema' => '',
-        'tujuan_asesmen' => '',
-        'unit_kompetensi' => [
-            ['kode' => 'M.741000.004.01', 'judul' => 'Melakukan survey sumber bahan baku'],
-            ['kode' => 'M.741000.006.01', 'judul' => 'Menentukan jenis produk'],
-            ['kode' => 'M.741000.008.01', 'judul' => 'Melakukan pengurusan perijinan usaha industri'],
-            ['kode' => 'M.741000.014.01', 'judul' => 'Membuat jadwal kerja personil bagian produksi'],
-            ['kode' => 'M.741000.019.01', 'judul' => 'Melakukan pengaturan penyimpanan bahan baku'],
-            ['kode' => 'M.741000.026.01', 'judul' => 'Menjalin hubungan dengan pelanggan'],
-            ['kode' => 'M.741000.027.01', 'judul' => 'Melakukan pembukan keuangan untuk setiap transaksi'],
-            ['kode' => 'N.821100.001.02', 'judul' => 'Menangani Penerimaan dan Pengiriman Dokumen/Surat'],
-            ['kode' => 'N.821100.067.01', 'judul' => 'Melakukan Transaksi Perbankan Sederhana'],
-        ],
-        'persyaratan_dasar' => [],
-        'bukti_administratif' => [],
-        'status_terima' => 'Diterima',
-    ];
-
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.APL.apl01', $data)->setPaper('a4', 'portrait');
-    return $pdf->stream('preview.pdf');
-});
+Route::get('apl01/{registration}', [PdfApl01Controller::class, 'show'])->name('apl01.form');
 
 // ============================================================
 // APL02
 // ============================================================
-// Route::post('/apl02/generate', [PdfApl02Controller::class, 'generate'])->name('apl02.generate');
-Route::get('/apl02/{registration}', [PdfApl02Controller::class, 'show'])->name('apl02.form');
+Route::get('apl02/{registration}', [PdfApl02Controller::class, 'show'])->name('apl02.form');
 
-Route::get('/apl02/preview', function () {
-    $data = [
-        'nama_skema' => 'Ahli Desain Grafis',
-        'kode_skema' => 'SUK-SKS-REV1-L007',
-        'nama_asesi' => '',
-        'nama_asesor' => '',
-        'no_reg_asesor' => '',
-        'unit_kompetensi' => [
-            [
-                'no' => 1,
-                'kode' => 'M.74100.001.02',
-                'judul' => 'Mengaplikasikan Prinsip Dasar Desain',
-                'elemen' => [
-                    [
-                        'no' => 1,
-                        'nama' => 'Menerapkan materi informasi yang berkaitan dengan pengetahuan dasar desain',
-                        'kriteria' => [
-                            ['no' => '1.1', 'uraian' => 'Sumber informasi ditentukan agar keabsahan informasi mengenai pengetahuan dasar desain sesuai dengan kebutuhan.'],
-                            ['no' => '1.2', 'uraian' => 'Materi informasi dijelaskan secara sistematis sesuai dengan tahapan kerja desain.'],
-                        ]
-                    ],
-                ]
-            ],
-        ],
-    ];
+// ============================================================
+// AK.01
+// ============================================================
+Route::get('ak01/{registration}', [PdfAk01Controller::class, 'show'])->name('ak01.form');
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.APL.apl02', $data)->setPaper('a4', 'portrait');
-    return $pdf->stream('apl02-preview.pdf');
-});
+// ============================================================
+// AK.04
+// ============================================================
+Route::get('ak04/{registration}', [PdfAk04Controller::class, 'show'])->name('ak04.form');
+
+
+// ============================================================
+// AK.07
+// ============================================================
+Route::get('ak07/{registration}', [PdfAk07Controller::class, 'show'])->name('ak07.form');
+
 
 // ============================================================
 // MAPA01
@@ -295,56 +226,6 @@ Route::get('/invoice/preview', function () {
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('invoice_preview.pdf');
-});
-
-Route::get('/ak01/preview', function () {
-    $data = [
-        'nama_skema' => 'AHLI DESAIN GRAFIS',
-        'kode_skema' => 'SUK-SKS-REV1-L007',
-        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
-        'nama_asesor' => '',
-        'nama_asesi' => '',
-        'hari_tanggal' => '',
-        'waktu' => '',
-        'tuk_pelaksanaan' => '',
-    ];
-
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.AK.ak01', $data)
-        ->setPaper('a4', 'portrait');
-
-    return $pdf->stream('ak01_preview.pdf');
-});
-
-Route::get('/ak04/preview', function () {
-    $data = [
-        'nama_asesi' => '',
-        'nama_asesor' => '',
-        'tanggal' => '',
-        'nama_skema' => 'AHLI DESAIN GRAFIS',
-        'no_skema' => 'SUK-SKS-REV1-L007',
-        'alasan' => '',
-    ];
-
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.AK.ak04', $data)
-        ->setPaper('a4', 'portrait');
-
-    return $pdf->stream('ak04_preview.pdf');
-});
-
-Route::get('/ak07/preview', function () {
-    $data = [
-        'nama_skema' => 'AHLI DESAIN GRAFIS',
-        'kode_skema' => 'SUK-SKS-REV1-L007',
-        'tuk' => 'Sewaktu/Tempat Kerja/Mandiri',
-        'nama_asesor' => '',
-        'nama_asesi' => '',
-        'tanggal' => '',
-    ];
-
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.AK.ak07', $data)
-        ->setPaper('a4', 'portrait');
-
-    return $pdf->stream('ak07_preview.pdf');
 });
 
 Route::get('/ia01/preview', function () {

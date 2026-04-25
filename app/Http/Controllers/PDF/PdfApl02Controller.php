@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\PDF;
 
 use App\Http\Controllers\Controller;
-use App\Models\Apl02;
+use App\Models\AssessmentRegistration;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PdfApl02Controller extends Controller
 {
-    public function show(Request $request, Apl02 $registration)
+    public function show(Request $request, AssessmentRegistration $registration)
     {
         $registration->load([
             'candidate',

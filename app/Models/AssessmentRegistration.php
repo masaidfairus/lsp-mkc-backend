@@ -56,7 +56,7 @@ class AssessmentRegistration extends Model
 
     public function appeals()
     {
-        return $this->hasMany(Appeal::class);
+        return $this->hasMany(Appeal::class, 'registration_id');
     }
 
     public function payments()
@@ -110,5 +110,10 @@ class AssessmentRegistration extends Model
     public function results()
     {
         return $this->hasMany(AssessmentResult::class, 'registration_id');
+    }
+
+    public function validations()
+    {
+        return $this->hasMany(AssessmentValidation::class, 'registration_id');
     }
 }

@@ -8,6 +8,7 @@ use App\Models\BasicRequirementProof;
 use App\Models\DocumentList;
 use App\Models\FileProfile;
 use App\Models\PortfolioScheme;
+use App\Models\Scheme;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,6 +28,20 @@ class DocumentProfileController extends Controller
     {
         $result = DocumentList::all();
         return $this->successResponse($result, 'Data portfolio berhasil ditampilkan');
+    }
+
+    public function showBasicRequirementBySchemeId(Scheme $scheme)
+    {
+        $basic = DocumentList::forScheme($scheme->id, 'basicRequirementProof')->get();
+
+        return $this->successResponse($basic, "Data persyaratan untuk skema {$scheme->name} berhasil ditampilkan");
+    }
+
+    public function showPortfolioBySchemeId(Scheme $scheme)
+    {
+        $portfolio = DocumentList::forScheme($scheme->id, 'portfolioScheme')->get(); //
+
+        return $this->successResponse($portfolio, "Data persyaratan untuk skema {$scheme->name} berhasil ditampilkan");
     }
 
     public function store(Request $request)

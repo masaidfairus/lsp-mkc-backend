@@ -80,16 +80,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(AssessmentRegistration::class, 'assessor_id', 'id');
     }
 
-    public function mainAssessorValidations()
-    {
-        return $this->hasMany(PeerValidation::class, 'main_assessor_id', 'id');
-    }
-
-    public function peerAssessorValidations()
-    {
-        return $this->hasMany(PeerValidation::class, 'peer_assessor_id', 'id');
-    }
-
     public function userFile()
     {
         return $this->hasMany(FileProfile::class, 'user_id', 'id');

@@ -45,7 +45,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Ambil semua data pendaftaran
     Route::get('registrations', [RegistrationController::class, 'index']);
 
-    Route::get('registrations', [App\Http\Controllers\Asesi\RegistrationController::class, 'index']);
     // Invoice
     Route::get('registrations/{registration}/invoice', [PaymentController::class, 'show']);
 
@@ -62,6 +61,9 @@ Route::middleware('auth:sanctum')->group(function () {
         'show'
     ]);
 
+    // Ambil Dokumen per ID Skema
+    Route::get('schemes/{scheme}/basic-requirements', [DocumentProfileController::class, 'showBasicRequirementBySchemeId']);
+    Route::get('schemes/{scheme}/portfolios', [DocumentProfileController::class, 'showPortfolioBySchemeId']);
 
     // Upload File Asesi
     Route::apiResource('document-profiles', DocumentProfileController::class)->only([
@@ -71,7 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
     ]);
 
     // Show All Document List
-    Route::get('document_lists', [DocumentProfileController::class, 'showDocumentLists']);
+    Route::get('document-lists', [DocumentProfileController::class, 'showDocumentLists']);
 
     // APL-01
     Route::get('registrations/{registration}/apl01', [Apl01Controller::class, 'show']);
