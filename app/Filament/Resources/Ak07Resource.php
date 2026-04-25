@@ -18,7 +18,7 @@ class Ak07Resource extends Resource
     protected static ?string $navigationLabel = 'AK.07';
     protected static ?string $modelLabel = 'AK.07';
     protected static ?string $pluralModelLabel = 'AK.07';
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 7;
 
     public static function form(Form $form): Form
     {

@@ -20,9 +20,9 @@ class Ak04Resource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
     protected static ?string $navigationGroup = 'AK';
     protected static ?string $navigationLabel = 'AK.04';
-    protected static ?string $modelLabel = 'AK.04 (Banding Asesmen)';
-    protected static ?string $pluralModelLabel = 'AK.04 (Banding Asesmen)';
-    protected static ?int $navigationSort = 2;
+    protected static ?string $modelLabel = 'AK.04';
+    protected static ?string $pluralModelLabel = 'AK.04';
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
