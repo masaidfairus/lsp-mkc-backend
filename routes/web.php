@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\PrivateFileController;
 use App\Http\Controllers\PDF\PdfAk01Controller;
 use App\Http\Controllers\PDF\PdfAk04Controller;
 use App\Http\Controllers\PDF\PdfAk07Controller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PDF\PdfApl01Controller;
 use App\Http\Controllers\PDF\PdfApl02Controller;
+use App\Http\Controllers\PDF\PdfMapa01Controller;
+use App\Http\Controllers\PDF\PdfMapa02Controller;
 
 // Route::get('/active', function () {
 //     return view('auth.activation');
@@ -30,6 +33,10 @@ Route::get('/logout', [AuthController::class, 'logout']);
 Route::get('/signature/verify', function () {
     return view('signature.verify');
 })->name('signature.verify');
+
+Route::get('admin/view-document/{record}', [PrivateFileController::class, 'download'])
+    ->name('private.file.view')
+    ->middleware(['auth']);
 
 // ============================================================
 // APL01
@@ -61,69 +68,12 @@ Route::get('ak07/{registration}', [PdfAk07Controller::class, 'show'])->name('ak0
 // ============================================================
 // MAPA01
 // ============================================================
-Route::get('/mapa01/preview', function () {
-    $data = [
-        'nama_skema' => 'AHLI DESAIN GRAFIS',
-        'kode_skema' => 'SUK-SKS-REV1-L007',
-        'tujuan_asesmen' => 'Sertifikasi',
-        'kelompok_pekerjaan' => [
-            [
-                'no' => 1,
-                'nama' => 'Menerapkan pengetahuan tentang desain',
-                'unit' => [
-                    ['kode' => 'M.74100.001.02', 'judul' => 'Mengaplikasikan Prinsip Dasar Desain'],
-                    ['kode' => 'M.74100.002.02', 'judul' => 'Menerapkan Prinsip Dasar Komunikasi'],
-                    ['kode' => 'M.74100.003.02', 'judul' => 'Menerapkan Pengetahuan Dasar Desain'],
-                ],
-            ],
-            [
-                'no' => 2,
-                'nama' => 'Menentukan obyektif dari program desain',
-                'unit' => [
-                    ['kode' => 'M.74100.004.02', 'judul' => 'Menerapkan Project Brief'],
-                    ['kode' => 'M.74100.005.02', 'judul' => 'Menerapkan Design Brief'],
-                    ['kode' => 'M.74100.006.01', 'judul' => 'Mengorganisasikan Informasi Terkait Proyek Desain'],
-                ],
-            ],
-            [
-                'no' => 3,
-                'nama' => 'Menerapkan proses desain',
-                'unit' => [
-                    ['kode' => 'M.74100.007.01', 'judul' => 'Menerapkan strategi Desain'],
-                    ['kode' => 'M.74100.008.02', 'judul' => 'Menerapkan Konsep Design'],
-                    ['kode' => 'M.74100.009.02', 'judul' => 'Mengoperasikan Perangkat Lunak Desain'],
-                    ['kode' => 'M.74100.010.01', 'judul' => 'Menciptakan Karya Desain'],
-                    ['kode' => 'M.74100.011.02', 'judul' => 'Mengevaluasi Hasil Karya Desain'],
-                    ['kode' => 'M.74100.012.02', 'judul' => 'Mempresentasikan Karya Desain'],
-                ],
-            ],
-            [
-                'no' => 4,
-                'nama' => 'Menerapkan proses produksi',
-                'unit' => [
-                    ['kode' => 'M.74100.013.02', 'judul' => 'Membuat Materi Siap Produksi'],
-                ],
-            ],
-        ],
-        'karakteristik_khusus' => 'Ada',
-        'kebutuhan_kontekstualisasi' => 'Ada',
-        'saran' => 'Ada',
-        'penyesuaian_perangkat' => 'Ada',
-        'peluang' => 'Ada',
-        'orang_relevan' => [],
-        'penyusun' => [
-            ['nama' => '', 'nomor_met' => ''],
-            ['nama' => '', 'nomor_met' => ''],
-        ],
-        'validator' => [
-            ['nama' => '', 'nomor_met' => ''],
-            ['nama' => '', 'nomor_met' => ''],
-        ],
-    ];
+Route::get('mapa01/{registration}', [PdfMapa01Controller::class, 'show'])->name('mapa01.form');
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.mapa.mapa01', $data)->setPaper('a4', 'portrait');
-    return $pdf->stream('mapa01_preview.pdf');
-});
+// ============================================================
+// MAPA02
+// ============================================================
+Route::get('mapa02/{registration}', [PdfMapa02Controller::class, 'show'])->name('mapa02.form');
 
 Route::get('/mapa02/preview', function () {
     $data = [

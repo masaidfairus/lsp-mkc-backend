@@ -66,11 +66,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('schemes/{scheme}/portfolios', [DocumentProfileController::class, 'showPortfolioBySchemeId']);
 
     // Upload File Asesi
-    Route::apiResource('document-profiles', DocumentProfileController::class)->only([
+    Route::apiResource('documents', DocumentProfileController::class)->only([
         'index',
         'store',
         'update'
     ]);
+
+    Route::get('documents/{id}/stream', [DocumentProfileController::class, 'stream'])
+        ->name('documents.stream');
 
     // Show All Document List
     Route::get('document-lists', [DocumentProfileController::class, 'showDocumentLists']);

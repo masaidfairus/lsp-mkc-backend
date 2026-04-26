@@ -31,6 +31,11 @@ class DocumentList extends Model
         return $this->hasMany(FileProfile::class, 'list_id');
     }
 
+    public function aplPortfolio()
+    {
+        return $this->hasMany(Apl02Portfolio::class, 'list_id');
+    }
+
     public function scopeForScheme($query, $schemeId, $relation)
     {
         return $query->whereHas($relation, function ($q) use ($schemeId) {

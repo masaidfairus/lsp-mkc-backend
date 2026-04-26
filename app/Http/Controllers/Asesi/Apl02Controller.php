@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class Apl02Controller extends Controller
 {
@@ -96,7 +97,10 @@ class Apl02Controller extends Controller
         $validated = $request->validate([
             'is_declared' => ['required', 'accepted'],
             'portfolio_ids' => ['nullable', 'array'],
-            'portfolio_ids.*' => ['integer', 'exists:file_profiles,id'],
+            'portfolio_ids.*' => [
+                'integer',
+                Rule::exists('file_profiles', 'id')->where('user_id', $request->user()->id)
+            ],
             'answers' => ['required', 'array', 'min:1'],
             'answers.*.element_id' => ['required', 'integer'],
             'answers.*.is_competent' => ['required', 'boolean'],
@@ -142,13 +146,25 @@ class Apl02Controller extends Controller
         }
 
         DB::transaction(function () use ($validated, $registration) {
-            Apl02Portfolio::where('registration_id', $registration->id)->delete();
-            foreach ($validated['portfolio_ids'] ?? [] as $fileProfileId) {
-                Apl02Portfolio::create([
-                    'registration_id' => $registration->id,
-                    'file_profile_id' => $fileProfileId,
-                    'is_active' => true,
-                ]);
+            $newFileProfileIds = $validated['portfolio_ids'] ?? [];
+
+            Apl02Portfolio::where('registration_id', $registration->id)
+                ->whereNotIn('file_profile_id', $newFileProfileIds)
+                ->update(['is_active' => false]);
+
+            foreach ($newFileProfileIds as $fileProfileId) {
+                $fileProfile = FileProfile::find($fileProfileId);
+
+                Apl02Portfolio::updateOrCreate(
+                    [
+                        'registration_id' => $registration->id,
+                        'list_id' => $fileProfile->list_id,
+                    ],
+                    [
+                        'file_profile_id' => $fileProfileId,
+                        'is_active' => true,
+                    ]
+                );
             }
 
             $rows = array_map(fn($answer) => [

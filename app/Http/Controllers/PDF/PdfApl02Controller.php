@@ -44,7 +44,7 @@ class PdfApl02Controller extends Controller
         ];
 
         $pdf = Pdf::loadView('forms.APL.apl02', $data)->setPaper('a4', 'portrait');
-        $filename = 'APL-02_' . str_replace(' ', '_', $request->nama_asesi) . '_' . date('Ymd') . '.pdf';
+        $filename = 'APL-02_' . str_replace(' ', '_', $candidate->name) . '_' . date('Ymd') . '.pdf';
 
         return $pdf->stream($filename);
     }

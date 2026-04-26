@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Storage;
 
 class PortfolioFilesRelationManager extends RelationManager
 {
-    protected static string $relationship = 'portfolioFiles';
+    // 1. Ini yang kamu minta
+    protected static string $relationship = 'aplPortfolio';
 
     protected static ?string $title = 'Dokumen Portofolio - APL.02';
 
@@ -21,23 +22,6 @@ class PortfolioFilesRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('status')
-                    ->options(EvidenceStatus::class)
-                    ->label('Status')
-                    ->required()
-                    ->live()
-                    ->afterStateUpdated(function ($state, Forms\Set $set) {
-                        if ($state === EvidenceStatus::Invalid->value) {
-                            $set('validation_result', ValidationResult::Pending->value);
-                        }
-                    }),
-                Forms\Components\Select::make('validation_result')
-                    ->options(ValidationResult::class)
-                    ->label('Validasi')
-                    ->required(),
-                Forms\Components\Textarea::make('admin_notes')
-                    ->label('Catatan Admin')
-                    ->columnSpanFull(),
             ]);
     }
 
@@ -45,34 +29,16 @@ class PortfolioFilesRelationManager extends RelationManager
     {
         return $table
             ->paginated(false)
-            ->recordTitleAttribute('documentList.title')
+            ->recordTitleAttribute('fileProfile.documentList.title')
             ->columns([
-                Tables\Columns\TextColumn::make('documentList.title')->label('Portofolio Skema'),
-                Tables\Columns\TextColumn::make('upload_document')
+                Tables\Columns\TextColumn::make('fileProfile.documentList.title')
+                    ->label('Portofolio Skema'),
+
+                Tables\Columns\TextColumn::make('fileProfile.upload_document')
                     ->label('Berkas')
                     ->formatStateUsing(fn($state) => $state ? 'Lihat Dokumen' : 'Tidak Ada File')
-                    ->url(fn($record) => $record->upload_document ? Storage::url($record->upload_document) : null)
-                    ->openUrlInNewTab()
+                    ->url(fn($record) => $record->fileProfile ? route('private.file.view', $record->fileProfile->id) : null)->openUrlInNewTab()
                     ->color('primary'),
-                // Tables\Columns\TextColumn::make('status')
-                //     ->label('Status')
-                //     ->badge(),
-                // Tables\Columns\IconColumn::make('validation_result')
-                //     ->label('Validasi')
-                //     ->options([
-                //         'heroicon-o-check-circle' => ValidationResult::MS->value,
-                //         'heroicon-o-x-circle' => ValidationResult::TMS->value,
-                //         'heroicon-o-minus-circle' => ValidationResult::Pending->value,
-                //     ])
-                //     ->colors([
-                //         'success' => ValidationResult::MS->value,
-                //         'danger' => ValidationResult::TMS->value,
-                //         'gray' => ValidationResult::Pending->value,
-                //     ]),
-                // Tables\Columns\TextColumn::make('admin_notes')
-                //     ->label('Catatan')
-                //     ->limit(30)
-                //     ->wrap(),
             ])
             ->filters([
                 //

@@ -69,6 +69,11 @@ class AssessmentRegistration extends Model
         return $this->hasOne(Apl01Data::class, 'registration_id');
     }
 
+    public function aplPortfolio()
+    {
+        return $this->hasMany(Apl02Portfolio::class, 'registration_id');
+    }
+
     public function filteredUserFiles()
     {
         return $this->hasMany(FileProfile::class, 'user_id', 'user_id')
