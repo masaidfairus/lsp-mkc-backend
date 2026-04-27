@@ -27,7 +27,6 @@ class Ak01Resource extends Resource
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
-                                // 1. Select berdasarkan nama asesi, bukan ID
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
                                     ->options(function () {
@@ -47,17 +46,14 @@ class Ak01Resource extends Resource
                                     ->reactive()
                                     ->afterStateUpdated(function ($state, callable $set) {
                                         if ($state) {
-                                            $reg = \App\Models\AssessmentRegistration::with(['scheme', 'candidate'])->find($state);
+                                            $reg = \App\Models\AssessmentRegistration::with(['scheme', 'candidate', 'assessor'])->find($state);
                                             if ($reg) {
-                                                // Auto fill skema
                                                 if ($reg->scheme) {
                                                     $set('ak01_data.certification_scheme.name', $reg->scheme->name);
                                                     $set('ak01_data.certification_scheme.code', $reg->scheme->code);
                                                 }
-                                                // 2. Auto fill nama asesi (read only)
                                                 $set('ak01_data.asesi_name', $reg->candidate?->name ?? '');
 
-                                                // 3. Auto fill TUK and Asesor
                                                 if ($reg->tuk) {
                                                     $set('ak01_data.tuk', $reg->tuk);
                                                 }
@@ -98,17 +94,12 @@ class Ak01Resource extends Resource
                                             ])
                                             ->required(),
 
-                                        // 3. Nama asesor dari dropdown user role asesor
                                         Forms\Components\Select::make('asesor_name')
                                             ->label('Nama Asesor')
-                                            ->options(function () {
-                                                return \App\Models\User::role('asesor')
-                                                    ->pluck('name', 'name');
-                                            })
+                                            ->options(fn () => \App\Models\User::role('asesor')->pluck('name', 'name'))
                                             ->searchable()
                                             ->required(),
 
-                                        // 2. Nama asesi read only, auto fill dari pilihan registrasi
                                         Forms\Components\TextInput::make('asesi_name')
                                             ->label('Nama Asesi')
                                             ->disabled()
@@ -118,34 +109,31 @@ class Ak01Resource extends Resource
 
                                 Forms\Components\Section::make('Bukti yang akan dikumpulkan')
                                     ->schema([
-                                        Forms\Components\Repeater::make('evidence_methods')
+                                        Forms\Components\CheckboxList::make('evidence_selections')
                                             ->label('Metode Bukti')
-                                            ->schema([
-                                                Forms\Components\Grid::make(4)
-                                                    ->schema([
-                                                        Forms\Components\TextInput::make('label')
-                                                            ->label('Metode/Bukti')
-                                                            ->required()
-                                                            ->columnSpan(3),
-                                                        Forms\Components\Checkbox::make('answer')
-                                                            ->label('Ya?')
-                                                            ->columnSpan(1),
-                                                    ]),
+                                            ->options([
+                                                'Hasil Verifikasi Portofolio' => 'Hasil Verifikasi Portofolio',
+                                                'Hasil Reviu Produk' => 'Hasil Reviu Produk',
+                                                'Hasil Observasi Langsung' => 'Hasil Observasi Langsung',
+                                                'Hasil Kegiatan Terstruktur' => 'Hasil Kegiatan Terstruktur',
+                                                'Hasil Tanya Jawab' => 'Hasil Tanya Jawab',
+                                                'Other' => 'Lainnya:',
                                             ])
-                                            ->default([
-                                                ['label' => 'Hasil Verifikasi Portofolio',  'answer' => false],
-                                                ['label' => 'Hasil Reviu Produk',           'answer' => false],
-                                                ['label' => 'Hasil Observasi Langsung',     'answer' => false],
-                                                ['label' => 'Hasil Kegiatan Terstruktur',   'answer' => false],
-                                                ['label' => 'Hasil Tanya Jawab',            'answer' => false],
-                                            ])
-                                            ->addActionLabel('Tambah Bukti Lainnya')
-                                            ->reorderable(true)
-                                            ->addable(true)
-                                            ->deletable(true),
+                                            ->required()
+                                            ->columns(2)
+                                            ->reactive(),
+                                        
+                                        Forms\Components\TextInput::make('evidence_other')
+                                            ->label('Bukti Lainnya')
+                                            ->placeholder('Sebutkan...')
+                                            ->visible(fn ($get) => in_array('Other', (array) $get('evidence_selections')))
+                                            ->columnSpanFull(),
+
+                                        Forms\Components\DateTimePicker::make('assessment_schedule')
+                                            ->label('Hari/Tanggal/Waktu Asesmen')
+                                            ->required(),
                                     ]),
 
-                                // 5. Bagian TTD — hanya dropdown dan QR preview
                                 Forms\Components\Grid::make(2)
                                     ->statePath('signatures')
                                     ->schema([
@@ -166,7 +154,6 @@ class Ak01Resource extends Resource
                                                     }),
                                                 Forms\Components\Hidden::make('name'),
                                                 Forms\Components\Hidden::make('signature'),
-                                                // QR preview saja
                                                 Forms\Components\Placeholder::make('qr_preview')
                                                     ->label('QR Code Asesor')
                                                     ->content(fn ($get) => $get('qr_preview')

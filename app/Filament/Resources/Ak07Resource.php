@@ -18,7 +18,7 @@ class Ak07Resource extends Resource
     protected static ?string $navigationLabel = 'AK.07';
     protected static ?string $modelLabel = 'AK.07';
     protected static ?string $pluralModelLabel = 'AK.07';
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 7;
 
     public static function form(Form $form): Form
     {
@@ -49,13 +49,18 @@ class Ak07Resource extends Resource
                                     ->reactive()
                                     ->afterStateUpdated(function ($state, callable $set) {
                                         if ($state) {
-                                            $reg = \App\Models\AssessmentRegistration::with(['scheme', 'candidate'])->find($state);
+                                            $reg = \App\Models\AssessmentRegistration::with(['scheme', 'candidate', 'assessor'])->find($state);
                                             if ($reg) {
                                                 if ($reg->scheme) {
                                                     $set('ak07_data.certification_scheme.name', $reg->scheme->name);
                                                     $set('ak07_data.certification_scheme.code', $reg->scheme->code);
                                                 }
                                                 $set('ak07_data.asesi_name', $reg->candidate?->name ?? '');
+                                                
+                                                // Auto-populate Assessor from Registration
+                                                if ($reg->assessor) {
+                                                    $set('ak07_data.asesor_name', $reg->assessor->name);
+                                                }
                                             }
                                         }
                                     }),
@@ -155,19 +160,23 @@ class Ak07Resource extends Resource
                                                 // 3. Using collapsed Section instead of Fieldset + live() to completely remove lag
                                                 Forms\Components\Section::make('Keterangan Penyesuaian (Buka jika Diperlukan)')
                                                     ->schema([
-                                                        Forms\Components\Repeater::make('note')
-                                                            ->label('')
-                                                            ->schema([
-                                                                Forms\Components\Hidden::make('title'),
-                                                                Forms\Components\Hidden::make('custom_value')->default(''),
-                                                                
-                                                                Forms\Components\Checkbox::make('is_checked')
-                                                                    ->label(fn ($get) => $get('title')),
-                                                            ])
-                                                            ->grid(2)
-                                                            ->reorderable(false)
-                                                            ->addable(false)
-                                                            ->deletable(false),
+                                                        Forms\Components\CheckboxList::make('note_selections')
+                                                            ->label('Pilih Penyesuaian')
+                                                            ->options(function ($get) {
+                                                                $notes = $get('note') ?? [];
+                                                                $options = [];
+                                                                foreach ($notes as $n) {
+                                                                    $options[$n['title']] = $n['title'];
+                                                                }
+                                                                return $options;
+                                                            })
+                                                            ->columns(2)
+                                                            ->reactive(),
+                                                        
+                                                        Forms\Components\TextInput::make('note_other')
+                                                            ->label('Keterangan Lainnya')
+                                                            ->visible(fn ($get) => in_array('Lainnya', (array) $get('note_selections')))
+                                                            ->columnSpanFull(),
                                                     ])
                                                     ->collapsed(),
                                             ])
@@ -218,24 +227,23 @@ class Ak07Resource extends Resource
 
                                                         // Keputusan Penyesuaian
                                                         Forms\Components\Section::make('Keputusan Penyesuaian')
-                                                            ->statePath('adjustment_decisions')
                                                             ->schema([
-                                                                Forms\Components\TextInput::make('industry_standard')
-                                                                    ->label('Standar Industri')
-                                                                    ->placeholder('Isi jika diperlukan'),
-                                                                Forms\Components\TextInput::make('sop')
-                                                                    ->label('SOP')
-                                                                    ->placeholder('Isi jika diperlukan'),
-                                                                Forms\Components\TextInput::make('technical_regulation')
-                                                                    ->label('Regulasi Teknis')
-                                                                    ->placeholder('Isi jika diperlukan'),
-                                                                Forms\Components\TextInput::make('assessment_method')
-                                                                    ->label('Metode Asesmen')
-                                                                    ->placeholder('Isi jika diperlukan'),
-                                                                Forms\Components\TextInput::make('fr_ia_assessment_instrument')
-                                                                    ->label('FR.IA / Instrumen Asesmen')
-                                                                    ->placeholder('Isi jika diperlukan'),
-                                                            ])->columns(2)->collapsed(),
+                                                                Forms\Components\Grid::make(2)
+                                                                    ->schema([
+                                                                        Forms\Components\TextInput::make('decision_industry_standard')
+                                                                            ->label('Standar Industri')
+                                                                            ->placeholder('Isi jika diperlukan'),
+                                                                        Forms\Components\TextInput::make('decision_sop')
+                                                                            ->label('SOP')
+                                                                            ->placeholder('Isi jika diperlukan'),
+                                                                        Forms\Components\TextInput::make('decision_regulation')
+                                                                            ->label('Regulasi Teknis')
+                                                                            ->placeholder('Isi jika diperlukan'),
+                                                                        Forms\Components\TextInput::make('decision_technique')
+                                                                            ->label('Teknik Asesmen')
+                                                                            ->placeholder('Isi jika diperlukan'),
+                                                                    ]),
+                                                            ])->collapsed(),
                                                     ])
                                                     ->collapsed(),
                                             ])

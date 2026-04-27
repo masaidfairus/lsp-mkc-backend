@@ -38,9 +38,15 @@ class AdminPanelProvider extends PanelProvider
                 'Admin',
                 'Mastering Data',
                 'Dokumen',
+                'Pendaftaran',
                 'APL',
                 'AK',
                 'MAPA',
+                'IA',
+                'IA (A)',
+                'IA (B)',
+                'IA (C)',
+                'VA',
                 'Filament Shield',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

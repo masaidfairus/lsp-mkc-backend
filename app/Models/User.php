@@ -60,6 +60,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Profile::class);
     }
 
+    public function userSignature()
+    {
+        return $this->hasOne(UserSignature::class);
+    }
+
     public function asesiPassword()
     {
         return $this->hasOne(AsesiPassword::class, 'user_id', 'id');

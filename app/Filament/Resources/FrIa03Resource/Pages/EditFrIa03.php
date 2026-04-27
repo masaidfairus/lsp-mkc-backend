@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Filament\Resources\FrIa03Resource\Pages;
+
+use App\Filament\Resources\FrIa03Resource;
+use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
+
+class EditFrIa03 extends EditRecord
+{
+    protected static string $resource = FrIa03Resource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\DeleteAction::make(),
+        ];
+    }
+}
