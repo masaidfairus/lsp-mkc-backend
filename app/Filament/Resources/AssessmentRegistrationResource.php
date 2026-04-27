@@ -31,8 +31,13 @@ class AssessmentRegistrationResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->where('status_apl01', '!=', Apl01Status::NOT_STARTED->value);
+        $query =  parent::getEloquentQuery();
+
+        if (!auth()->user()->hasRole('admin') || !auth()->user()->hasRole('super_admin')) {
+            $query->where('assessor_id', auth()->id());
+        }
+        
+        return $query;
     }
 
     public static function form(Form $form): Form
