@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Ambil semua data pendaftaran
     Route::get('registrations', [RegistrationController::class, 'index']);
+    Route::delete('registrations/{registration}', [RegistrationController::class, 'destroy']);
 
     // Invoice
     Route::get('registrations/{registration}/invoice', [PaymentController::class, 'show']);
@@ -69,10 +70,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('documents', DocumentProfileController::class)->only([
         'index',
         'store',
-        'update'
+        'update',
     ]);
 
-    Route::get('documents/{id}/stream', [DocumentProfileController::class, 'stream'])
+    Route::delete('documents/{document}', [DocumentProfileController::class, 'destroy']);
+
+    Route::get('documents/{document}/stream', [DocumentProfileController::class, 'stream'])
         ->name('documents.stream');
 
     // Show All Document List

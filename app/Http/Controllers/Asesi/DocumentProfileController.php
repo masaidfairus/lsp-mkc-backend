@@ -37,19 +37,18 @@ class DocumentProfileController extends Controller
         return $this->successResponse($files, 'Data dokumen berhasil ditampilkan.');
     }
 
-    public function stream(Request $request, $id)
+    public function stream(Request $request, FileProfile $document)
     {
         $user = $request->user();
 
         // Asesi hanya bisa akses milik sendiri
         // Admin bisa akses semua
-        $query = FileProfile::where('id', $id);
 
         if ($user->role !== 'admin') {
-            $query->where('user_id', $user->id);
+            $document->where('user_id', $user->id);
         }
 
-        $file = $query->firstOrFail();
+        $file = $document->firstOrFail();
 
         $content = Storage::disk('local')->get($file->upload_document);
         $mimeType = mime_content_type(Storage::disk('local')->path($file->upload_document));
@@ -115,39 +114,47 @@ class DocumentProfileController extends Controller
         return $this->successResponse($result, 'Portfolio berhasil diupload');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, FileProfile $document)
     {
-        $portfolioListIds = PortfolioScheme::pluck('list_id');
-
-        $portfolio = FileProfile::where('id', $id)
-            ->where('user_id', $request->user()->id)
-            ->whereIn('list_id', $portfolioListIds)
-            ->firstOrFail();
-
         $validated = $request->validate([
-            'list_id' => ['sometimes', 'exists:document_lists,id'],
-            'description' => ['sometimes', 'string', 'max:500'],
             'file' => ['sometimes', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
         ]);
 
         if ($request->hasFile('file')) {
-            Storage::disk('local')->delete($portfolio->upload_document);
+            if ($document->upload_document && Storage::disk('local')->exists($document->upload_document)) {
+                Storage::disk('local')->delete($document->upload_document);
+            }
 
             $user = $request->user();
             $file = $request->file('file');
-            $filename = "portfolio_{$user->id}_" . uniqid() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs("portfolios/{$user->id}", $filename, 'local');
+
+            $filename = "doc_{$user->id}_{$document->id}_" . uniqid() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs("document-profile/{$user->id}", $filename, 'local');
 
             $validated['upload_document'] = $path;
             unset($validated['file']);
         }
 
-        $portfolio->update($validated);
+        $document->update($validated);
 
         return $this->successResponse(
-            $portfolio->fresh()->load('documentList'),
+            $document->fresh()->load('documentList'),
             'Portfolio berhasil diupdate'
         );
+    }
+
+    public function destroy(Request $request, FileProfile $document)
+    {
+        if ($document->user_id !== $request->user()->id) {
+            return $this->errorResponse('E1005', 403);
+        }
+
+        if ($document->upload_document && Storage::disk('local')->exists($document->upload_document)) {
+            Storage::disk('local')->delete($document->upload_document);
+        }
+
+        $document->delete();
+        return $this->successResponse([], 'Pendaftaran berhasil dibatalkan/dihapus');
     }
 }
 

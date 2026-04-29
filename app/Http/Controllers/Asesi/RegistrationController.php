@@ -50,42 +50,52 @@ class RegistrationController extends Controller
 
                 return [
                     'registration_id' => $reg->id,
-                    'scheme_name'     => $reg->scheme?->name ?? '-',
-                    'scheme_code'     => $reg->scheme?->code ?? '-',
-                    'created_at'      => $reg->created_at?->format('Y-m-d'),
-                    'forms'           => [
+                    'scheme_name' => $reg->scheme?->name ?? '-',
+                    'scheme_code' => $reg->scheme?->code ?? '-',
+                    'created_at' => $reg->created_at?->format('Y-m-d'),
+                    'forms' => [
                         [
-                            'code'   => 'APL.01',
-                            'label'  => 'Permohonan Sertifikasi',
+                            'code' => 'APL.01',
+                            'label' => 'Permohonan Sertifikasi',
                             'status' => $reg->status_apl01?->value ?? 'draft',
                         ],
                         [
-                            'code'   => 'APL.02',
-                            'label'  => 'Asesmen Mandiri',
+                            'code' => 'APL.02',
+                            'label' => 'Asesmen Mandiri',
                             'status' => $reg->status_apl02?->value ?? 'draft',
                         ],
                         [
-                            'code'   => 'AK.01',
-                            'label'  => 'Persetujuan Asesmen',
+                            'code' => 'AK.01',
+                            'label' => 'Persetujuan Asesmen',
                             'status' => $ak01Status,
                         ],
                         [
-                            'code'   => 'AK.04',
-                            'label'  => 'Banding Asesmen',
+                            'code' => 'AK.04',
+                            'label' => 'Banding Asesmen',
                             'status' => $ak04Status,
                         ],
                         [
-                            'code'   => 'AK.07',
-                            'label'  => 'Ceklis Penyesuaian',
+                            'code' => 'AK.07',
+                            'label' => 'Ceklis Penyesuaian',
                             'status' => $ak07Status,
                         ],
                     ],
-                ];  
+                ];
             });
 
         return $this->successResponse(
             $registrations,
             'Data registrasi berhasil ditampilkan'
         );
+    }
+
+    public function destroy(Request $request, AssessmentRegistration $registration)
+    {
+        if ($registration->user_id !== $request->user()->id) {
+            return $this->errorResponse('E1005', 403);
+        }
+
+        $registration->delete();
+        return $this->successResponse([], 'Pendaftaran berhasil dibatalkan/dihapus');
     }
 }
