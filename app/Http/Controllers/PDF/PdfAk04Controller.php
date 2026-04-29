@@ -32,6 +32,17 @@ class PdfAk04Controller extends Controller
         $assessor = $registration->assessor;
         $ak04Data = $registration->appeals->pluck('ak04_data')->first();
 
+        if (!$ak04Data) {
+            return view('components.status-page', [
+                'type' => 'danger',
+                'title' => 'Data Banding Tidak Ditemukan',
+                'message' => 'Belum ada pengajuan banding (AK.04) untuk pendaftaran ini.',
+                'details' => ['Dokumen AK.04 hanya tersedia jika asesi telah mengajukan banding melalui portal asesi.'],
+                'button_text' => 'Kembali',
+                'button_url' => url()->previous(),
+            ]);
+        }
+
         $rawAssessmentDate = $ak04Data['assessment_date'];
         $assessmentDate = $this->convertDateToLocalTime($rawAssessmentDate);
         $notes = $ak04Data['reason_notes'];
@@ -40,10 +51,10 @@ class PdfAk04Controller extends Controller
         $appealQuestions = collect($ak04Data['appeal_questions'])->pluck('answer', 'id')->toArray();
       
         $data = [
-            'scheme_name' => $scheme->name,
-            'scheme_code' => $scheme->code,
-            'asesi_name' => strtoupper($candidate->name),
-            'asesor_name' => $assessor->name,
+            'scheme_name' => $scheme?->name ?? '-',
+            'scheme_code' => $scheme?->code ?? '-',
+            'asesi_name' => strtoupper($candidate?->name ?? 'Unknown'),
+            'asesor_name' => $assessor?->name ?? 'Belum Ditugaskan',
             'assessment_date' => $assessmentDate,
             'appeal_questions' => $appealQuestions,
             'reason_notes' => $notes,
@@ -51,7 +62,10 @@ class PdfAk04Controller extends Controller
             'asesi_sign_date' => $this->convertDateToLocalTime($asesiSign['date']),
         ];
 
-        $pdf = Pdf::loadView('forms.ak.ak04', $data)->setPaper('a4', 'portrait');
+        $pdf = Pdf::loadView('forms.ak.ak04', $data)
+            ->setPaper('a4', 'portrait')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true);
         $filename = 'AK-04_' . str_replace(' ', '_', $candidate->name) . '_' . date('Ymd') . '.pdf';
 
         return $pdf->stream($filename);

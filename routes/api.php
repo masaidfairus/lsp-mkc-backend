@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Ambil semua data pendaftaran
     Route::get('registrations', [RegistrationController::class, 'index']);
+    Route::delete('registrations/{id}', [RegistrationController::class, 'destroy']);
 
     // Invoice
     Route::get('registrations/{registration}/invoice', [PaymentController::class, 'show']);

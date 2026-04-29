@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FrIa11Resource\Pages;
+use App\Filament\Traits\HasStandardIaForm;
 use App\Models\AssessmentInstrument;
 use App\Models\AssessmentRegistration;
 use App\Models\User;
@@ -17,8 +17,10 @@ use Illuminate\Support\HtmlString;
 
 class FrIa11Resource extends Resource
 {
+    use HasStandardIaForm;
+
     protected static ?string $model = AssessmentInstrument::class;
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
     protected static ?string $navigationGroup = 'IA';
     protected static ?string $navigationLabel = 'FR.IA.11';
     protected static ?string $modelLabel = 'FR.IA.11';
@@ -50,24 +52,21 @@ class FrIa11Resource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set) {
+                                    ->afterStateHydrated(function ($state, callable $set, callable $get) {
                                         if ($state) {
-                                            $reg = AssessmentRegistration::with(['scheme.competencyUnits.workGroup', 'candidate', 'assessor'])->find($state);
-                                            if ($reg) {
-                                                $set('fria11_data.header.certification_scheme', $reg->scheme?->name);
-                                                $set('fria11_data.header.scheme_number', $reg->scheme?->code);
-                                                $set('fria11_data.header.tuk', $reg->tuk ?? '');
-                                                $set('fria11_data.header.assessor_name', $reg->assessor?->name);
-                                                $set('fria11_data.header.assessee_name', $reg->candidate?->name);
-                                                $set('fria11_data.header.assessment_date', now()->format('d-m-Y'));
-                                            }
+                                            self::populateIa11Data($state, $set, $get);
+                                        }
+                                    })
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        if ($state) {
+                                            self::populateIa11Data($state, $set, $get, true);
                                         }
                                     }),
                             ]),
 
                         Forms\Components\Hidden::make('document_type')->default('FR.IA.11'),
 
-                        Forms\Components\Group::make()->statePath('fria11_data')
+                        Forms\Components\Group::make()->statePath('main_data')
                             ->schema([
 
                                 Forms\Components\Section::make('Header Dokumen')
@@ -102,28 +101,51 @@ class FrIa11Resource extends Resource
                                             ->label('Tanggal pengoperasian / penggunaan')
                                             ->native(false),
 
-                                        Forms\Components\TextInput::make('product_details.product_image_url')->label('Gambar produk (URL)'),
+                                        Forms\Components\FileUpload::make('product_details.product_image_url')
+                                            ->label('Gambar produk (jika ada)')
+                                            ->image()
+                                            ->directory('ia11/products')
+                                            ->visibility('public'),
                                     ]),
 
                                 // Hasil Reviu Produk
-                                Forms\Components\Section::make('Spesifikasi dan Performa Produk')
+                                Forms\Components\Section::make('Hasil Reviu Produk')
                                     ->schema([
                                         Forms\Components\Repeater::make('product_reviews')
                                             ->label('')
                                             ->schema([
-                                                Forms\Components\TextInput::make('category_name')->label('Kategori')->disabled()->dehydrated(),
+                                                Forms\Components\TextInput::make('category_name')
+                                                    ->label('Kategori')
+                                                    ->disabled()
+                                                    ->dehydrated()
+                                                    ->extraAttributes(['class' => 'font-bold text-lg']),
+                                                
                                                 Forms\Components\Repeater::make('review_criteria')
                                                     ->label('Kriteria Review')
                                                     ->schema([
-                                                        Forms\Components\Textarea::make('criterion_text')->label('Kriteria')->rows(1)->columnSpan(4),
-                                                        Forms\Components\Checkbox::make('achievement.is_yes')->label('Ya'),
-                                                        Forms\Components\Checkbox::make('achievement.is_no')->label('Tidak'),
+                                                        Forms\Components\Textarea::make('criterion_text')->label('Kriteria')->rows(1)->columnSpan(4)->disabled()->dehydrated(),
+                                                        Forms\Components\Group::make([
+                                                            Forms\Components\Radio::make('achievement.is_yes')
+                                                                ->label('Pencapaian')
+                                                                ->options([
+                                                                    true => 'Ya',
+                                                                    false => 'Tidak'
+                                                                ])
+                                                                ->inline()
+                                                                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                                                    // Sync with is_no for compatibility if needed
+                                                                    $set('achievement.is_no', !$state);
+                                                                }),
+                                                        ])->columnSpan(2)
                                                     ])
                                                     ->columns(6)
-                                                    ->addActionLabel('Tambah Kriteria'),
+                                                    ->disableItemCreation()
+                                                    ->disableItemDeletion()
+                                                    ->disableItemMovement(),
                                             ])
                                             ->disableItemCreation()
                                             ->disableItemDeletion()
+                                            ->disableItemMovement()
                                             ->itemLabel(fn(array $state): ?string => $state['category_name'] ?? ''),
                                     ]),
 
@@ -149,157 +171,62 @@ class FrIa11Resource extends Resource
                                             ]),
                                     ]),
 
-                                // Penyusun & Validator
-                                Forms\Components\Section::make('Penyusun dan Validator')
-                                    ->schema([
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\Section::make('Penyusun Dokumen')
-                                                    ->schema([self::signatureRepeater('compilers', 'Penyusun')])
-                                                    ->columnSpan(1),
-                                                Forms\Components\Section::make('Validator Dokumen')
-                                                    ->schema([self::signatureRepeater('validators', 'Validator')])
-                                                    ->columnSpan(1),
-                                            ]),
-                                    ]),
+                                self::standardDocumentControlBlock('document_control'),
                             ]),
 
                         Forms\Components\Section::make('Tanda Tangan')
-                            ->schema([self::assessorSignatureBlock()]),
+                            ->schema([
+                                self::standardAsesiDisclaimer(),
+                                self::standardAssessorSignatureBlock('main_data.signatures.assessor'),
+                            ]),
                     ]),
             ]);
     }
 
-    // ====================== SIGNATURE HELPER ======================
-    private static function signatureRepeater(string $key, string $label): Forms\Components\Repeater
+    protected static function populateIa11Data($state, callable $set, callable $get = null, bool $isUpdate = false)
     {
-        return Forms\Components\Repeater::make("document_control.{$key}")
-            ->label('')
-            ->schema([self::signatureSchema($label)])
-            ->minItems(2)
-            ->maxItems(2)
-            ->disableItemCreation()
-            ->disableItemDeletion()
-            ->default([[], []]);
-    }
+        $reg = AssessmentRegistration::with(['scheme.competencyUnits.workGroup', 'candidate', 'assessor'])->find($state);
+        if ($reg) {
+            $set('main_data.header.certification_scheme', $reg->scheme?->name);
+            $set('main_data.header.scheme_number', $reg->scheme?->code);
+            $set('main_data.header.tuk', $reg->tuk ?? '');
+            $set('main_data.header.assessor_name', $reg->assessor?->name);
+            $set('main_data.header.assessee_name', $reg->candidate?->name);
+            
+            if ($get && !$get('main_data.header.assessment_date')) {
+                $set('main_data.header.assessment_date', now()->format('d-m-Y'));
+            }
 
-    private static function signatureSchema(string $label): Forms\Components\Group
-    {
-        return Forms\Components\Group::make()
-            ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->label($label)
-                    ->options(User::role('asesor')->pluck('name', 'id'))
-                    ->live()
-                    ->searchable()
-                    ->preload()
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if ($user = User::find($state)) {
-                            $set('name', $user->name);
-                            $set('reg_number', $user->registration_number ?? '');
-                            $set('date', now()->format('d-m-Y'));
-
-                            $sig = UserSignature::where('user_id', $user->id)->first()
-                                ?? UserSignature::where('name', $user->name)->first();
-
-                            if ($sig) {
-                                $set('signature', self::resolveSignatureUrl($sig->signature_image));
-                            }
-                        }
-                    }),
-
-                Forms\Components\Hidden::make('name'),
-                Forms\Components\Hidden::make('reg_number'),
-                Forms\Components\Hidden::make('date'),
-                Forms\Components\Hidden::make('signature'),
-
-                Forms\Components\Placeholder::make('sig_preview')
-                    ->label('')
-                    ->content(fn($get) => self::renderSignaturePreview($get, $label)),
-            ]);
-    }
-
-    private static function assessorSignatureBlock(): Forms\Components\Section
-    {
-        return Forms\Components\Section::make('Asesor')
-            ->statePath('fria11_data.signatures.assessor')
-            ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->label('Pilih Asesor')
-                    ->options(User::role('asesor')->pluck('name', 'id'))
-                    ->live()
-                    ->searchable()
-                    ->preload()
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if ($user = User::find($state)) {
-                            $set('name', $user->name);
-                            $set('reg_number', $user->registration_number ?? '');
-                            $set('signature_and_date', now()->format('d-m-Y'));
-                        }
-                    }),
-                Forms\Components\Hidden::make('name'),
-                Forms\Components\Hidden::make('reg_number'),
-                Forms\Components\Hidden::make('signature_and_date'),
-                Forms\Components\Placeholder::make('preview')->content(fn($get) => self::renderSignaturePreview($get, 'Asesor')),
-            ]);
-    }
-
-    private static function resolveSignatureUrl(?string $path): ?string
-    {
-        if (!$path) return null;
-        if (str_starts_with($path, 'data:') || str_starts_with($path, 'http')) return $path;
-        $normalized = preg_replace('#^/?storage/#', '', $path);
-        return Storage::url($normalized);
-    }
-
-    private static function renderSignaturePreview($get, string $role): HtmlString
-    {
-        $name = $get('name') ?? '';
-        if (!$name) {
-            return new HtmlString('<div class="text-gray-400 italic text-sm">Pilih ' . $role . ' untuk preview</div>');
+            // Populate categories if empty
+            $existingReviews = $get ? (array) $get('main_data.product_reviews') : [];
+            if ($isUpdate || empty($existingReviews) || empty(array_filter(array_column($existingReviews, 'category_name')))) {
+                $reviews = [
+                    [
+                        'category_no' => 1,
+                        'category_name' => 'Spesifikasi produk',
+                        'review_criteria' => [
+                            ['criterion_text' => 'Ukuran produk sesuai rencana atau gambar kerja', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                            ['criterion_text' => 'Estetika/penampilan produk', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                            ['criterion_text' => 'Kebersihan dan kerapian permukaan produk', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                        ]
+                    ],
+                    [
+                        'category_no' => 2,
+                        'category_name' => 'Performa produk atau Karateristik Produk',
+                        'review_criteria' => [
+                            ['criterion_text' => 'Kesesuaian ukuran (dimensi dan/atau berat)', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                            ['criterion_text' => 'Kesesuaian dengan gambar kerja atau bentuk', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                            ['criterion_text' => 'Kerapian dan kerapatan sambungan', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                            ['criterion_text' => 'Pemasangan perlengkapan bahan penolong', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                            ['criterion_text' => 'Kualitas produk sesuai dengan rujukan', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                            ['criterion_text' => '.......................................', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                            ['criterion_text' => '.......................................', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                        ]
+                    ]
+                ];
+                $set('main_data.product_reviews', $reviews);
+            }
         }
-
-        $regNumber = $get('reg_number') ?? 'N/A';
-        $date = $get('date') ?? now()->format('d-m-Y');
-        $signature = $get('signature');
-
-        $imgHtml = $signature
-            ? "<img src='" . htmlspecialchars($signature) . "' style='max-height:70px;object-fit:contain;' />"
-            : "<div style='font-size:11px;color:#dc2626;font-style:italic;'>Tanda tangan belum diunggah</div>";
-
-        $html = "
-        <div style='font-family: system-ui, sans-serif; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; max-width: 480px; color: #0f172a;'>
-            <div style='padding: 8px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;'>
-                <span style='font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: #64748b;'>{$role}</span>
-            </div>
-            <div style='padding: 20px;'>
-                <div style='display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0;'>
-                    <div style='flex: 1;'>
-                        <p style='font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 4px;'>Nama Lengkap</p>
-                        <p style='font-size: 16px; font-weight: 600; margin: 0 0 14px;'>{$name}</p>
-                        <p style='font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 6px;'>No. Registrasi MET</p>
-                        <span style='font-size: 13px; font-weight: 500; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 12px; font-family: monospace;'>{$regNumber}</span>
-                    </div>
-                </div>
-                <div style='display: grid; grid-template-columns: 1fr 130px; gap: 16px;'>
-                    <div>
-                        <p style='font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;'>Tanda Tangan</p>
-                        <div style='height: 110px; border: 1px dashed #e2e8f0; border-radius: 12px; background: #f8fafc; display: flex; align-items: center; justify-content: center; position: relative;'>
-                            <div style='position: relative; z-index: 10;'>{$imgHtml}</div>
-                        </div>
-                    </div>
-                    <div>
-                        <p style='font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; text-align: center;'>Tanggal</p>
-                        <div style='height: 110px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;'>
-                            <p style='font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em;'>Ditetapkan</p>
-                            <p style='font-size: 15px; font-weight: 600; font-family: monospace;'>{$date}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>";
-
-        return new HtmlString($html);
     }
 
     public static function table(Table $table): Table

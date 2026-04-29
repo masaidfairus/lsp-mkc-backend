@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FrVaResource\Pages;
+use App\Models\AssessmentValidation;
 use App\Models\PeerValidation;
 use App\Models\AssessmentRegistration;
 use Filament\Forms;
@@ -13,9 +14,9 @@ use Filament\Tables\Table;
 
 class FrVaResource extends Resource
 {
-    protected static ?string $model = PeerValidation::class;
+    protected static ?string $model = AssessmentValidation::class;
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
-    protected static ?string $navigationGroup = 'VA';
+    protected static ?string $navigationGroup = 'MKVA';
     protected static ?string $navigationLabel = 'FR.VA';
     protected static ?string $modelLabel = 'FR.VA';
     protected static ?string $pluralModelLabel = 'FR.VA';
@@ -44,19 +45,27 @@ class FrVaResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
+                                    ->afterStateHydrated(function ($state, callable $set) {
+                                        if (!$state) return;
+                                        $reg = AssessmentRegistration::with('scheme')->find($state);
+                                        if ($reg && $reg->scheme) {
+                                            $set('validation_data.header.scheme_name', $reg->scheme->name);
+                                            $set('validation_data.header.scheme_number', $reg->scheme->code);
+                                        }
+                                    })
                                     ->afterStateUpdated(function ($state, callable $set) {
                                         if (!$state) return;
                                         $reg = AssessmentRegistration::with('scheme')->find($state);
                                         if ($reg && $reg->scheme) {
-                                            $set('fr_va_data.header.scheme_name', $reg->scheme->name);
-                                            $set('fr_va_data.header.scheme_number', $reg->scheme->code);
+                                            $set('validation_data.header.scheme_name', $reg->scheme->name);
+                                            $set('validation_data.header.scheme_number', $reg->scheme->code);
                                         }
                                     }),
                             ]),
 
                         Forms\Components\Hidden::make('document_type')->default('FR.VA'),
 
-                        Forms\Components\Group::make()->statePath('fr_va_data')
+                        Forms\Components\Group::make()->statePath('validation_data')
                             ->schema([
 
                                 // HEADER
@@ -76,6 +85,57 @@ class FrVaResource extends Resource
                                             ->columns(3),
                                         Forms\Components\TextInput::make('header.scheme_name')->label('Nama Skema')->disabled()->dehydrated(),
                                         Forms\Components\TextInput::make('header.scheme_number')->label('Nomor Skema')->disabled()->dehydrated(),
+                                        
+                                        Forms\Components\Group::make()
+                                            ->schema([
+                                                Forms\Components\Select::make('header.validator_id')
+                                                    ->label('Pilih Validator')
+                                                    ->options(\App\Models\User::role(['asesor', 'admin'])->pluck('name', 'id'))
+                                                    ->searchable()
+                                                    ->preload(),
+                                                Forms\Components\Select::make('header.lead_assessor_id')
+                                                    ->label('Pilih Lead Assessor')
+                                                    ->options(\App\Models\User::role(['asesor', 'admin'])->pluck('name', 'id'))
+                                                    ->searchable()
+                                                    ->preload(),
+                                            ])->columns(2)->columnSpanFull(),
+                                    ]),
+
+                                // 1. Menyiapkan Proses Validasi
+                                Forms\Components\Section::make('1. Menyiapkan Proses Validasi')
+                                    ->schema([
+                                        Forms\Components\Grid::make(3)
+                                            ->schema([
+                                                Forms\Components\CheckboxList::make('preparation.focus_and_purpose')
+                                                    ->label('Tujuan dan Fokus Validasi')
+                                                    ->options([
+                                                        'Bagian dari Proses Penjaminan Mutu Organisasi' => 'Bagian dari Proses Penjaminan Mutu Organisasi',
+                                                        'Mengantisipasi Risiko' => 'Mengantisipasi Risiko',
+                                                        'Memenuhi Persyaratan BNSP' => 'Memenuhi Persyaratan BNSP',
+                                                        'Memastikan Kesesuaian Bukti' => 'Memastikan Kesesuaian Bukti',
+                                                        'Meningkatkan Kualitas Asesmen' => 'Meningkatkan Kualitas Asesmen',
+                                                        'Mengevaluasi Kualitas Perangkat Asesmen' => 'Mengevaluasi Kualitas Perangkat Asesmen',
+                                                    ]),
+                                                Forms\Components\CheckboxList::make('preparation.validation_context')
+                                                    ->label('Konteks Validasi')
+                                                    ->options([
+                                                        'Karakteristik Asesi' => 'Karakteristik Asesi',
+                                                        'Lingkungan' => 'Lingkungan',
+                                                        'Kebijakan / SOP' => 'Kebijakan / SOP',
+                                                        'Bahan dan Alat Pendukung' => 'Bahan dan Alat Pendukung',
+                                                        'Persyaratan Khusus' => 'Persyaratan Khusus',
+                                                        'Lainnya' => 'Lainnya',
+                                                    ]),
+                                                Forms\Components\CheckboxList::make('preparation.validation_approach')
+                                                    ->label('Pendekatan Validasi')
+                                                    ->options([
+                                                        'Asesmen Berbasis Kompetensi' => 'Asesmen Berbasis Kompetensi',
+                                                        'Asesmen Portofolio' => 'Asesmen Portofolio',
+                                                        'Asesmen RPL' => 'Asesmen RPL',
+                                                        'Observasi Langsung' => 'Observasi Langsung',
+                                                        'Pendekatan Tertulis/Lisan' => 'Pendekatan Tertulis/Lisan',
+                                                    ]),
+                                            ]),
                                     ]),
 
                                 // Acuan Pembanding
@@ -85,50 +145,45 @@ class FrVaResource extends Resource
                                         Forms\Components\CheckboxList::make('references.benchmarks')
                                             ->label('Acuan Pembanding')
                                             ->options([
-                                                'competency_standards' => 'Standar Kompetensi (SKKNI/SKK/SKI)',
-                                                'certification_scheme' => 'Skema Sertifikasi',
-                                                'sop_ik' => 'SOP/IK',
-                                                'manual_instruction' => 'Manual Instruction / Book Manual',
-                                                'performance_standard' => 'Standar Kinerja',
+                                                'Standar Kompetensi (SKKNI/SKK/SKI)' => 'Standar Kompetensi (SKKNI/SKK/SKI)',
+                                                'Skema Sertifikasi' => 'Skema Sertifikasi',
+                                                'SOP/IK' => 'SOP/IK',
+                                                'Manual Instruction / Book Manual' => 'Manual Instruction / Book Manual',
+                                                'Standar Kinerja' => 'Standar Kinerja',
                                             ]),
 
                                         Forms\Components\CheckboxList::make('references.materials')
                                             ->label('Dokumen Terkait dan Bahan-Bahan')
                                             ->options([
-                                                'assessment_instruments' => 'Perangkat Asesmen',
-                                                'regulations_guidelines' => 'Peraturan / Pedoman',
-                                                'assessment_results_evidence' => 'Bukti-bukti hasil asesmen',
+                                                'Perangkat Asesmen' => 'Perangkat Asesmen',
+                                                'Peraturan / Pedoman' => 'Peraturan / Pedoman',
+                                                'Bukti-bukti hasil asesmen' => 'Bukti-bukti hasil asesmen',
                                             ]),
-                                    ]),
-
-                                // 1. Menyiapkan Proses Validasi
-                                Forms\Components\Section::make('1. Menyiapkan Proses Validasi')
-                                    ->schema([
-                                        Forms\Components\CheckboxList::make('preparation.focus_and_purpose')
-                                            ->label('Tujuan dan Fokus Validasi')
-                                            ->options([
-                                                'quality_assurance' => 'Bagian dari Proses Penjaminan Mutu Organisasi',
-                                                'risk_anticipation' => 'Mengantisipasi Risiko',
-                                                'bnsp_requirements' => 'Memenuhi Persyaratan BNSP',
-                                                'evidence_consistency' => 'Memastikan Kesesuaian Bukti',
-                                                'assessment_quality_improvement' => 'Meningkatkan Kualitas Asesmen',
-                                                'evaluate_instrument_quality' => 'Mengevaluasi Kualitas Perangkat Asesmen',
-                                            ])
-                                            ->columns(2),
                                     ]),
 
                                 // Orang yang Relevan
                                 Forms\Components\Section::make('Orang yang Relevan')
                                     ->schema([
-                                        Forms\Components\Repeater::make('preparation.relevant_persons')
-                                            ->label('')
+                                        Forms\Components\Grid::make(2)
                                             ->schema([
-                                                Forms\Components\TextInput::make('role')->label('Peran'),
-                                                Forms\Components\TextInput::make('name')->label('Nama'),
-                                                Forms\Components\Textarea::make('confirmation_result')->label('Hasil Konfirmasi/Diskusi')->rows(2),
-                                            ])
-                                            ->columns(3)
-                                            ->addActionLabel('Tambah'),
+                                                Forms\Components\CheckboxList::make('preparation.relevant_roles')
+                                                    ->label('Peran Orang yang Relevan')
+                                                    ->options([
+                                                        'Asesor Kompetensi (wajib)' => 'Asesor Kompetensi (wajib)',
+                                                        'Lead Asesor [Ketua TUK]' => 'Lead Asesor [Ketua TUK]',
+                                                        'Manager, Supervisor' => 'Manager, Supervisor',
+                                                        'Tenaga Ahli di bidangnya' => 'Tenaga Ahli di bidangnya',
+                                                        'Koordinator Pelatihan' => 'Koordinator Pelatihan',
+                                                        'Anggota Asosiasi Industry Profesi' => 'Anggota Asosiasi Industry Profesi',
+                                                    ])
+                                                    ->columns(2),
+                                                Forms\Components\TagsInput::make('preparation.relevant_names_combined')
+                                                    ->label('Nama Keseluruhan')
+                                                    ->placeholder('Tambah nama baru...'),
+                                            ]),
+                                        Forms\Components\Textarea::make('preparation.confirmation_result')
+                                            ->label('Hasil Konfirmasi/Diskusi (Tujuan, Fokus & Konteks)')
+                                            ->rows(2),
                                     ]),
 
                                 // 2. Memberikan Kontribusi
@@ -149,6 +204,11 @@ class FrVaResource extends Resource
                                     ->schema([
                                         Forms\Components\Repeater::make('validation_matrix')
                                             ->label('')
+                                            ->default([
+                                                ['no' => 1, 'aspect' => 'Meninjau Perangkat Asesmen', 'rules_of_evidence' => [], 'principles_of_assessment' => []],
+                                                ['no' => 2, 'aspect' => 'Membandingkan Bukti-bukti Asesmen', 'rules_of_evidence' => [], 'principles_of_assessment' => []],
+                                                ['no' => 3, 'aspect' => 'Mengevaluasi Hasil Asesmen', 'rules_of_evidence' => [], 'principles_of_assessment' => []],
+                                            ])
                                             ->schema([
                                                 Forms\Components\TextInput::make('no')->numeric()->disabled()->dehydrated(),
                                                 Forms\Components\Textarea::make('aspect')->label('Aspek'),
@@ -158,7 +218,7 @@ class FrVaResource extends Resource
                                                     ->columns(4),
                                                 Forms\Components\CheckboxList::make('principles_of_assessment')
                                                     ->label('Prinsip Asesmen')
-                                                    ->options(['v'=>'V','r'=>'R','f'=>'F','a'=>'F'])
+                                                    ->options(['v'=>'V','r'=>'R','f'=>'F','a'=>'A']) // Fixed typo: A instead of F twice
                                                     ->columns(4),
                                             ])
                                             ->columns(1)
@@ -200,9 +260,10 @@ class FrVaResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('scheme.name')->label('Skema'),
-                Tables\Columns\TextColumn::make('mainAssessor.name')->label('Asesor Utama'),
-                Tables\Columns\TextColumn::make('peerAssessor.name')->label('Peer Assessor'),
+                Tables\Columns\TextColumn::make('registration.candidate.name')->label('Asesi')->searchable(),
+                Tables\Columns\TextColumn::make('registration.scheme.name')->label('Skema')->searchable(),
+                Tables\Columns\TextColumn::make('registration.assessor.name')->label('Asesor')->searchable(),
+                Tables\Columns\TextColumn::make('created_at')->label('Dibuat')->dateTime()->sortable(),
             ])
             ->actions([Tables\Actions\EditAction::make()]);
     }

@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FrIa06cResource\Pages;
+use App\Filament\Traits\HasStandardIaForm;
 use App\Models\AssessmentInstrument;
 use App\Models\AssessmentRegistration;
 use App\Models\CompetencyUnit;
@@ -18,8 +18,10 @@ use Illuminate\Support\HtmlString;
 
 class FrIa06cResource extends Resource
 {
+    use HasStandardIaForm;
+
     protected static ?string $model = AssessmentInstrument::class;
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static ?string $navigationIcon = 'heroicon-o-document-plus';
     
     protected static ?string $navigationGroup = 'IA (C)';
     protected static ?string $navigationLabel = 'FR.IA.06c';
@@ -52,28 +54,21 @@ class FrIa06cResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set) {
+                                    ->afterStateHydrated(function ($state, callable $set, callable $get) {
                                         if ($state) {
-                                            $reg = AssessmentRegistration::with(['scheme', 'candidate', 'assessor'])->find($state);
-                                            if ($reg) {
-                                                $set('fria06c_data.header.certification_scheme', $reg->scheme?->name);
-                                                $set('fria06c_data.header.scheme_number', $reg->scheme?->code);
-                                                $set('fria06c_data.header.tuk', 'Sewaktu/Tempat Kerja/Mandiri');
-                                                $set('fria06c_data.header.assessor_name', $reg->assessor?->name ?? '');
-                                                $set('fria06c_data.header.assessee_name', $reg->candidate?->name ?? '');
-                                                $set('fria06c_data.header.date', now()->format('d-m-Y'));
-                                                $set('fria06c_data.header.time', now()->format('H:i'));
-
-                                                $units = self::getSchemeUnitsForDropdown($reg->scheme_id);
-                                                $set('unachieved_units', $units);
-                                            }
+                                            self::populateIa06cData($state, $set, $get);
+                                        }
+                                    })
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        if ($state) {
+                                            self::populateIa06cData($state, $set, $get, true);
                                         }
                                     }),
                             ]),
 
                         Forms\Components\Hidden::make('document_type')->default('FR.IA.06C'),
 
-                        Forms\Components\Group::make()->statePath('fria06c_data')
+                        Forms\Components\Group::make()->statePath('main_data')
                             ->schema([
 
                                 // ================== HEADER ==================
@@ -96,21 +91,39 @@ class FrIa06cResource extends Resource
                                         Forms\Components\Repeater::make('answer_sheet')
                                             ->label('')
                                             ->schema([
-                                                Forms\Components\TextInput::make('no')->label('No.')->numeric()->disabled()->dehydrated(),
+                                                Forms\Components\TextInput::make('no')
+                                                    ->label('No.')
+                                                    ->numeric()
+                                                    ->disabled()
+                                                    ->dehydrated()
+                                                    ->default(fn (Forms\Get $get) => count($get('../answer_sheet') ?? []) + 1),
                                                 Forms\Components\Textarea::make('answer_text')
                                                     ->label('Jawaban Asesi')
                                                     ->rows(4)
                                                     ->required()
                                                     ->columnSpanFull(),
-                                                Forms\Components\Radio::make('achievement.is_yes')->label('Ya')->options(['1'=>'Ya'])->inline(),
-                                                Forms\Components\Radio::make('achievement.is_no')->label('Tidak')->options(['1'=>'Tidak'])->inline(),
+                                                Forms\Components\Group::make([
+                                                    Forms\Components\Radio::make('achievement.is_yes')
+                                                        ->label('Pencapaian')
+                                                        ->options([true => 'Ya', false => 'Tidak'])
+                                                        ->inline()
+                                                ])->columnSpanFull(),
                                             ])
                                             ->columns(1)
+                                            ->live()
+                                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                                if (!is_array($state)) return;
+                                                $i = 1;
+                                                foreach ($state as $key => $item) {
+                                                    $state[$key]['no'] = $i++;
+                                                }
+                                                $set('answer_sheet', $state);
+                                            })
                                             ->addActionLabel('Tambah Jawaban Esai')
                                             ->default(array_map(fn($i) => [
                                                 'no' => $i,
                                                 'answer_text' => '',
-                                                'achievement' => ['is_yes' => false, 'is_no' => false]
+                                                'achievement' => ['is_yes' => null, 'is_no' => null]
                                             ], range(1, 5))),
                                     ]),
 
@@ -128,75 +141,43 @@ class FrIa06cResource extends Resource
                                                 'belum_tercapai' => 'Belum Tercapai',
                                             ]),
 
-                                        Forms\Components\Select::make('feedback_section.unachieved_details')
+                                        Forms\Components\TextInput::make('feedback_section.unachieved_details')
                                             ->label('Unit / Elemen / KUK yang belum tercapai')
-                                            ->options(fn(callable $get) => $get('unachieved_units') ?? [])
-                                            ->searchable()
                                             ->columnSpanFull(),
                                     ]),
 
-                                // ================== PENYUSUN & VALIDATOR ==================
-                                Forms\Components\Section::make('Penyusun dan Validator')
-                                    ->schema([
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                Forms\Components\Section::make('Penyusun')
-                                                    ->schema([self::signatureRepeater('compilers', 'Penyusun')])
-                                                    ->columnSpan(1),
-                                                Forms\Components\Section::make('Validator')
-                                                    ->schema([self::signatureRepeater('validators', 'Validator')])
-                                                    ->columnSpan(1),
-                                            ]),
-                                    ]),
+                                self::standardDocumentControlBlock('document_control'),
+                            ]),
 
-                                // ================== TANDA TANGAN ==================
-                                Forms\Components\Section::make('Tanda Tangan')
-                                    ->schema([
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-                                                // Asesi (tetap disediakan karena payload ada)
-                                                Forms\Components\Section::make('Asesi')
-                                                    ->statePath('signatures.assessee')
-                                                    ->schema([
-                                                        Forms\Components\TextInput::make('name')->label('Nama Asesi')->disabled()->dehydrated(),
-                                                        Forms\Components\DatePicker::make('signature_date')->label('Tanggal')->native(false),
-                                                        Forms\Components\Placeholder::make('preview')
-                                                            ->content(fn($get) => self::renderSignaturePreview($get, 'Asesi')),
-                                                    ])
-                                                    ->columnSpan(1),
-
-                                                // Asesor
-                                                Forms\Components\Section::make('Asesor')
-                                                    ->statePath('signatures.assessor')
-                                                    ->schema([
-                                                        Forms\Components\Select::make('user_id')
-                                                            ->label('Pilih Asesor')
-                                                            ->options(User::role('asesor')->pluck('name', 'id'))
-                                                            ->live()
-                                                            ->searchable()
-                                                            ->preload()
-                                                            ->afterStateUpdated(function ($state, callable $set) {
-                                                                if ($user = User::find($state)) {
-                                                                    $set('name', $user->name);
-                                                                    $set('reg_number', $user->registration_number ?? '');
-                                                                    $set('signature_date', now()->format('d-m-Y'));
-                                                                    $sig = UserSignature::where('user_id', $user->id)->first() ?? UserSignature::where('name', $user->name)->first();
-                                                                    if ($sig) $set('signature_url', self::resolveSignatureUrl($sig->signature_image));
-                                                                }
-                                                            }),
-                                                        Forms\Components\Hidden::make('name'),
-                                                        Forms\Components\Hidden::make('reg_number'),
-                                                        Forms\Components\Hidden::make('signature_url'),
-                                                        Forms\Components\DatePicker::make('signature_date')->label('Tanggal')->native(false),
-                                                        Forms\Components\Placeholder::make('preview')
-                                                            ->content(fn($get) => self::renderSignaturePreview($get, 'Asesor')),
-                                                    ])
-                                                    ->columnSpan(1),
-                                            ]),
-                                    ]),
+                        Forms\Components\Section::make('Tanda Tangan')
+                            ->schema([
+                                self::standardAsesiDisclaimer(),
+                                self::standardAssessorSignatureBlock('main_data.signatures.assessor'),
                             ]),
                     ]),
             ]);
+    }
+
+    protected static function populateIa06cData($state, callable $set, callable $get = null, bool $isUpdate = false)
+    {
+        $reg = AssessmentRegistration::with(['scheme', 'candidate', 'assessor'])->find($state);
+        if ($reg) {
+            $set('main_data.header.certification_scheme', $reg->scheme?->name);
+            $set('main_data.header.scheme_number', $reg->scheme?->code);
+            $set('main_data.header.tuk', 'Sewaktu/Tempat Kerja/Mandiri');
+            $set('main_data.header.assessor_name', $reg->assessor?->name ?? '');
+            $set('main_data.header.assessee_name', $reg->candidate?->name ?? '');
+            
+            if ($get && !$get('main_data.header.date')) {
+                $set('main_data.header.date', now()->format('Y-m-d'));
+            }
+            if ($get && !$get('main_data.header.time')) {
+                $set('main_data.header.time', now()->format('H:i'));
+            }
+
+            $units = self::getSchemeUnitsForDropdown($reg->scheme_id);
+            $set('unachieved_units', $units);
+        }
     }
 
     private static function getSchemeUnitsForDropdown($schemeId): array
@@ -213,88 +194,6 @@ class FrIa06cResource extends Resource
             $options[$key] = $key;
         }
         return $options;
-    }
-
-    // ====================== SIGNATURE HELPERS ======================
-    private static function signatureRepeater(string $key, string $label): Forms\Components\Repeater
-    {
-        return Forms\Components\Repeater::make("document_control.{$key}")
-            ->label('')
-            ->schema([self::signatureSchema($label)])
-            ->minItems(1)
-            ->maxItems(2)
-            ->disableItemCreation()
-            ->disableItemDeletion()
-            ->default([[]]);
-    }
-
-    private static function signatureSchema(string $label): Forms\Components\Group
-    {
-        return Forms\Components\Group::make()
-            ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->label($label)
-                    ->options(User::role('asesor')->pluck('name', 'id'))
-                    ->live()
-                    ->searchable()
-                    ->preload()
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if ($user = User::find($state)) {
-                            $set('name', $user->name);
-                            $set('met_number', $user->registration_number ?? '');
-                            $set('signature_and_date', now()->format('d-m-Y'));
-                            $sig = UserSignature::where('user_id', $user->id)->first() ?? UserSignature::where('name', $user->name)->first();
-                            if ($sig) $set('signature_url', self::resolveSignatureUrl($sig->signature_image));
-                        }
-                    }),
-
-                Forms\Components\Hidden::make('name'),
-                Forms\Components\Hidden::make('met_number'),
-                Forms\Components\Hidden::make('signature_and_date'),
-                Forms\Components\Hidden::make('signature_url'),
-
-                Forms\Components\Placeholder::make('preview')
-                    ->content(fn($get) => self::renderSignaturePreview($get, $label)),
-            ]);
-    }
-
-    private static function resolveSignatureUrl(?string $path): ?string
-    {
-        if (!$path) return null;
-        if (str_starts_with($path, 'data:') || str_starts_with($path, 'http')) return $path;
-        $normalized = preg_replace('#^/?storage/#', '', $path);
-        return Storage::url($normalized);
-    }
-
-    private static function renderSignaturePreview($get, string $role): HtmlString
-    {
-        $name = $get('name') ?? '';
-        if (!$name) {
-            return new HtmlString('<div class="text-gray-400 italic text-sm">Pilih ' . $role . ' untuk preview</div>');
-        }
-
-        $date = $get('signature_date') ?? now()->format('d-m-Y');
-        $signature = $get('signature_url');
-
-        $imgHtml = $signature
-            ? "<img src='" . htmlspecialchars($signature) . "' style='max-height:70px;object-fit:contain;' />"
-            : "<div style='font-size:11px;color:#dc2626;font-style:italic;'>Belum ada tanda tangan</div>";
-
-        $html = "
-        <div style='font-family: system-ui, sans-serif; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; max-width: 480px; color: #0f172a;'>
-            <div style='padding: 8px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;'>
-                <span style='font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: #64748b;'>Tanda Tangan {$role}</span>
-            </div>
-            <div style='padding: 20px;'>
-                <p style='font-size: 16px; font-weight: 600; margin: 0 0 14px;'>{$name}</p>
-                <div style='height: 110px; border: 1px dashed #e2e8f0; border-radius: 12px; background: #f8fafc; display: flex; align-items: center; justify-content: center;'>
-                    {$imgHtml}
-                </div>
-                <p style='text-align: center; margin-top: 8px; font-size: 13px;'>{$date}</p>
-            </div>
-        </div>";
-
-        return new HtmlString($html);
     }
 
     public static function table(Table $table): Table

@@ -164,7 +164,7 @@
 <body>
 
     @php
-$unit_kompetensi = $unit_kompetensi ?? [];
+        $unit_kompetensi = $unit_kompetensi ?? [];
     @endphp
 
     <div class="judul-utama">FR.APL.02. ASESMEN MANDIRI</div>
@@ -242,45 +242,45 @@ $unit_kompetensi = $unit_kompetensi ?? [];
 
             {{-- Loop elemen --}}
             @foreach($unit['competencyElements'] as $elemen)
-                        @php
-                $jawaban = $asesmen_mandiri->get($elemen['id']);
-                $isCompetent = isset($jawaban['is_competent']) ? $jawaban['is_competent'] : null;
-                        @endphp
-                        <tr>
-                            <td colspan="4">
-                                <div class="elemen-nama">
-                                    {{ $loop->iteration }}&nbsp;&nbsp;Elemen: <span
-                                        style="font-weight:normal;">{{ $elemen['title'] }}</span>
-                                </div>
-                                <div class="kriteria-label">Kriteria Unjuk Kerja:</div>
-                                @foreach($elemen['performanceCriteria'] as $kri)
-                                    <div class="kriteria-item">
-                                        {{ $loop->iteration . '.'}} {{ $kri['name'] }}&nbsp;&nbsp;&nbsp;{{ $kri['description'] }}
+                @php
+                    $jawaban = $asesmen_mandiri->get($elemen['id']);
+                    $isCompetent = isset($jawaban['is_competent']) ? $jawaban['is_competent'] : null;
+                @endphp
+                <tr>
+                    <td colspan="4">
+                        <div class="elemen-nama">
+                            {{ $loop->iteration }}&nbsp;&nbsp;Elemen: <span
+                                style="font-weight:normal;">{{ $elemen['title'] }}</span>
+                        </div>
+                        <div class="kriteria-label">Kriteria Unjuk Kerja:</div>
+                        @foreach($elemen['performanceCriteria'] as $kri)
+                            <div class="kriteria-item">
+                                {{ $loop->iteration . '.'}} {{ $kri['name'] }}&nbsp;&nbsp;&nbsp;{{ $kri['description'] }}
+                            </div>
+                        @endforeach
+                    </td>
+                    <td style="text-align:center; vertical-align:middle;"><span
+                            class="{{ $isCompetent === true ? 'checkbox-checked' : 'checkbox' }}"></span></td>
+                    <td style="text-align:center; vertical-align:middle;"><span
+                            class="{{ $isCompetent === false ? 'checkbox-checked' : 'checkbox' }}"></span></td>
+                    <td style="font-size: 8pt; vertical-align: top; padding: 4px; width: 25%;">
+                        {{-- Cek apakah ada file di dalam koleksi portfolios --}}
+                        @if($portfolios && $portfolios->count() > 0)
+                            <div style="line-height: 1.3;">
+                                @foreach($portfolios as $file)
+                                    {{-- Menampilkan Judul Dokumen (dari master) atau Title (dari upload) --}}
+                                    <div style="margin-bottom: 3px;">
+                                        {{ $file->documentList->title ?? ($file->title ?? 'Dokumen Tanpa Nama') }}
                                     </div>
                                 @endforeach
-                            </td>
-                            <td style="text-align:center; vertical-align:middle;"><span
-                                    class="{{ $isCompetent === true ? 'checkbox-checked' : 'checkbox' }}"></span></td>
-                            <td style="text-align:center; vertical-align:middle;"><span
-                                    class="{{ $isCompetent === false ? 'checkbox-checked' : 'checkbox' }}"></span></td>
-                            <td style="font-size: 8pt; vertical-align: top; padding: 4px; width: 25%;">
-                                {{-- Cek apakah ada file di dalam koleksi portfolios --}}
-                                @if($portfolios && $portfolios->count() > 0)
-                                    <div style="line-height: 1.3;">
-                                        @foreach($portfolios as $file)
-                                            {{-- Menampilkan Judul Dokumen (dari master) atau Title (dari upload) --}}
-                                            <div style="margin-bottom: 3px;">
-                                                {{ $file->documentList->title ?? ($file->title ?? 'Dokumen Tanpa Nama') }}
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <div style="color: #999; font-style: italic; text-align: center; padding-top: 5px;">
-                                        Belum ada bukti
-                                    </div>
-                                @endif
-                            </td>
-                        </tr>
+                            </div>
+                        @else
+                            <div style="color: #999; font-style: italic; text-align: center; padding-top: 5px;">
+                                Belum ada bukti
+                            </div>
+                        @endif
+                    </td>
+                </tr>
             @endforeach
 
         </table>
@@ -323,8 +323,15 @@ $unit_kompetensi = $unit_kompetensi ?? [];
                         <td style="border-bottom:1px solid #000; padding:4px 6px;">{{ $no_reg_asesor ?? '' }}</td>
                     </tr>
                     <tr>
-                        <td style="padding:4px 6px; height:45px; vertical-align:top;">Tanda tangan/<br>Tanggal</td>
-                        <td style="padding:4px 6px;"></td>
+                        <td style="padding:4px 6px; height:80px; vertical-align:top;">Tanda tangan/<br>Tanggal</td>
+                        <td style="padding:4px 6px; vertical-align:middle; text-align:center;">
+                            @if($asesor_qr_code)
+                                <img src="{{ $asesor_qr_code }}" style="width:50px; height:50px; vertical-align: middle;">
+                            @endif
+                            <span style="vertical-align: middle; margin-left: 10px; font-size: 8pt;">
+                                {{ $asesor_date ?? '' }}
+                            </span>
+                        </td>
                     </tr>
                 </table>
             </td>

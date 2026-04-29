@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AssessmentRegistration;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Enums\Apl02Status;
 
 class PdfApl02Controller extends Controller
 {
@@ -32,19 +33,26 @@ class PdfApl02Controller extends Controller
             })
             ->get();
 
+        $signatureData = $this->getAssessorSignatureData($assessor);
+
         $data = [
             'nama_skema' => $scheme->name,
             'kode_skema' => $scheme->code,
             'nama_asesi' => strtoupper($candidate->name),
-            'nama_asesor' => $assessor->name,
-            'no_reg_asesor' => $assessor->registration_number,
+            'nama_asesor' => $assessor?->name ?? 'Belum Ditugaskan',
+            'no_reg_asesor' => $signatureData['reg_number'],
+            'asesor_qr_code' => $signatureData['qr_code'],
+            'asesor_date' => $registration->status_apl02 === Apl02Status::APPROVED ? $this->convertDateToLocalTime($registration->updated_at) : '',
             'unit_kompetensi' => $scheme->competencyUnits ?? [],
             'asesmen_mandiri' => $selfAssessments ?? [],
             'portfolios' => $portfolios,
         ];
 
-        $pdf = Pdf::loadView('forms.APL.apl02', $data)->setPaper('a4', 'portrait');
-        $filename = 'APL-02_' . str_replace(' ', '_', $request->nama_asesi) . '_' . date('Ymd') . '.pdf';
+        $pdf = Pdf::loadView('forms.APL.apl02', $data)
+            ->setPaper('a4', 'portrait')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true);
+        $filename = 'APL-02_' . str_replace(' ', '_', $data['nama_asesi']) . '_' . date('Ymd') . '.pdf';
 
         return $pdf->stream($filename);
     }

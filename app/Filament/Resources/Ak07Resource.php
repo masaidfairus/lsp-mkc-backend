@@ -61,6 +61,10 @@ class Ak07Resource extends Resource
                                                 if ($reg->assessor) {
                                                     $set('ak07_data.asesor_name', $reg->assessor->name);
                                                 }
+
+                                                if ($reg->tuk) {
+                                                    $set('ak07_data.tuk', $reg->tuk);
+                                                }
                                             }
                                         }
                                     }),
@@ -90,14 +94,10 @@ class Ak07Resource extends Resource
                                 // ── Header fields ──────────────────────────────────────
                                 Forms\Components\Grid::make(4)
                                     ->schema([
-                                        Forms\Components\Select::make('tuk')
+                                        Forms\Components\TextInput::make('tuk')
                                             ->label('TUK')
-                                            ->options([
-                                                'Sewaktu'      => 'Sewaktu',
-                                                'Tempat Kerja' => 'Tempat Kerja',
-                                                'Mandiri'      => 'Mandiri',
-                                            ])
-                                            ->required(),
+                                            ->disabled()
+                                            ->dehydrated(),
 
                                         Forms\Components\TextInput::make('asesi_name')
                                             ->label('Nama Asesi')
@@ -227,19 +227,20 @@ class Ak07Resource extends Resource
 
                                                         // Keputusan Penyesuaian
                                                         Forms\Components\Section::make('Keputusan Penyesuaian')
+                                                             ->statePath('adjustment_decisions')
                                                             ->schema([
                                                                 Forms\Components\Grid::make(2)
                                                                     ->schema([
-                                                                        Forms\Components\TextInput::make('decision_industry_standard')
+                                                                        Forms\Components\TextInput::make('industry_standard')
                                                                             ->label('Standar Industri')
                                                                             ->placeholder('Isi jika diperlukan'),
-                                                                        Forms\Components\TextInput::make('decision_sop')
+                                                                        Forms\Components\TextInput::make('sop')
                                                                             ->label('SOP')
                                                                             ->placeholder('Isi jika diperlukan'),
-                                                                        Forms\Components\TextInput::make('decision_regulation')
+                                                                        Forms\Components\TextInput::make('technical_regulation')
                                                                             ->label('Regulasi Teknis')
                                                                             ->placeholder('Isi jika diperlukan'),
-                                                                        Forms\Components\TextInput::make('decision_technique')
+                                                                        Forms\Components\TextInput::make('assessment_method')
                                                                             ->label('Teknik Asesmen')
                                                                             ->placeholder('Isi jika diperlukan'),
                                                                     ]),
@@ -255,18 +256,41 @@ class Ak07Resource extends Resource
 
                                 // ── Hasil Penyesuaian Asesmen ──────────────────────────
                                 Forms\Components\Section::make('Hasil Penyesuaian Asesmen')
-                                    ->statePath('adjustment_results')
                                     ->schema([
-                                        Forms\Components\Textarea::make('assessment_benchmark')
-                                            ->label('Acuan Pembanding Asesmen')
-                                            ->rows(3),
-                                        Forms\Components\Textarea::make('assessment_method')
-                                            ->label('Metode Asesmen')
-                                            ->rows(3),
-                                        Forms\Components\Textarea::make('assessment_instrument')
-                                            ->label('Instrumen Asesmen')
-                                            ->rows(3),
-                                    ])->columns(3),
+                                        Forms\Components\Section::make('A. Hasil penyesuaian sesuai karekteristik asesi')
+                                            ->statePath('adjustment_results_a')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('assessment_benchmark')
+                                                    ->label('Acuan Pembanding Asesmen')
+                                                    ->placeholder('tuliskan nama acuan pembanding')
+                                                    ->default('ada'),
+                                                Forms\Components\TextInput::make('assessment_method')
+                                                    ->label('Metode Asesmen')
+                                                    ->placeholder('tuliskan nama metode asesmen')
+                                                    ->default('ada'),
+                                                Forms\Components\TextInput::make('assessment_instrument')
+                                                    ->label('Instrumen Asesmen')
+                                                    ->placeholder('tuliskan nama formulir instrumen asesmen')
+                                                    ->default('ada'),
+                                            ])->columns(3)->collapsed(),
+
+                                        Forms\Components\Section::make('B. Hasil penyesuaian rencana asesmen sesuai acuan pembanding, potensi asesi dan konteks asesi')
+                                            ->statePath('adjustment_results_b')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('assessment_benchmark')
+                                                    ->label('Acuan Pembanding Asesmen')
+                                                    ->placeholder('tuliskan nama acuan pembanding')
+                                                    ->default('ada'),
+                                                Forms\Components\TextInput::make('assessment_method')
+                                                    ->label('Metode Asesmen')
+                                                    ->placeholder('tuliskan nama metode asesmen')
+                                                    ->default('ada'),
+                                                Forms\Components\TextInput::make('assessment_instrument')
+                                                    ->label('Instrumen Asesmen')
+                                                    ->placeholder('tuliskan nama formulir instrumen asesmen')
+                                                    ->default('ada'),
+                                            ])->columns(3)->collapsed(),
+                                    ]),
 
                                 // ── 5. Tanda Tangan – ASESOR ONLY ──────────────────────
                                 Forms\Components\Section::make('Tanda Tangan Asesor')

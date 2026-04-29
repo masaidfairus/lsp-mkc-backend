@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FrIa03Resource\Pages;
+use App\Filament\Traits\HasStandardIaForm;
 use App\Models\AssessmentInstrument;
 use App\Models\AssessmentRegistration;
 use App\Models\User;
@@ -17,8 +17,10 @@ use Illuminate\Support\HtmlString;
 
 class FrIa03Resource extends Resource
 {
+    use HasStandardIaForm;
+
     protected static ?string $model = AssessmentInstrument::class;
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
     protected static ?string $navigationGroup = 'IA';
     protected static ?string $navigationLabel = 'FR.IA.03';
     protected static ?string $modelLabel = 'FR.IA.03';
@@ -50,56 +52,23 @@ class FrIa03Resource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set) {
+                                    ->afterStateHydrated(function ($state, callable $set, callable $get) {
                                         if ($state) {
-                                            $reg = AssessmentRegistration::with([
-                                                'scheme.competencyUnits.workGroup',
-                                                'candidate',
-                                                'assessor'
-                                            ])->find($state);
-
-                                            if ($reg) {
-                                                $set('fr_ia_03_data.header.certification_scheme', $reg->scheme?->name);
-                                                $set('fr_ia_03_data.header.scheme_number', $reg->scheme?->code);
-                                                $set('fr_ia_03_data.header.tuk', $reg->tuk ?? '');
-                                                $set('fr_ia_03_data.header.assessor_name', $reg->assessor?->name);
-                                                $set('fr_ia_03_data.header.assessee_name', $reg->candidate?->name);
-                                                $set('fr_ia_03_data.header.date', now()->format('d-m-Y'));
-
-                                                // Populate work_groups
-                                                if ($reg->scheme) {
-                                                    $units = $reg->scheme->competencyUnits;
-                                                    $grouped = $units->groupBy(fn($u) => $u->workGroup?->name ?? 'Kelompok Pekerjaan');
-
-                                                    $workGroups = [];
-                                                    $groupNo = 1;
-                                                    foreach ($grouped as $wgName => $wgUnits) {
-                                                        $workGroups[] = [
-                                                            'group_label' => "Kelompok Pekerjaan {$groupNo}",
-                                                            'group_name' => $wgName,
-                                                            'units' => $wgUnits->map(fn($u, $idx) => [
-                                                                'no' => $idx + 1,
-                                                                'unit_code' => $u->unit_code,
-                                                                'unit_title' => $u->unit_title,
-                                                            ])->toArray(),
-                                                            'observation_questions' => [
-                                                                ['no' => 1, 'question' => '', 'response' => '', 'achievement' => ['is_yes' => false, 'is_no' => false]],
-                                                                ['no' => 2, 'question' => '', 'response' => '', 'achievement' => ['is_yes' => false, 'is_no' => false]],
-                                                            ],
-                                                        ];
-                                                        $groupNo++;
-                                                    }
-                                                    $set('fr_ia_03_data.work_groups', $workGroups);
-                                                }
-                                            }
+                                            self::populateIa03Data($state, $set, $get);
+                                        }
+                                    })
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        if ($state) {
+                                            self::populateIa03Data($state, $set, $get, true);
                                         }
                                     }),
+
                             ]),
 
                         Forms\Components\Hidden::make('document_type')->default('FR.IA.03'),
 
                         Forms\Components\Group::make()
-                            ->statePath('fr_ia_03_data')
+                            ->statePath('main_data')
                             ->schema([
 
                                 Forms\Components\Section::make('Header Dokumen')
@@ -138,7 +107,8 @@ class FrIa03Resource extends Resource
                                                     ->columns(3)
                                                     ->disableItemCreation()
                                                     ->disableItemDeletion()
-                                                    ->disableItemMovement(),
+                                                    ->disableItemMovement()
+                                                    ->extraAttributes(['style' => 'max-height: 200px; overflow-y: auto;']),
 
                                                 Forms\Components\Repeater::make('observation_questions')
                                                     ->label('Pertanyaan Pendukung Observasi')
@@ -146,8 +116,12 @@ class FrIa03Resource extends Resource
                                                         Forms\Components\TextInput::make('no')->label('No')->disabled()->dehydrated()->numeric(),
                                                         Forms\Components\Textarea::make('question')->label('Pertanyaan')->rows(2)->columnSpan(2),
                                                         Forms\Components\Textarea::make('response')->label('Respons Asesi')->rows(2)->columnSpan(2),
-                                                        Forms\Components\Checkbox::make('achievement.is_yes')->label('Ya'),
-                                                        Forms\Components\Checkbox::make('achievement.is_no')->label('Tidak'),
+                                                        Forms\Components\Group::make([
+                                                            Forms\Components\Radio::make('achievement.is_yes')
+                                                                ->label('Pencapaian')
+                                                                ->options([true => 'Ya', false => 'Tidak'])
+                                                                ->inline()
+                                                        ])->columnSpan(5),
                                                     ])
                                                     ->columns(5)
                                                     ->addActionLabel('Tambah Pertanyaan')
@@ -162,15 +136,65 @@ class FrIa03Resource extends Resource
                                 Forms\Components\Textarea::make('assessee_feedback')
                                     ->label('Umpan Balik Asesi')
                                     ->rows(3),
+
+                                self::standardDocumentControlBlock('document_control'),
                             ]),
 
                         Forms\Components\Section::make('Tanda Tangan')
                             ->schema([
-                                self::assesseeSignatureBlock(),
-                                self::assessorSignatureBlock(),
+                                self::standardAsesiDisclaimer(),
+                                self::standardAssessorSignatureBlock('main_data.signatures.assessor'),
                             ]),
                     ]),
             ]);
+    }
+
+    protected static function populateIa03Data($state, callable $set, callable $get = null, bool $isUpdate = false)
+    {
+        $reg = AssessmentRegistration::with([
+            'scheme.competencyUnits.workGroup',
+            'candidate',
+            'assessor'
+        ])->find($state);
+
+        if ($reg) {
+            $set('main_data.header.certification_scheme', $reg->scheme?->name);
+            $set('main_data.header.scheme_number', $reg->scheme?->code);
+            $set('main_data.header.tuk', $reg->tuk ?? '');
+            $set('main_data.header.assessor_name', $reg->assessor?->name);
+            $set('main_data.header.assessee_name', $reg->candidate?->name);
+            
+            if ($get && !$get('main_data.header.date')) {
+                $set('main_data.header.date', now()->format('d-m-Y'));
+            }
+
+            // Populate work_groups if empty
+            $existingGroups = $get ? (array) $get('main_data.work_groups') : [];
+            if (($isUpdate || empty($existingGroups) || empty(array_filter(array_column($existingGroups, 'group_name')))) && $reg->scheme) {
+                $units = $reg->scheme->competencyUnits;
+                $grouped = $units->groupBy(fn($u) => $u->workGroup?->name ?? 'Kelompok Pekerjaan');
+
+                $workGroups = [];
+                $groupNo = 1;
+                foreach ($grouped as $wgName => $wgUnits) {
+                    $workGroups[] = [
+                        'group_label' => "Kelompok Pekerjaan {$groupNo}",
+                        'group_name' => $wgName,
+                        'units' => $wgUnits->map(fn($u, $idx) => [
+                            'no' => $idx + 1,
+                            'unit_code' => $u->unit_code,
+                            'unit_title' => $u->unit_title,
+                        ])->toArray(),
+                        'observation_questions' => [
+                            ['no' => 1, 'question' => '', 'response' => '', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                            ['no' => 2, 'question' => '', 'response' => '', 'achievement' => ['is_yes' => null, 'is_no' => null]],
+                        ],
+                    ];
+                    $groupNo++;
+                }
+                $set('main_data.work_groups', $workGroups);
+            }
+        }
     }
 
     public static function table(Table $table): Table
@@ -194,94 +218,5 @@ class FrIa03Resource extends Resource
             'create' => Pages\CreateFrIa03::route('/create'),
             'edit' => Pages\EditFrIa03::route('/{record}/edit'),
         ];
-    }
-
-    private static function assessorSignatureBlock(): Forms\Components\Section
-    {
-        return Forms\Components\Section::make('Asesor')
-            ->statePath('fr_ia_03_data.signatures.assessor')
-            ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->label('Pilih Asesor')
-                    ->options(User::role('asesor')->pluck('name', 'id'))
-                    ->live()
-                    ->searchable()
-                    ->preload()
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if ($user = User::find($state)) {
-                            $set('name', $user->name);
-                            $set('reg_no', $user->registration_number ?? '');
-                            $set('date', now()->format('d-m-Y'));
-
-                            $sig = UserSignature::where('user_id', $user->id)->first() ?? UserSignature::where('name', $user->name)->first();
-                            if ($sig) {
-                                $set('signature_url', self::resolveSignatureUrl($sig->signature_image));
-                            }
-                        }
-                    }),
-
-                Forms\Components\Hidden::make('name'),
-                Forms\Components\Hidden::make('reg_no'),
-                Forms\Components\Hidden::make('date'),
-                Forms\Components\Hidden::make('signature_url'),
-
-                Forms\Components\Placeholder::make('sig_preview')
-                    ->label('')
-                    ->content(fn($get) => self::renderSignaturePreview($get, 'Asesor')),
-            ]);
-    }
-
-    private static function assesseeSignatureBlock(): Forms\Components\Section
-    {
-        return Forms\Components\Section::make('Asesi')
-            ->statePath('fr_ia_03_data.signatures.assessee')
-            ->schema([
-                Forms\Components\TextInput::make('name')->label('Nama Asesi')->disabled()->dehydrated(),
-                Forms\Components\Hidden::make('date'),
-                Forms\Components\Hidden::make('signature_url'),
-
-                Forms\Components\Placeholder::make('sig_preview')
-                    ->label('')
-                    ->content(fn($get) => self::renderSignaturePreview($get, 'Asesi')),
-            ]);
-    }
-
-    private static function resolveSignatureUrl(?string $path): ?string
-    {
-        if (!$path) return null;
-        if (str_starts_with($path, 'data:') || str_starts_with($path, 'http')) return $path;
-        $normalized = preg_replace('#^/?storage/#', '', $path);
-        return Storage::url($normalized);
-    }
-
-    private static function renderSignaturePreview($get, string $role): HtmlString
-    {
-        $name = $get('name') ?? '';
-        if (!$name) {
-            return new HtmlString('<div class="text-gray-400 italic text-sm">Pilih ' . $role . ' untuk preview</div>');
-        }
-
-        $date = $get('date') ?? now()->format('d-m-Y');
-        $signature = $get('signature_url');
-
-        $imgHtml = $signature
-            ? "<img src='" . htmlspecialchars($signature) . "' style='max-height:70px;object-fit:contain;' />"
-            : "<div style='font-size:11px;color:#dc2626;font-style:italic;'>Belum ada tanda tangan</div>";
-
-        $html = "
-        <div style='font-family: system-ui, sans-serif; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; max-width: 480px; color: #0f172a;'>
-            <div style='padding: 8px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;'>
-                <span style='font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: #64748b;'>Tanda Tangan {$role}</span>
-            </div>
-            <div style='padding: 20px;'>
-                <p style='font-size: 16px; font-weight: 600; margin: 0 0 14px;'>{$name}</p>
-                <div style='height: 110px; border: 1px dashed #e2e8f0; border-radius: 12px; background: #f8fafc; display: flex; align-items: center; justify-content: center;'>
-                    <div style='position: relative; z-index: 10;'>{$imgHtml}</div>
-                </div>
-                <p style='text-align: center; margin-top: 8px; font-size: 13px;'>{$date}</p>
-            </div>
-        </div>";
-
-        return new HtmlString($html);
     }
 }

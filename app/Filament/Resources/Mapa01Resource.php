@@ -100,6 +100,10 @@ class Mapa01Resource extends Resource
                                                         $set('mapa01_data.section_1_approach.tujuan_asesmen', [$tujuan]);
                                                     }
                                                 }
+                                                
+                                                if ($reg->tuk) {
+                                                    $set('mapa01_data.header.tuk', $reg->tuk);
+                                                }
                                             }
                                         }
                                     }),
@@ -166,13 +170,10 @@ class Mapa01Resource extends Resource
                                             ->label('Nama Asesi')
                                             ->disabled()
                                             ->dehydrated(),
-                                        Forms\Components\Select::make('tuk')
+                                        Forms\Components\TextInput::make('tuk')
                                             ->label('TUK')
-                                            ->options([
-                                                'Sewaktu'      => 'Sewaktu',
-                                                'Tempat Kerja' => 'Tempat Kerja',
-                                                'Mandiri'      => 'Mandiri',
-                                            ]),
+                                            ->disabled()
+                                            ->dehydrated(),
                                         Forms\Components\TextInput::make('assessment_date')
                                             ->label('Tanggal Asesmen')
                                             ->disabled()
@@ -203,7 +204,8 @@ class Mapa01Resource extends Resource
                                                 'Rekognisi Pembelajaran Lampau (RPL)' => 'Rekognisi Pembelajaran Lampau (RPL)',
                                                 'Other'                               => 'Lainnya:',
                                             ])
-                                            ->required()
+                                            ->disabled()
+                                            ->dehydrated()
                                             ->reactive()
                                             ->columns(2),
 

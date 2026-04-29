@@ -88,4 +88,32 @@ class RegistrationController extends Controller
             'Data registrasi berhasil ditampilkan'
         );
     }
+
+    public function destroy($id)
+{
+    $user = request()->user();
+
+    $registration = AssessmentRegistration::where('id', $id)
+        ->where('user_id', $user->id)
+        ->first();
+
+    if (!$registration) {
+        return response()->json([
+            'message' => 'Pengajuan tidak ditemukan atau bukan milik Anda'
+        ], 404);
+    }
+
+    // Opsional: Cek apakah boleh dibatalkan
+    if (in_array($registration->status_apl01?->value, ['approved', 'submitted'])) {
+        return response()->json([
+            'message' => 'Pengajuan yang sudah diproses tidak dapat dibatalkan'
+        ], 403);
+    }
+
+    $registration->delete();
+
+    return response()->json([
+        'message' => 'Pengajuan berhasil dibatalkan'
+    ]);
+}
 }

@@ -158,29 +158,26 @@
         <tr>
             <td colspan="3" style="vertical-align:middle;">Bukti yang akan dikumpulkan :</td>
             <td style="padding: 8px; line-height: 2; border-right: 1px solid white" colspan="2">
-                <span class="cb-set"><span
-                        class="{{ ($evidence_map['Hasil Verifikasi Portofolio'] ?? false) ? 'cb-checked' : 'cb' }}"></span>
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Verifikasi Portofolio'] ?? false) ? '☑' : '☐' !!}</span>
                     Hasil Verifikasi Portofolio</span>
-                <span class="cb-set"><span
-                        class="{{ ($evidence_map['Hasil Reviu Produk'] ?? false) ? 'cb-checked' : 'cb' }}"></span> Hasil
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Reviu Produk'] ?? false) ? '☑' : '☐' !!}</span>
+ Hasil
                     Reviu Produk</span>
-                <span class="cb-set"><span
-                        class="{{ ($evidence_map['Hasil Observasi Langsung'] ?? false) ? 'cb-checked' : 'cb' }}"></span>
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Observasi Langsung'] ?? false) ? '☑' : '☐' !!}</span>
                     Hasil Observasi Langsung</span>
-                <span class="cb-set"><span
-                        class="{{ ($evidence_map['Hasil Kegiatan Terstruktur'] ?? false) ? 'cb-checked' : 'cb' }}"></span>
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Kegiatan Terstruktur'] ?? false) ? '☑' : '☐' !!}</span>
                     Hasil Kegiatan Terstruktur</span>
-                <span class="cb-set"><span
-                        class="{{ ($evidence_map['Lainnya'] ?? false) ? 'cb-checked' : 'cb' }}"></span> Lainnya
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Lainnya'] ?? false) ? '☑' : '☐' !!}</span>
+ Lainnya
                     ......</span>
             </td>
             <td style="padding: 8px; line-height: 2; border-left: 1px solid white" colspan="2">
-                <span class="cb-set"><span
-                        class="{{ ($evidence_map['Hasil Tanya Jawab'] ?? false) ? 'cb-checked' : 'cb' }}"></span> Hasil
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Tanya Jawab'] ?? false) ? '☑' : '☐' !!}</span>
+ Hasil
                     Tanya Jawab</span>
-                <span class="cb-set"><span class="cb"></span> Daftar Pertanyaan Tertulis</span>
-                <span class="cb-set"><span class="cb"></span> Daftar Pertanyaan Lisan</span>
-                <span class="cb-set"><span class="cb"></span> Daftar Pertanyaan Wawancara</span>
+                <span class="cb-set"><span style="font-size: 11pt;">☐</span> Daftar Pertanyaan Tertulis</span>
+                <span class="cb-set"><span style="font-size: 11pt;">☐</span> Daftar Pertanyaan Lisan</span>
+                <span class="cb-set"><span style="font-size: 11pt;">☐</span> Daftar Pertanyaan Wawancara</span>
             </td>
         </tr>
 
@@ -241,32 +238,29 @@
     </table>
 
     {{-- TTD --}}
+
     <table class="tbl" style="border-top:none;">
-        <colgroup>
-            <col style="width:40%;">
-            <col style="width:20%;">
-            <col style="width:40%;">
-            <col style="width:40%;">
-            <col style="width:20%;">
-            <col style="width:40%;">
-        </colgroup>
-        <tr style="padding: 1rem">
-            <td style="height:50px; vertical-align:bottom; padding-bottom:5px; border-right:none;" colspan="2">
-                Tanda tangan Asesor : {{ $asesor_name }}
+        <tr style="border-bottom: none;">
+            <td
+                style="width: 55%; border-right: none; border-bottom: none; height: 80px; vertical-align: middle; padding: 10px;">
+                Tanda tangan Asesor :
+                @if($asesor_qr_code)
+                    <img src="{{ $asesor_qr_code }}"
+                        style="width:50px; height:50px; vertical-align: middle; margin-left: 5px;">
+                @endif
             </td>
-            <td style="vertical-align:bottom; padding-bottom:5px; border-left:none; border-right:none;" colspan="2">
+            <td style="width: 45%; border-left: none; border-bottom: none; vertical-align: middle; padding: 10px;">
                 Tanggal : {{ $asesor_sign_date }}
             </td>
-            <td style="border-left:none;"></td>
         </tr>
-        <tr style="padding: 1rem">
-            <td style="height:50px; vertical-align:bottom; padding-bottom:5px; border-right:none;" colspan="2">
+        <tr style="border-top: none;">
+            <td
+                style="width: 55%; border-right: none; border-top: none; height: 60px; vertical-align: middle; padding: 10px;">
                 Tanda tangan Asesi : {{ $asesi_name }}
             </td>
-            <td style="vertical-align:bottom;a padding-bottom:5px; border-left:none; border-right:none;" colspan="2">
+            <td style="width: 45%; border-left: none; border-top: none; vertical-align: middle; padding: 10px;">
                 Tanggal : {{ $asesi_sign_date }}
             </td>
-            <td style="border-left:none;"></td>
         </tr>
     </table>
 
