@@ -40,6 +40,12 @@ class Ak04Resource extends Resource
                                         $scheme = $record->scheme?->name ?? 'No Scheme';
                                         return "{$candidate} — {$scheme} — #{$record->id}";
                                     })
+                                    ->searchable()
+                                    ->preload()
+                                    ->reactive()
+                                    ->hint('Hanya pendaftaran yang SUDAH mengajukan banding yang akan muncul di sini.')
+                                    ->hintColor('primary')
+                                    ->hintIcon('heroicon-m-information-circle')
                                     ->disabled()
                                     ->dehydrated(),
                                 

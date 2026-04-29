@@ -89,13 +89,31 @@ class RegistrationController extends Controller
         );
     }
 
-    public function destroy(Request $request, AssessmentRegistration $registration)
-    {
-        if ($registration->user_id !== $request->user()->id) {
-            return $this->errorResponse('E1005', 403);
-        }
+    public function destroy($id)
+{
+    $user = request()->user();
 
-        $registration->delete();
-        return $this->successResponse([], 'Pendaftaran berhasil dibatalkan/dihapus');
+    $registration = AssessmentRegistration::where('id', $id)
+        ->where('user_id', $user->id)
+        ->first();
+
+    if (!$registration) {
+        return response()->json([
+            'message' => 'Pengajuan tidak ditemukan atau bukan milik Anda'
+        ], 404);
     }
+
+    // Opsional: Cek apakah boleh dibatalkan
+    if (in_array($registration->status_apl01?->value, ['approved', 'submitted'])) {
+        return response()->json([
+            'message' => 'Pengajuan yang sudah diproses tidak dapat dibatalkan'
+        ], 403);
+    }
+
+    $registration->delete();
+
+    return response()->json([
+        'message' => 'Pengajuan berhasil dibatalkan'
+    ]);
+}
 }

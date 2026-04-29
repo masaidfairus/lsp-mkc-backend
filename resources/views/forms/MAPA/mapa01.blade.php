@@ -16,11 +16,10 @@
             font-family: Arial, Helvetica, sans-serif;
             font-size: 9pt;
             color: #000;
-            padding: 4rem
+            padding: 4rem;
         }
-
         @page {
-            margin: 1.8cm 2cm 1.8cm 2cm;
+            margin: 1.5cm 2cm 1.5cm 2cm;
             size: A4 portrait;
         }
 
@@ -35,7 +34,6 @@
             font-size: 11pt;
             font-weight: bold;
             margin-bottom: 10px;
-            letter-spacing: 0.3px;
         }
 
         .cb,
@@ -78,16 +76,13 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 12px;
-            table-layout: fixed;
         }
 
         .tbl-skema td {
             border: 1px solid #000;
             padding: 5px 7px;
             vertical-align: middle;
-            font-size: 9pt;
         }
-
         .tbl-b1 {
             width: 100%;
             border-collapse: collapse;
@@ -99,7 +94,6 @@
             border: 1px solid #000;
             padding: 6px 8px;
             vertical-align: top;
-            font-size: 9pt;
             word-wrap: break-word;
         }
 
@@ -186,29 +180,31 @@
         .kp-label {
             background: #f0f0f0;
             font-weight: bold;
-            font-size: 8.5pt;
-            padding: 4px 8px;
+            padding: 6px 8px;
             border: 1px solid #000;
-            border-bottom: none;
         }
+        .tbl-unit-list {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+        .tbl-unit-list th { border: 1px solid #000; padding: 5px; background: #ddd; font-weight: bold; }
+        .tbl-unit-list td { border: 1px solid #000; padding: 4px 6px; }
 
-        /* Tabel metode — 10 kolom */
         .tbl-metode {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            border-top: none;
-            margin-bottom: 0;
-            font-size: 8pt;
+            margin-bottom: 15px;
         }
 
         .tbl-metode th,
         .tbl-metode td {
             border: 1px solid #000;
-            padding: 5px 4px;
-            vertical-align: middle;
+            padding: 4px;
+            font-size: 8pt;
             text-align: center;
-            word-wrap: break-word;
+            vertical-align: middle;
         }
 
         .tbl-metode th {
@@ -284,6 +280,8 @@
             padding: 5px 7px;
             vertical-align: top;
         }
+        .tbl-konfirmasi th { border: 1px solid #000; padding: 6px; background: #ddd; font-weight: bold; text-align: center; }
+        .tbl-konfirmasi td { border: 1px solid #000; padding: 6px; vertical-align: middle; }
 
         .tbl-ttd {
             width: 100%;
@@ -331,6 +329,9 @@
             vertical-align: top;
             word-wrap: break-word;
         }
+        .tbl-ttd th { border: 1px solid #000; padding: 6px; background: #ddd; font-weight: bold; text-align: center; }
+        .tbl-ttd td { border: 1px solid #000; padding: 6px; vertical-align: top; text-align: center; }
+        .sig-image { max-height: 45px; display: block; margin: 0 auto; }
     </style>
 </head>
 

@@ -269,6 +269,14 @@
         </tr>
     </table>
 
+    {{-- PANDUAN --}}
+    <div class="panduan-box">
+        <div class="panduan-title">Panduan Bagi Asesor:</div>
+        <div class="panduan-item">Lengkapi ceklis ini sebelum pelaksanaan asesmen.</div>
+        <div class="panduan-item">Hasil penyesuaian yang wajar dan beralasan ini harus dibahas dan disepakati bersama antara asesi dan asesor.</div>
+        <div class="panduan-item">Bila asesi tidak setuju dengan hasil penyesuaian ini maka asesi dapat melakukan banding (FR.AK.04).</div>
+    </div>
+
     {{-- POTENSI ASESI --}}
     <table class="potensi-tbl">
         <colgroup>
@@ -288,7 +296,7 @@
 
                 {{-- Kolom Checkbox --}}
                 <td style="text-align:center; vertical-align:middle;" colspan="1">
-                    <span class="{{ $item['is_checked'] ? 'cb-checked' : 'cb' }}"></span>
+                    <span style="font-size: 14pt;">{!! $item['is_checked'] ? '☑' : '☐' !!}</span>
                 </td>
 
                 {{-- Kolom Label Dinamis --}}
@@ -342,7 +350,7 @@
                         @foreach($item['note'] as $note)
                             <div class="cb-item">
                                 {{-- Logika centang di dalam keterangan --}}
-                                <span class="{{ ($note['is_checked'] ?? false) ? 'cb-checked' : 'cb' }}"></span>
+                                <span style="font-size: 13pt;">{!! ($note['is_checked'] ?? false) ? '☑' : '☐' !!}</span>
                                 {!! $note['title'] !!}
                             </div>
                         @endforeach
@@ -409,16 +417,30 @@
     {{-- Ringkasan hasil --}}
     <table class="tbl" style="margin-bottom:10px;">
         <tr>
-            <td style="line-height:1.7; font-size:8pt;">
-                &bull; &nbsp; Hasil Penyesuaian yang wajar dan beralasan disepakati menggunakan<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&bull; &nbsp; Acuan Pembanding Asesmen:
-                {{ $adjustment_results['assessment_benchmark'] ?? '( tuliskan nama acuan pembanding )' }}<br>
+            <td style="line-height:1.7; font-size:8pt; padding: 10px;">
+                <strong>Hasil Penyesuaian yang wajar dan beralasan disepakati menggunakan:</strong><br><br>
 
-                &nbsp;&nbsp;&nbsp;&nbsp;&bull; &nbsp; Metode Asesmen:
-                {{ $adjustment_results['assessment_method'] ?? '( tuliskan nama metode asesmen )' }}<br>
+                <strong>A. Hasil penyesuaian sesuai karakteristik asesi</strong><br>
+                <div style="margin-left: 15px;">
+                    1) Acuan Pembanding Asesmen:
+                    {{ $adjustment_results_a['assessment_benchmark'] ?? '( tuliskan nama acuan pembanding )' }}<br>
+                    2) Metode Asesmen:
+                    {{ $adjustment_results_a['assessment_method'] ?? '( tuliskan nama metode asesmen )' }}<br>
+                    3) Instrumen Asesmen:
+                    {{ $adjustment_results_a['assessment_instrument'] ?? '( tuliskan nama formulir instrumen asesmen )' }}
+                </div>
+                <br>
 
-                &nbsp;&nbsp;&nbsp;&nbsp;&bull; &nbsp; Instrumen Asesmen:
-                {{ $adjustment_results['assessment_instrument'] ?? '( tuliskan nama formulir instrumen asesmen )' }}
+                <strong>B. Hasil penyesuaian rencana asesmen sesuai acuan pembanding, potensi asesi dan konteks
+                    asesi</strong><br>
+                <div style="margin-left: 15px;">
+                    1) Acuan Pembanding Asesmen:
+                    {{ $adjustment_results_b['assessment_benchmark'] ?? '( tuliskan nama acuan pembanding )' }}<br>
+                    2) Metode Asesmen:
+                    {{ $adjustment_results_b['assessment_method'] ?? '( tuliskan nama metode asesmen )' }}<br>
+                    3) Instrumen Asesmen:
+                    {{ $adjustment_results_b['assessment_instrument'] ?? '( tuliskan nama formulir instrumen asesmen )' }}
+                </div>
             </td>
         </tr>
     </table>
@@ -432,8 +454,21 @@
             <col style="width:20%;">
         </colgroup>
         <tr>
-            <td>Nama Asesor : {{ $asesor_name }}</td>
-            <td class="ttd-space">Tanggal dan Tanda Tangan Asesor: {{ $asesor_sign_date }}</td>
+            <td>
+                Nama Asesor : {{ $asesor_name }}<br>
+                <span style="font-size: 8pt;">No. Reg: {{ $asesor_reg }}</span>
+            </td>
+            <td class="ttd-space" style="vertical-align: middle; padding: 6px;">
+                Tanggal dan Tanda Tangan Asesor:<br>
+                <div style="margin-top: 10px;">
+                    @if($asesor_qr_code)
+                        <img src="{{ $asesor_qr_code }}" style="width: 50px; height: 50px; vertical-align: middle;">
+                    @endif
+                    <span style="vertical-align: middle; margin-left: 8px;">
+                        {{ $asesor_sign_date }}
+                    </span>
+                </div>
+            </td>
         </tr>
         <tr>
             <td>Nama Asesi : {{ $asesi_name }}</td>
