@@ -38,6 +38,6 @@ class FileProfile extends Model
 
     public function apl02Portfolio()
     {
-        return $this->hasMany(Apl02Portfolio::class);
+        return $this->hasMany(Apl02Portfolio::class, 'list_id');
     }
 }

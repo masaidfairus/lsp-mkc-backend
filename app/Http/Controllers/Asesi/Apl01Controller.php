@@ -190,14 +190,14 @@ class Apl01Controller extends Controller
                 foreach ($validated['evidence'] as $item) {
                     $file = $item['file'];
                     $filename = "user_{$user->id}_req_{$item['list_id']}_" . uniqid() . "." . $file->getClientOriginalExtension();
-                    $path = $file->storeAs("bukti-dasar/{$registration->id}", $filename, 'public');
+                    $path = $file->storeAs("bukti-dasar/{$registration->id}", $filename, 'local');
 
                     $existing = FileProfile::where([
                         'list_id' => $item['list_id'],
                     ])->first();
 
                     if ($existing) {
-                        Storage::disk('public')->delete($existing->upload_document);
+                        Storage::disk('local')->delete($existing->upload_document);
                         $existing->delete();
                     }
 
@@ -248,14 +248,14 @@ class Apl01Controller extends Controller
                 foreach ($validated['evidence'] as $item) {
                     $file = $item['file'];
                     $filename = "user_{$user->id}_list_{$item['list_id']}_" . uniqid() . "." . $file->getClientOriginalExtension();
-                    $path = $file->storeAs("bukti-admin/{$registration->id}", $filename, 'public');
+                    $path = $file->storeAs("bukti-admin/{$registration->id}", $filename, 'local');
 
                     $existing = FileProfile::where([
                         'list_id' => $item['list_id'],
                     ])->first();
 
                     if ($existing) {
-                        Storage::disk('public')->delete($existing->upload_document);
+                        Storage::disk('local')->delete($existing->upload_document);
                         $existing->delete();
                     }
 

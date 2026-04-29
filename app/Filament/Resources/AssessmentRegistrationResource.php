@@ -10,14 +10,12 @@ use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\SelfA
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\EvidenceRelationManager;
 use App\Filament\Resources\AssessmentRegistrationResource\Pages;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\AplDataRelationManager;
-use App\Models\Apl01;
 use App\Models\AssessmentRegistration;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 
 class AssessmentRegistrationResource extends Resource
@@ -33,8 +31,13 @@ class AssessmentRegistrationResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->where('status_apl01', '!=', Apl01Status::NOT_STARTED->value);
+        $query =  parent::getEloquentQuery();
+
+        if (!auth()->user()->hasRole('admin') || !auth()->user()->hasRole('super_admin')) {
+            $query->where('assessor_id', auth()->id());
+        }
+        
+        return $query;
     }
 
     public static function form(Form $form): Form
@@ -110,12 +113,19 @@ class AssessmentRegistrationResource extends Resource
                                 ->icon('heroicon-o-printer')
                                 ->url(fn($record) => $record ? route('apl02.form', ['registration' => $record->id]) : '#')
                                 ->openUrlInNewTab(),
-                                        ])->columnSpanFull(),
-                                    ]),
-                                Forms\Components\Tabs\Tab::make('Dokumen AK')
-                                    ->schema([
-                                        Forms\Components\Actions::make([
-                                            Forms\Components\Actions\Action::make('generate_ak01_pdf')
+                            Forms\Components\Actions\Action::make('generate_mapa01_pdf')
+                                ->label('Cetak Dokumen MAPA.01')
+                                ->color('success')
+                                ->icon('heroicon-o-printer')
+                                ->url(fn($record) => $record ? route('mapa01.form', ['registration' => $record->id]) : '#')
+                                ->openUrlInNewTab(),
+                            Forms\Components\Actions\Action::make('generate_mapa02_pdf')
+                                ->label('Cetak Dokumen MAPA.02')
+                                ->color('success')
+                                ->icon('heroicon-o-printer')
+                                ->url(fn($record) => $record ? route('mapa02.form', ['registration' => $record->id]) : '#')
+                                ->openUrlInNewTab(),
+                            Forms\Components\Actions\Action::make('generate_ak01_pdf')
                                 ->label('Cetak Dokumen AK.01')
                                 ->color('success')
                                 ->icon('heroicon-o-printer')
