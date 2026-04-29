@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\Apl01Status;
-use App\Enums\Apl02Status;
+use App\Enums\AssessmentStatus;
 use App\Enums\CertificationPurpose;
 use App\Enums\Result;
 use Illuminate\Database\Eloquent\Model;
@@ -15,16 +14,14 @@ class AssessmentRegistration extends Model
         'scheme_id',
         'assessor_id',
         'tuk',
-        'status_apl01',
-        'status_apl02',
+        'status',
         'final_result',
         'assessed_at',
         'admin_notes',
     ];
 
     protected $casts = [
-        'status_apl01' => Apl01Status::class,
-        'status_apl02' => Apl02Status::class,
+        'status' => AssessmentStatus::class,
         'certification_purpose' => CertificationPurpose::class,
         'assessed_at' => 'datetime',
     ];

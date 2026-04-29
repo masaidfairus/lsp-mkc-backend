@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\PDF;
 
-use App\Enums\Apl01Status;
+use App\Enums\AssessmentStatus;
 use App\Models\AssessmentRegistration;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -27,7 +27,7 @@ class PdfApl01Controller extends Controller
         }
 
         // ── Validasi status ──────────────────────────────────────────
-        if (is_null($registration->status_apl01)) {
+        if ($registration->status === AssessmentStatus::APL01_DRAFT) {
             return response()->json(['message' => 'APL-01 belum disubmit.'], 422);
         }
 
@@ -122,8 +122,9 @@ class PdfApl01Controller extends Controller
                 ])->values()->toArray(),
 
             'status_terima' => match (true) {
-                $registration->status_apl01 === Apl01Status::APPROVED => 'DITERIMA',
-                $registration->status_apl01 === Apl01Status::REJECTED => 'DITOLAK',
+                $registration->status === AssessmentStatus::APL01_APPROVED,
+                $registration->status->isApl01Complete() => 'DITERIMA',
+                $registration->status === AssessmentStatus::APL01_REJECTED => 'DITOLAK',
                 default => 'DIPROSES',
             },
         ];

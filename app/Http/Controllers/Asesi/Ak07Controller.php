@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers\Asesi;
 
-use App\Enums\Apl01Status;
-use App\Enums\Apl02Status;
+use App\Enums\AssessmentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AssessmentRegistration;
 use Illuminate\Http\Request;
@@ -20,11 +19,11 @@ class Ak07Controller extends Controller
             return $this->errorResponse('E1005', 403);
         }
 
-        if ($registration->status_apl01 !== Apl01Status::APPROVED) {
+        if (!$registration->status->isApl01Complete()) {
             return $this->errorResponse('E2009', 403);
         }
 
-        if ($registration->status_apl02 !== Apl02Status::APPROVED) {
+        if (!$registration->status->isApl02Complete()) {
             return $this->errorResponse('E2018', 403);
         }
 
@@ -47,11 +46,11 @@ class Ak07Controller extends Controller
             return $this->errorResponse('E1005', 403);
         }
 
-        if ($registration->status_apl01 !== Apl01Status::APPROVED) {
+        if (!$registration->status->isApl01Complete()) {
             return $this->errorResponse('E2009', 403);
         }
 
-        if ($registration->status_apl02 !== Apl02Status::APPROVED) {
+        if (!$registration->status->isApl02Complete()) {
             return $this->errorResponse('E2018', 403);
         }
 

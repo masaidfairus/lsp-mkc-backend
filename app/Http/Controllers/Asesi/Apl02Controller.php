@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Asesi;
 
 use App\Http\Controllers\Controller;
-use App\Enums\Apl01Status;
-use App\Enums\Apl02Status;
+use App\Enums\AssessmentStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Apl02Portfolio;
 use App\Models\AssessmentRegistration;
@@ -28,7 +27,7 @@ class Apl02Controller extends Controller
             return $this->errorResponse('E1005', 403);
         }
 
-        if ($registration->status_apl01 !== Apl01Status::APPROVED) {
+        if (!$registration->status->isApl01Complete()) {
             return $this->errorResponse('E2009', 403);
         }
 
@@ -181,7 +180,7 @@ class Apl02Controller extends Controller
                 ['is_competent', 'updated_at']
             );
 
-            $registration->update(['status_apl02' => Apl02Status::SUBMITTED, 'assessed_at' => Carbon::now()]);
+            $registration->update(['status' => AssessmentStatus::APL02_SUBMITTED, 'assessed_at' => Carbon::now()]);
         });
 
         return $this->successResponse(

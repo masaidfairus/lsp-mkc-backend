@@ -3,8 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\Role;
-use App\Enums\Apl01Status;
-use App\Enums\Apl02Status;
+use App\Enums\AssessmentStatus;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\PortfolioFilesRelationManager;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\SelfAssessmentRelationManager;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\EvidenceRelationManager;
@@ -64,14 +63,11 @@ class AssessmentRegistrationResource extends Resource
                                     ->label('Asesi Bertugas')
                                     ->searchable()
                                     ->preload(),
-                                Forms\Components\Select::make('status_apl01')
-                                    ->options([
-                                        Apl01Status::PENDING->value => Apl01Status::PENDING->getLabel(),
-                                        Apl01Status::APPROVED->value => Apl01Status::APPROVED->getLabel(),
-                                        Apl01Status::REJECTED->value => Apl01Status::REJECTED->getLabel(),
-                                    ])
-                                    ->label('Status APL-01')
-                                    ->required(),
+                                Forms\Components\Select::make('status')
+                                    ->options(AssessmentStatus::class)
+                                    ->label('Status Pendaftaran')
+                                    ->required()
+                                    ->native(false),
                             ]),
                         Forms\Components\Textarea::make('admin_notes')
                             ->label('Catatan Admin')
@@ -79,21 +75,7 @@ class AssessmentRegistrationResource extends Resource
                             ->rows(3)
                             ->columnSpanFull(),
                     ]),
-                Forms\Components\Section::make('Validasi Evaluasi Mandiri (APL-02)')
-                    ->schema([
-                        Forms\Components\Select::make('user_id')
-                            ->relationship('candidate', 'name')
-                            ->label('Asesi')
-                            ->disabled(),
-                        Forms\Components\Select::make('scheme_id')
-                            ->relationship('scheme', 'name')
-                            ->label('Skema')
-                            ->disabled(),
-                        Forms\Components\Select::make('status_apl02')
-                            ->options(Apl02Status::class)
-                            ->label('Status APL-02')
-                            ->required(),
-                    ])->columns(2),
+
                 Forms\Components\Section::make('Mencetak Dokumen Asesi')
                     ->schema([
                         Forms\Components\Actions::make([
@@ -165,6 +147,10 @@ class AssessmentRegistrationResource extends Resource
                     ->label('Catatan Admin')
                     ->placeholder('Tambah catatan...')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Daftar')
                     ->dateTime()
@@ -172,7 +158,10 @@ class AssessmentRegistrationResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
+                    ->options(AssessmentStatus::class)
+                    ->native(false),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

@@ -57,12 +57,12 @@ class RegistrationController extends Controller
                         [
                             'code' => 'APL.01',
                             'label' => 'Permohonan Sertifikasi',
-                            'status' => $reg->status_apl01?->value ?? 'draft',
+                            'status' => $reg->status?->apl01Value() ?? 'not_started',
                         ],
                         [
                             'code' => 'APL.02',
                             'label' => 'Asesmen Mandiri',
-                            'status' => $reg->status_apl02?->value ?? 'draft',
+                            'status' => $reg->status?->apl02Value() ?? 'not_started',
                         ],
                         [
                             'code' => 'AK.01',
