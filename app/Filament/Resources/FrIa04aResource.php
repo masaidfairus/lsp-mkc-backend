@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FrIa04aResource\Pages;
+use App\Filament\Traits\HasStandardIaForm;
 use App\Models\AssessmentInstrument;
 use App\Models\AssessmentRegistration;
 use App\Models\User;
@@ -17,8 +18,10 @@ use Illuminate\Support\HtmlString;
 
 class FrIa04aResource extends Resource
 {
+    use HasStandardIaForm;
+
     protected static ?string $model = AssessmentInstrument::class;
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static ?string $navigationIcon = 'heroicon-o-document-magnifying-glass';
     protected static ?string $navigationGroup = 'IA (A)';
     protected static ?string $navigationLabel = 'FR.IA.04a';
     protected static ?string $modelLabel = 'FR.IA.04a';
@@ -50,22 +53,14 @@ class FrIa04aResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set) {
+                                    ->afterStateHydrated(function ($state, callable $set, callable $get) {
                                         if ($state) {
-                                            $reg = AssessmentRegistration::with([
-                                                'scheme.competencyUnits.workGroup',
-                                                'candidate',
-                                                'assessor'
-                                            ])->find($state);
-
-                                            if ($reg) {
-                                                $set('fria04a_data.header.certification_scheme', $reg->scheme?->name);
-                                                $set('fria04a_data.header.scheme_code', $reg->scheme?->code);
-                                                $set('fria04a_data.header.tuk', $reg->tuk ?? '');
-                                                $set('fria04a_data.header.assessor_name', $reg->assessor?->name);
-                                                $set('fria04a_data.header.assessee_name', $reg->candidate?->name);
-                                                $set('fria04a_data.header.assessment_date', now()->format('Y-m-d'));
-                                            }
+                                            self::populateIa04aData($state, $set, $get);
+                                        }
+                                    })
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        if ($state) {
+                                            self::populateIa04aData($state, $set, $get, true);
                                         }
                                     }),
                             ]),
@@ -73,7 +68,7 @@ class FrIa04aResource extends Resource
                         Forms\Components\Hidden::make('document_type')->default('FR.IA.04A'),
 
                         Forms\Components\Group::make()
-                            ->statePath('fria04a_data')
+                            ->statePath('main_data')
                             ->schema([
 
                                 Forms\Components\Section::make('Header Dokumen')
@@ -102,14 +97,15 @@ class FrIa04aResource extends Resource
                                                 Forms\Components\Repeater::make('units')
                                                     ->label('Unit Kompetensi')
                                                     ->schema([
-                                                        Forms\Components\TextInput::make('no')->label('No')->disabled()->numeric(),
-                                                        Forms\Components\TextInput::make('unit_code')->label('Kode Unit')->disabled(),
-                                                        Forms\Components\TextInput::make('unit_title')->label('Judul Unit')->disabled(),
+                                                        Forms\Components\TextInput::make('no')->label('No')->disabled()->dehydrated()->numeric()->columnSpan(1),
+                                                        Forms\Components\TextInput::make('unit_code')->label('Kode Unit')->disabled()->dehydrated()->columnSpan(2),
+                                                        Forms\Components\TextInput::make('unit_title')->label('Judul Unit')->disabled()->dehydrated()->columnSpan(3),
                                                     ])
-                                                    ->columns(3)
+                                                    ->columns(6)
                                                     ->disableItemCreation()
                                                     ->disableItemDeletion()
-                                                    ->disableItemMovement(),
+                                                    ->disableItemMovement()
+                                                    ->extraAttributes(['style' => 'max-height: 300px; overflow-y: auto;']),
 
                                                 Forms\Components\Textarea::make('scenario_instructions.content')->label('Skenario Instruksi')->rows(3)->columnSpanFull(),
                                                 Forms\Components\TextInput::make('scenario_instructions.time_allocation')->label('Alokasi Waktu Skenario'),
@@ -125,44 +121,65 @@ class FrIa04aResource extends Resource
                                             ->itemLabel(fn(array $state): ?string => 'Kelompok ' . ($state['group_id'] ?? '')),
                                     ]),
 
-                                Forms\Components\Section::make('Kontrol Dokumen')
-                                    ->schema([
-                                        Forms\Components\Repeater::make('document_control.compilers')
-                                            ->label('Penyusun')
-                                            ->schema([
-                                                Forms\Components\TextInput::make('no')->label('No')->numeric(),
-                                                Forms\Components\TextInput::make('name')->label('Nama'),
-                                                Forms\Components\TextInput::make('met_no')->label('No. MET'),
-                                                Forms\Components\DatePicker::make('date')->label('Tanggal')->native(false),
-                                                Forms\Components\TextInput::make('signature')->label('Tanda Tangan'),
-                                            ])
-                                            ->columns(5)
-                                            ->addActionLabel('Tambah Penyusun'),
-
-                                        Forms\Components\Repeater::make('document_control.validators')
-                                            ->label('Validator')
-                                            ->schema([
-                                                Forms\Components\TextInput::make('no')->label('No')->numeric(),
-                                                Forms\Components\TextInput::make('name')->label('Nama'),
-                                                Forms\Components\TextInput::make('met_no')->label('No. MET'),
-                                                Forms\Components\DatePicker::make('date')->label('Tanggal')->native(false),
-                                                Forms\Components\TextInput::make('signature')->label('Tanda Tangan'),
-                                            ])
-                                            ->columns(5)
-                                            ->addActionLabel('Tambah Validator'),
-                                    ]),
+                                self::standardDocumentControlBlock('document_control'),
                             ]),
 
                         Forms\Components\Section::make('Tanda Tangan')
                             ->schema([
-                                self::assessorSignatureBlock(),
-                                self::supervisorSignatureBlock(),
+                                self::standardAsesiDisclaimer(),
+                                self::standardAssessorSignatureBlock('main_data.signatures.assessor'),
                             ]),
                     ]),
             ]);
     }
 
-    // ... (table, pages, signature methods tetap sama seperti sebelumnya)
+    protected static function populateIa04aData($state, callable $set, callable $get = null, bool $isUpdate = false)
+    {
+        $reg = AssessmentRegistration::with([
+            'scheme.competencyUnits.workGroup',
+            'candidate',
+            'assessor'
+        ])->find($state);
+
+        if ($reg) {
+            $set('main_data.header.certification_scheme', $reg->scheme?->name);
+            $set('main_data.header.scheme_code', $reg->scheme?->code);
+            $set('main_data.header.tuk', $reg->tuk ?? '');
+            $set('main_data.header.assessor_name', $reg->assessor?->name);
+            $set('main_data.header.assessee_name', $reg->candidate?->name);
+            
+            if ($get && !$get('main_data.header.assessment_date')) {
+                $set('main_data.header.assessment_date', now()->format('Y-m-d'));
+            }
+
+            // Populate work groups if empty (to avoid overwriting user input during edit)
+            $existingGroups = $get ? (array) $get('main_data.work_groups') : [];
+            if (($isUpdate || empty($existingGroups) || empty(array_filter(array_column($existingGroups, 'group_name')))) && $reg->scheme) {
+                $units = $reg->scheme->competencyUnits;
+                $grouped = $units->groupBy(fn($u) => $u->work_group_id);
+
+                $workGroups = [];
+                $idx = 1;
+                foreach ($grouped as $wgId => $wgUnits) {
+                    $wgName = $wgUnits->first()->workGroup?->name ?? 'Kelompok Pekerjaan';
+                    $workGroups[] = [
+                        'group_id' => $idx++,
+                        'group_name' => $wgName,
+                        'units' => $wgUnits->map(fn($u, $i) => [
+                            'no' => $i + 1,
+                            'unit_code' => $u->unit_code,
+                            'unit_title' => $u->unit_title,
+                        ])->toArray(),
+                        'scenario_instructions' => ['content' => '', 'time_allocation' => ''],
+                        'demonstration_items' => ['content' => '', 'time_allocation' => ''],
+                        'assessee_feedback' => '',
+                    ];
+                }
+                $set('main_data.work_groups', $workGroups);
+            }
+        }
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -184,75 +201,5 @@ class FrIa04aResource extends Resource
             'create' => Pages\CreateFrIa04a::route('/create'),
             'edit' => Pages\EditFrIa04a::route('/{record}/edit'),
         ];
-    }
-
-    private static function assessorSignatureBlock(): Forms\Components\Section
-    {
-        return Forms\Components\Section::make('Asesor')
-            ->statePath('fria04a_data.signatures.assessor')
-            ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->label('Pilih Asesor')
-                    ->options(User::role('asesor')->pluck('name', 'id'))
-                    ->live()
-                    ->searchable()
-                    ->preload()
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if ($user = User::find($state)) {
-                            $set('name', $user->name);
-                            $set('signature_url', self::resolveSignatureUrl($user->signature?->signature_image ?? null));
-                        }
-                    }),
-                Forms\Components\Hidden::make('name'),
-                Forms\Components\Hidden::make('signature_url'),
-                Forms\Components\Placeholder::make('preview')->content(fn($get) => self::renderSignaturePreview($get, 'Asesor')),
-            ]);
-    }
-
-    private static function supervisorSignatureBlock(): Forms\Components\Section
-    {
-        return Forms\Components\Section::make('Supervisor / Atasan')
-            ->statePath('fria04a_data.signatures.supervisor')
-            ->schema([
-                Forms\Components\TextInput::make('name')->label('Nama Supervisor'),
-                Forms\Components\Hidden::make('signature_url'),
-                Forms\Components\Placeholder::make('preview')->content(fn($get) => self::renderSignaturePreview($get, 'Supervisor')),
-            ]);
-    }
-
-    private static function resolveSignatureUrl(?string $path): ?string
-    {
-        if (!$path) return null;
-        if (str_starts_with($path, 'data:') || str_starts_with($path, 'http')) return $path;
-        $normalized = preg_replace('#^/?storage/#', '', $path);
-        return Storage::url($normalized);
-    }
-
-    private static function renderSignaturePreview($get, string $role): HtmlString
-    {
-        $name = $get('name') ?? '';
-        if (!$name) {
-            return new HtmlString('<div class="text-gray-400 italic text-sm">Isi ' . $role . ' untuk preview</div>');
-        }
-
-        $signature = $get('signature_url');
-        $imgHtml = $signature
-            ? "<img src='" . htmlspecialchars($signature) . "' style='max-height:70px;object-fit:contain;' />"
-            : "<div style='font-size:11px;color:#dc2626;font-style:italic;'>Belum ada tanda tangan</div>";
-
-        $html = "
-        <div style='font-family: system-ui, sans-serif; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; max-width: 480px; color: #0f172a;'>
-            <div style='padding: 8px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;'>
-                <span style='font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: #64748b;'>Tanda Tangan {$role}</span>
-            </div>
-            <div style='padding: 20px;'>
-                <p style='font-size: 16px; font-weight: 600; margin: 0 0 14px;'>{$name}</p>
-                <div style='height: 110px; border: 1px dashed #e2e8f0; border-radius: 12px; background: #f8fafc; display: flex; align-items: center; justify-content: center;'>
-                    {$imgHtml}
-                </div>
-            </div>
-        </div>";
-
-        return new HtmlString($html);
     }
 }

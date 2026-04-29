@@ -1,6 +1,7 @@
 <?php
 namespace App\Filament\Resources;
 use App\Filament\Resources\Ak01Resource\Pages;
+use App\Filament\Traits\HasStandardIaForm;
 use App\Models\Ak01;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Ak01Resource extends Resource
 {
+    use HasStandardIaForm;
     protected static ?string $model = Ak01::class;
     protected static ?string $navigationIcon = 'heroicon-o-document-check';
     protected static ?string $navigationGroup = 'AK';
@@ -85,18 +87,14 @@ class Ak01Resource extends Resource
 
                                 Forms\Components\Grid::make(3)
                                     ->schema([
-                                        Forms\Components\Select::make('tuk')
+                                        Forms\Components\TextInput::make('tuk')
                                             ->label('TUK')
-                                            ->options([
-                                                'Sewaktu'      => 'Sewaktu',
-                                                'Tempat Kerja' => 'Tempat Kerja',
-                                                'Mandiri'      => 'Mandiri',
-                                            ])
-                                            ->required(),
+                                            ->disabled()
+                                            ->dehydrated(),
 
                                         Forms\Components\Select::make('asesor_name')
                                             ->label('Nama Asesor')
-                                            ->options(fn () => \App\Models\User::role('asesor')->pluck('name', 'name'))
+                                            ->disabled()
                                             ->searchable()
                                             ->required(),
 
@@ -133,34 +131,8 @@ class Ak01Resource extends Resource
                                             ->label('Hari/Tanggal/Waktu Asesmen')
                                             ->required(),
                                     ]),
-
-                                Forms\Components\Grid::make(2)
-                                    ->statePath('signatures')
-                                    ->schema([
-                                        Forms\Components\Section::make('Tanda Tangan Asesor')
-                                            ->statePath('asesor')
-                                            ->schema([
-                                                Forms\Components\Select::make('signature_id')
-                                                    ->label('Pilih Tanda Tangan Asesor')
-                                                    ->options(\App\Models\UserSignature::pluck('name', 'id'))
-                                                    ->reactive()
-                                                    ->afterStateUpdated(function ($state, callable $set) {
-                                                        $sig = \App\Models\UserSignature::find($state);
-                                                        if ($sig) {
-                                                            $set('name', $sig->name);
-                                                            $set('signature', $sig->signature_image);
-                                                            $set('qr_preview', $sig->qr_code);
-                                                        }
-                                                    }),
-                                                Forms\Components\Hidden::make('name'),
-                                                Forms\Components\Hidden::make('signature'),
-                                                Forms\Components\Placeholder::make('qr_preview')
-                                                    ->label('QR Code Asesor')
-                                                    ->content(fn ($get) => $get('qr_preview')
-                                                        ? new \Illuminate\Support\HtmlString("<img src='{$get('qr_preview')}' width='120' />")
-                                                        : '-'),
-                                            ]),
-                                    ]),
+                                self::standardAsesiDisclaimer(),
+                                self::standardAssessorSignatureBlock('signatures.asesor'),
                             ]),
                     ]),
             ]);

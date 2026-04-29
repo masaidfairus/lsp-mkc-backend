@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FrIa10Resource\Pages;
+use App\Filament\Traits\HasStandardIaForm;
 use App\Models\AssessmentInstrument;
 use App\Models\AssessmentRegistration;
 use App\Models\User;
@@ -17,8 +17,10 @@ use Illuminate\Support\HtmlString;
 
 class FrIa10Resource extends Resource
 {
+    use HasStandardIaForm;
+
     protected static ?string $model = AssessmentInstrument::class;
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationGroup = 'IA';
     protected static ?string $navigationLabel = 'FR.IA.10';
     protected static ?string $modelLabel = 'FR.IA.10';
@@ -50,41 +52,14 @@ class FrIa10Resource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set) {
+                                    ->afterStateHydrated(function ($state, callable $set, callable $get) {
                                         if ($state) {
-                                            $reg = AssessmentRegistration::with([
-                                                'scheme.competencyUnits.workGroup',
-                                                'candidate',
-                                                'assessor'
-                                            ])->find($state);
-
-                                            if ($reg) {
-                                                $set('fria10_data.header.certification_scheme', $reg->scheme?->name);
-                                                $set('fria10_data.header.scheme_number', $reg->scheme?->code);
-                                                $set('fria10_data.header.tuk', $reg->tuk ?? '');
-                                                $set('fria10_data.header.assessor_name', $reg->assessor?->name);
-                                                $set('fria10_data.header.assessee_name', $reg->candidate?->name);
-                                                $set('fria10_data.header.date', now()->format('d-m-Y'));
-
-                                                // Auto populate work groups
-                                                if ($reg->scheme) {
-                                                    $units = $reg->scheme->competencyUnits;
-                                                    $grouped = $units->groupBy(fn($u) => $u->workGroup?->name ?? 'Lainnya');
-
-                                                    $workGroups = [];
-                                                    foreach ($grouped as $wgName => $wgUnits) {
-                                                        $workGroups[] = [
-                                                            'group_name' => $wgName,
-                                                            'units' => $wgUnits->map(fn($u, $idx) => [
-                                                                'no' => $idx + 1,
-                                                                'unit_code' => $u->unit_code,
-                                                                'unit_title' => $u->unit_title,
-                                                            ])->toArray(),
-                                                        ];
-                                                    }
-                                                    $set('fria10_data.work_groups', $workGroups);
-                                                }
-                                            }
+                                            self::populateIa10Data($state, $set, $get);
+                                        }
+                                    })
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        if ($state) {
+                                            self::populateIa10Data($state, $set, $get, true);
                                         }
                                     }),
                             ]),
@@ -92,7 +67,7 @@ class FrIa10Resource extends Resource
                         Forms\Components\Hidden::make('document_type')->default('FR.IA.10'),
 
                         Forms\Components\Group::make()
-                            ->statePath('fria10_data')
+                            ->statePath('main_data')
                             ->schema([
 
                                 Forms\Components\Section::make('Header Dokumen')
@@ -116,9 +91,9 @@ class FrIa10Resource extends Resource
                                                 Forms\Components\Repeater::make('units')
                                                     ->label('Unit Kompetensi')
                                                     ->schema([
-                                                        Forms\Components\TextInput::make('no')->label('No')->disabled()->numeric(),
-                                                        Forms\Components\TextInput::make('unit_code')->label('Kode Unit')->disabled(),
-                                                        Forms\Components\TextInput::make('unit_title')->label('Judul Unit')->disabled(),
+                                                        Forms\Components\TextInput::make('no')->label('No')->disabled()->dehydrated()->numeric(),
+                                                        Forms\Components\TextInput::make('unit_code')->label('Kode Unit')->disabled()->dehydrated(),
+                                                        Forms\Components\TextInput::make('unit_title')->label('Judul Unit')->disabled()->dehydrated(),
                                                     ])
                                                     ->columns(3)
                                                     ->disableItemCreation()
@@ -139,19 +114,24 @@ class FrIa10Resource extends Resource
                                         Forms\Components\TextInput::make('third_party_details.phone')->label('Telepon'),
                                     ])->columns(2),
 
-                                Forms\Components\Section::make('Verifikasi')
+                                 Forms\Components\Section::make('Verifikasi')
                                     ->schema([
                                         Forms\Components\Repeater::make('verification_questions')
                                             ->label('')
                                             ->schema([
-                                                Forms\Components\Textarea::make('question')->label('Pertanyaan')->rows(2)->columnSpan(4)->disabled()->dehydrated(),
+                                                Forms\Components\Textarea::make('question')->label('Pertanyaan')->rows(2)->columnSpan(4)->required(),
                                                 Forms\Components\Checkbox::make('is_yes')->label('Ya'),
                                                 Forms\Components\Checkbox::make('is_no')->label('Tidak'),
                                             ])
                                             ->columns(6)
-                                            ->disableItemCreation()
-                                            ->disableItemDeletion()
-                                            ->disableItemMovement(),
+                                            ->default([
+                                                ['question' => 'Apakah asesi bekerja dengan mempertimbangkan Kesehatan, Keamanan dan Keselamatan Kerja?', 'is_yes' => false, 'is_no' => false],
+                                                ['question' => 'Apakah asesi berinteraksi dengan harmonis didalam kelompoknya?', 'is_yes' => false, 'is_no' => false],
+                                                ['question' => 'Apakah asesi dapat mengelola tugas-tugas secara bersamaan?', 'is_yes' => false, 'is_no' => false],
+                                                ['question' => 'Apakah asesi dapat dengan cepat beradaptasi dengan peralatan dan lingkungan yang baru?', 'is_yes' => false, 'is_no' => false],
+                                                ['question' => 'Apakah asesi dapat merespon dengan cepat masalah-masalah yang ada di tempat kerjanya?', 'is_yes' => false, 'is_no' => false],
+                                                ['question' => 'Apakah Anda bersedia dihubungi jika verifikasi lebih lanjut dari pernyataan ini diperlukan?', 'is_yes' => false, 'is_no' => false],
+                                            ]),
                                     ]),
 
                                 Forms\Components\Section::make('Penilaian Naratif')
@@ -170,156 +150,66 @@ class FrIa10Resource extends Resource
                                         Forms\Components\Textarea::make('overall_conclusion.further_training_needs')->label('Identifikasi kebutuhan pelatihan lebih lanjut untuk asesi')->rows(2),
                                         Forms\Components\Textarea::make('overall_conclusion.other_comments')->label('Ada komentar lain')->rows(3),
                                     ]),
+
+                                self::standardDocumentControlBlock('document_control'),
                             ]),
 
-                        // Penyusun & Validator
-                        Forms\Components\Section::make('Penyusun dan Validator')
+                        Forms\Components\Section::make('Tanda Tangan')
                             ->schema([
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Section::make('Penyusun Dokumen')
-                                            ->schema([self::signatureRepeater('compilers', 'Penyusun')])
-                                            ->columnSpan(1),
-                                        Forms\Components\Section::make('Validator Dokumen')
-                                            ->schema([self::signatureRepeater('validators', 'Validator')])
-                                            ->columnSpan(1),
-                                    ]),
+                                self::standardAsesiDisclaimer(),
+                                self::standardAssessorSignatureBlock('main_data.signatures.assessor'),
                             ]),
-
-                        Forms\Components\Section::make('Tanda Tangan Asesor')
-                            ->schema([self::assessorSignatureBlock()]),
                     ]),
             ]);
     }
 
-    // ====================== SIGNATURE HELPER ======================
-    private static function signatureRepeater(string $key, string $label): Forms\Components\Repeater
+    protected static function populateIa10Data($state, callable $set, callable $get = null, bool $isUpdate = false)
     {
-        return Forms\Components\Repeater::make("document_control.{$key}")
-            ->label('')
-            ->schema([self::signatureSchema($label)])
-            ->minItems(2)
-            ->maxItems(2)
-            ->disableItemCreation()
-            ->disableItemDeletion()
-            ->default([[], []]);
-    }
+        $reg = AssessmentRegistration::with([
+            'scheme.competencyUnits.workGroup',
+            'candidate',
+            'assessor'
+        ])->find($state);
 
-    private static function signatureSchema(string $label): Forms\Components\Group
-    {
-        return Forms\Components\Group::make()
-            ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->label($label)
-                    ->options(User::role('asesor')->pluck('name', 'id'))
-                    ->live()
-                    ->searchable()
-                    ->preload()
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if ($user = User::find($state)) {
-                            $set('name', $user->name);
-                            $set('reg_number', $user->registration_number ?? '');
-                            $set('date', now()->format('d-m-Y'));
+        if ($reg) {
+            $set('main_data.header.certification_scheme', $reg->scheme?->name);
+            $set('main_data.header.scheme_number', $reg->scheme?->code);
+            $set('main_data.header.tuk', $reg->tuk ?? '');
+            $set('main_data.header.assessor_name', $reg->assessor?->name);
+            $set('main_data.header.assessee_name', $reg->candidate?->name);
 
-                            $sig = UserSignature::where('user_id', $user->id)->first()
-                                ?? UserSignature::where('name', $user->name)->first();
+            if ($get && !$get('main_data.header.date')) {
+                $set('main_data.header.date', now()->format('d-m-Y'));
+            }
 
-                            if ($sig) {
-                                $set('signature', self::resolveSignatureUrl($sig->signature_image));
-                            }
-                        }
-                    }),
+            // Only repopulate work_groups if empty, missing units, or user changed registration
+            $existingGroups = $get ? (array) $get('main_data.work_groups') : [];
+            $hasUnits = false;
+            foreach ($existingGroups as $group) {
+                if (!empty($group['units'])) {
+                    $hasUnits = true;
+                    break;
+                }
+            }
 
-                Forms\Components\Hidden::make('name'),
-                Forms\Components\Hidden::make('reg_number'),
-                Forms\Components\Hidden::make('date'),
-                Forms\Components\Hidden::make('signature'),
+            if (($isUpdate || empty($existingGroups) || !$hasUnits) && $reg->scheme) {
+                $units = $reg->scheme->competencyUnits;
+                $grouped = $units->groupBy(fn($u) => $u->workGroup?->name ?? 'Lainnya');
 
-                Forms\Components\Placeholder::make('sig_preview')
-                    ->label('')
-                    ->content(fn($get) => self::renderSignaturePreview($get, $label)),
-            ]);
-    }
-
-    private static function assessorSignatureBlock(): Forms\Components\Section
-    {
-        return Forms\Components\Section::make('Asesor')
-            ->statePath('fria10_data.overall_conclusion')
-            ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->label('Pilih Asesor')
-                    ->options(User::role('asesor')->pluck('name', 'id'))
-                    ->live()
-                    ->searchable()
-                    ->preload()
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if ($user = User::find($state)) {
-                            $set('assessor_signature', $user->name);
-                            $set('date', now()->format('d-m-Y'));
-                        }
-                    }),
-                Forms\Components\Hidden::make('assessor_signature'),
-                Forms\Components\Hidden::make('date'),
-                Forms\Components\Placeholder::make('preview')->content(fn($get) => self::renderSignaturePreview($get, 'Asesor')),
-            ]);
-    }
-
-    private static function resolveSignatureUrl(?string $path): ?string
-    {
-        if (!$path) return null;
-        if (str_starts_with($path, 'data:') || str_starts_with($path, 'http')) return $path;
-        $normalized = preg_replace('#^/?storage/#', '', $path);
-        return Storage::url($normalized);
-    }
-
-    private static function renderSignaturePreview($get, string $role): HtmlString
-    {
-        $name = $get('name') ?? $get('assessor_signature') ?? '';
-        if (!$name) {
-            return new HtmlString('<div class="text-gray-400 italic text-sm">Pilih ' . $role . ' untuk preview</div>');
+                $workGroups = [];
+                foreach ($grouped as $wgName => $wgUnits) {
+                    $workGroups[] = [
+                        'group_name' => $wgName,
+                        'units' => $wgUnits->map(fn($u, $idx) => [
+                            'no' => $idx + 1,
+                            'unit_code' => $u->unit_code,
+                            'unit_title' => $u->unit_title,
+                        ])->toArray(),
+                    ];
+                }
+                $set('main_data.work_groups', $workGroups);
+            }
         }
-
-        $regNumber = $get('reg_number') ?? 'N/A';
-        $date = $get('date') ?? now()->format('d-m-Y');
-        $signature = $get('signature');
-
-        $imgHtml = $signature
-            ? "<img src='" . htmlspecialchars($signature) . "' style='max-height:70px;object-fit:contain;' />"
-            : "<div style='font-size:11px;color:#dc2626;font-style:italic;'>Tanda tangan belum diunggah</div>";
-
-        $html = "
-        <div style='font-family: system-ui, sans-serif; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; max-width: 480px; color: #0f172a;'>
-            <div style='padding: 8px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;'>
-                <span style='font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: #64748b;'>{$role}</span>
-            </div>
-            <div style='padding: 20px;'>
-                <div style='display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0;'>
-                    <div style='flex: 1;'>
-                        <p style='font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 4px;'>Nama Lengkap</p>
-                        <p style='font-size: 16px; font-weight: 600; margin: 0 0 14px;'>{$name}</p>
-                        <p style='font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 6px;'>No. Registrasi MET</p>
-                        <span style='font-size: 13px; font-weight: 500; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 12px; font-family: monospace;'>{$regNumber}</span>
-                    </div>
-                </div>
-                <div style='display: grid; grid-template-columns: 1fr 130px; gap: 16px;'>
-                    <div>
-                        <p style='font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;'>Tanda Tangan</p>
-                        <div style='height: 110px; border: 1px dashed #e2e8f0; border-radius: 12px; background: #f8fafc; display: flex; align-items: center; justify-content: center; position: relative;'>
-                            <div style='position: relative; z-index: 10;'>{$imgHtml}</div>
-                        </div>
-                    </div>
-                    <div>
-                        <p style='font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; text-align: center;'>Tanggal</p>
-                        <div style='height: 110px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;'>
-                            <p style='font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em;'>Ditetapkan</p>
-                            <p style='font-size: 15px; font-weight: 600; font-family: monospace;'>{$date}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>";
-
-        return new HtmlString($html);
     }
 
     public static function table(Table $table): Table

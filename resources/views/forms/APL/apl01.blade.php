@@ -98,7 +98,7 @@
             border: 1px solid #000;
             vertical-align: middle;
         }
-        
+
         .checkbox-checked {
             display: inline-block;
             width: 11px;
@@ -252,7 +252,8 @@
             <td class="lbl" style="vertical-align:top; padding-top:3px;"></td>
             <td class="colon" style="vertical-align:top; padding-top:3px;"></td>
             <td class="val" style="vertical-align:top; padding-top:3px;">
-                {{ $rt_rw ? 'RT/RW ' . $rt_rw . ', ' : '' }}{{ $kelurahan }}, {{ $kecamatan }}</td>
+                {{ $rt_rw ? 'RT/RW ' . $rt_rw . ', ' : '' }}{{ $kelurahan }}, {{ $kecamatan }}
+            </td>
         </tr>
         {{-- Alamat baris 3 + kode pos --}}
         <tr>
@@ -637,13 +638,24 @@
                     </tr>
                     <tr>
                         <td style="border-bottom:1px solid #000; padding:4px 6px;">Nama :</td>
-                        <td style="border-bottom:1px solid #000; padding:4px 6px;"></td>
+                        <td style="border-bottom:1px solid #000; padding:4px 6px;">{{ $asesor_name }}</td>
                     </tr>
                     <tr>
-                        <td style="padding:4px 6px; height:50px; vertical-align:top;">
+                        <td style="border-bottom:1px solid #000; padding:4px 6px;">No. Reg :</td>
+                        <td style="border-bottom:1px solid #000; padding:4px 6px;">{{ $asesor_reg }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px 6px; height:80px; vertical-align:top;">
                             Tanda tangan/<br>Tanggal
                         </td>
-                        <td style="padding:4px 6px;"></td>
+                        <td style="padding:4px 6px; vertical-align:middle; text-align:center;">
+                            @if($asesor_qr_code)
+                                <img src="{{ $asesor_qr_code }}" style="width:50px; height:50px; vertical-align: middle;">
+                            @endif
+                            <div style="vertical-align: middle; margin-left: 10px; font-size: 8pt; margin-top: 6px;">
+                                {{ $asesor_sign_date }}
+                            </div>
+                        </td>
                     </tr>
                 </table>
             </td>

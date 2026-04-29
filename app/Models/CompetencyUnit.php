@@ -18,6 +18,11 @@ class CompetencyUnit extends Model
         return $this->belongsTo(Scheme::class);
     }
 
+    public function workGroup()
+    {
+        return $this->belongsTo(WorkGroup::class);
+    }
+
     public function competencyElements()
     {
         return $this->hasMany(CompetencyElement::class, 'competency_unit_id');

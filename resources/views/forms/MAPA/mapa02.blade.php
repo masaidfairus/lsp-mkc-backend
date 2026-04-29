@@ -16,11 +16,10 @@
             font-family: Arial, Helvetica, sans-serif;
             font-size: 9pt;
             color: #000;
-            padding: 4rem
+            padding: 4rem;
         }
-
         @page {
-            margin: 1.8cm 2cm 1.8cm 2cm;
+            margin: 1.5cm 2cm 1.5cm 2cm;
             size: A4 portrait;
         }
 
@@ -34,23 +33,17 @@
             margin-bottom: 10px;
             letter-spacing: 0.3px;
         }
-
-        /* Skema */
         .tbl-skema {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 14px;
-            table-layout: fixed;
+            margin-bottom: 15px;
         }
 
         .tbl-skema td {
             border: 1px solid #000;
             padding: 5px 7px;
             vertical-align: middle;
-            font-size: 9pt;
         }
-
-        /* Tabel unit list */
         .tbl-unit {
             width: 100%;
             border-collapse: collapse;
@@ -74,6 +67,8 @@
             vertical-align: middle;
             word-wrap: break-word;
         }
+        .tbl-unit th { border: 1px solid #000; padding: 5px; background: #ddd; font-weight: bold; }
+        .tbl-unit td { border: 1px solid #000; padding: 5px 7px; }
 
         /* Tabel instrumen asesmen */
         .tbl-instrumen {
@@ -176,13 +171,11 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            font-size: 8.5pt;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .tbl-footer td {
             border: 1px solid #000;
-            padding: 5px 8px;
             vertical-align: middle;
         }
 
