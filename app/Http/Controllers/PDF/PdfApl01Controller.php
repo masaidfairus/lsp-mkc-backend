@@ -20,9 +20,9 @@ class PdfApl01Controller extends Controller
     public function show(Request $request, AssessmentRegistration $registration)
     {
 
-       if ($registration->status_apl01 !== Apl01Status::APPROVED) {
-        return app(\App\Http\Controllers\PdfFallbackController::class)->show($registration, 'Dokumen APL.01 Belum Siap', 'Dokumen APL.01 belum dapat dicetak karena status APL.01 masih dalam proses persetujuan.');
-    }
+        if (!$registration->status->isApl01Complete()) {
+            return app(\App\Http\Controllers\PdfFallbackController::class)->show($registration, 'Dokumen APL.01 Belum Siap', 'Dokumen APL.01 belum dapat dicetak karena status APL.01 masih dalam proses persetujuan.');
+        }
 
         // ── Otorisasi ────────────────────────────────────────────────
         $user = $request->user();
@@ -135,7 +135,7 @@ class PdfApl01Controller extends Controller
             'asesor_reg' => $this->getAssessorSignatureData($registration->assessor)['reg_number'],
             'asesor_qr_code' => $this->getAssessorSignatureData($registration->assessor)['qr_code'],
             'asesor_name' => $registration->assessor?->name ?? '',
-            'asesor_sign_date' => $registration->status_apl01 === Apl01Status::APPROVED ? $this->convertDateToLocalTime($registration->updated_at) : '',
+            'asesor_sign_date' => $registration->status->isApl01Complete() ? $this->convertDateToLocalTime($registration->updated_at) : '',
         ];
 
         // ── Render & stream PDF ──────────────────────────────────────

@@ -28,7 +28,7 @@ class ProfileController extends Controller
             'address' => ['required', 'string', 'max:1000'],
             'home_postal_code' => ['required', 'numeric', 'digits:5', 'between:10000,99999'],
             'phone_number' => ['required', 'string', 'regex:/^(\+62|0)8[1-9][0-9]{6,10}$/'],
-            'education_qualifications' => ['required', 'string', 'max:255'],
+            'education_id' => ['required', 'exists:master_education,id'],
             'company_name' => ['required', 'string', 'max:255'],
             'job_title' => ['required', 'string', 'max:255'],
             'company_address' => ['required', 'string', 'max:1000'],

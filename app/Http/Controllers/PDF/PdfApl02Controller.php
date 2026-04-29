@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AssessmentRegistration;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Enums\Apl02Status;
+use App\Enums\AssessmentStatus;
 
 class PdfApl02Controller extends Controller
 {
@@ -42,7 +42,7 @@ class PdfApl02Controller extends Controller
             'nama_asesor' => $assessor?->name ?? 'Belum Ditugaskan',
             'no_reg_asesor' => $signatureData['reg_number'],
             'asesor_qr_code' => $signatureData['qr_code'],
-            'asesor_date' => $registration->status_apl02 === Apl02Status::APPROVED ? $this->convertDateToLocalTime($registration->updated_at) : '',
+            'asesor_date' => $registration->status->isApl02Complete() ? $this->convertDateToLocalTime($registration->updated_at) : '',
             'unit_kompetensi' => $scheme->competencyUnits ?? [],
             'asesmen_mandiri' => $selfAssessments ?? [],
             'portfolios' => $portfolios,

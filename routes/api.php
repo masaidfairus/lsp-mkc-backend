@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Asesi\BankAccountController;
 use App\Http\Controllers\Asesi\DocumentProfileController;
+use App\Http\Controllers\Asesi\MasterEducationController;
 use App\Http\Controllers\Asesi\PaymentController;
 use App\Http\Controllers\Asesi\RegistrationController;
 use App\Http\Controllers\PDF\PdfApl01Controller;
@@ -58,6 +59,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Skema Publik
     Route::apiResource('schemes', SchemeController::class)->only([
+        'index',
+        'show'
+    ]);
+
+    Route::apiResource('master-education', MasterEducationController::class)->only([
         'index',
         'show'
     ]);

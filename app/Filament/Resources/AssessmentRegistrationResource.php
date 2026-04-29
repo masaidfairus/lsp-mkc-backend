@@ -32,7 +32,7 @@ class AssessmentRegistrationResource extends Resource
     {
         $query =  parent::getEloquentQuery();
 
-        if (!auth()->user()->hasRole('admin') || !auth()->user()->hasRole('super_admin')) {
+        if (!auth()->user()->hasRole('super_admin')) {
             $query->where('assessor_id', auth()->id());
         }
         

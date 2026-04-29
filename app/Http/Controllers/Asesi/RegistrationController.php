@@ -104,7 +104,7 @@ class RegistrationController extends Controller
     }
 
     // Opsional: Cek apakah boleh dibatalkan
-    if (in_array($registration->status_apl01?->value, ['approved', 'submitted'])) {
+    if ($registration->status?->isApl01Complete()) {
         return response()->json([
             'message' => 'Pengajuan yang sudah diproses tidak dapat dibatalkan'
         ], 403);
