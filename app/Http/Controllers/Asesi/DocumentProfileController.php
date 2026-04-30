@@ -41,17 +41,18 @@ class DocumentProfileController extends Controller
     {
         $user = $request->user();
 
-        // Asesi hanya bisa akses milik sendiri
-        // Admin bisa akses semua
-
-        if ($user->role !== 'admin') {
-            $document->where('user_id', $user->id);
+        if ($user->role !== 'admin' && $document->getAttribute('user_id') !== $user->id) {
+            return $this->errorResponse('E1005', 403);
         }
 
-        $file = $document->firstOrFail();
+        $path = $document->getAttribute('upload_document');
 
-        $content = Storage::disk('local')->get($file->upload_document);
-        $mimeType = mime_content_type(Storage::disk('local')->path($file->upload_document));
+        if (!$path || !Storage::disk('local')->exists($path)) {
+            return $this->errorResponse('E4004', 404);
+        }
+
+        $content = Storage::disk('local')->get($path);
+        $mimeType = mime_content_type(Storage::disk('local')->path($path));
 
         return response($content)->header('Content-Type', $mimeType);
     }

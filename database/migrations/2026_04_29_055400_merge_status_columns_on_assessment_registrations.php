@@ -25,7 +25,7 @@ return new class extends Migration
     {
         // ── 1. Add nullable status column ────────────────────────────
         Schema::table('assessment_registrations', function (Blueprint $table) {
-            $table->string('status')->nullable()->after('status_apl02')->index();
+            $table->string('status')->nullable()->after('certification_purpose');
         });
 
         // ── 2. Backfill using priority CASE logic ─────────────────────

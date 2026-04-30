@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Asesi;
 use App\Http\Controllers\Controller;
 use App\Enums\AssessmentStatus;
 use App\Enums\CertificationPurpose;
-use App\Enums\FileContext;
 use App\Enums\Gender;
 use App\Enums\PaymentStatus;
 use App\Models\AdministrativeProof;
