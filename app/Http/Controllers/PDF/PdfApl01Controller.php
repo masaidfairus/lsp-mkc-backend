@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\PDF;
 
 use App\Enums\Apl01Status;
+use App\Enums\AssessmentStatus;
 use App\Models\AssessmentRegistration;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -40,6 +41,11 @@ class PdfApl01Controller extends Controller
         
         if (!$isAuthorized) {
             return response()->json(['message' => 'Forbidden.'], 403);
+        }
+
+        // ── Validasi status ──────────────────────────────────────────
+        if ($registration->status === AssessmentStatus::APL01_DRAFT) {
+            return response()->json(['message' => 'APL-01 belum disubmit.'], 422);
         }
 
         // ── Load semua relasi sekaligus (N+1 safe) ───────────────────
@@ -108,14 +114,15 @@ class PdfApl01Controller extends Controller
                     'status' => $file->status,
                 ])->values()->toArray(),
             'status_terima' => match (true) {
-                $registration->status_apl01 === Apl01Status::APPROVED => 'DITERIMA',
-                $registration->status_apl01 === Apl01Status::REJECTED => 'DITOLAK',
+                $registration->status === AssessmentStatus::APL01_APPROVED,
+                $registration->status->isApl01Complete() => 'DITERIMA',
+                $registration->status === AssessmentStatus::APL01_REJECTED => 'DITOLAK',
                 default => 'DIPROSES',
             },
             'asesor_reg' => $signatureData['reg_number'],
             'asesor_qr_code' => $signatureData['qr_code'],
             'asesor_name' => $registration->assessor?->name ?? '',
-            'asesor_sign_date' => $registration->status_apl01 === Apl01Status::APPROVED ? $this->convertDateToLocalTime($registration->updated_at) : '',
+            'asesor_sign_date' => $registration->status->isApl01Complete() ? $this->convertDateToLocalTime($registration->updated_at) : '',
         ];
 
         $pdf = Pdf::loadView('forms.APL.apl01', $data)

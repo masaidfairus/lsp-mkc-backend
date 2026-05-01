@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Asesi;
 
 use App\Http\Controllers\Controller;
-use App\Enums\Apl01Status;
+use App\Enums\AssessmentStatus;
 use App\Enums\CertificationPurpose;
-use App\Enums\FileContext;
 use App\Enums\Gender;
 use App\Enums\PaymentStatus;
 use App\Models\AdministrativeProof;
@@ -35,7 +34,7 @@ class Apl01Controller extends Controller
                 'address' => ['required', 'string', 'max:1000'],
                 'home_postal_code' => ['required', 'numeric', 'digits:5', 'between:10000,99999'],
                 'phone_number' => ['required', 'string', 'regex:/^(\+62|0)8[1-9][0-9]{6,10}$/'],
-                'education_qualifications' => ['required', 'string', 'max:255'],
+                'education_id' => ['required', 'exists:master_education,id'],
                 'company_name' => ['required', 'string', 'max:255'],
                 'job_title' => ['required', 'string', 'max:255'],
                 'company_address' => ['required', 'string', 'max:1000'],
@@ -70,7 +69,11 @@ class Apl01Controller extends Controller
 
             $registration = $user->registrations()->findOrFail($validated['registration_id']);
 
-            if ($registration->status_apl01 === Apl01Status::PENDING || $registration->status_apl01 === Apl01Status::PAID || $registration->status_apl01 === Apl01Status::APPROVED) {
+            if (in_array($registration->status, [
+                AssessmentStatus::APL01_PENDING,
+                AssessmentStatus::APL01_PAID,
+                AssessmentStatus::APL01_APPROVED,
+            ])) {
                 return $this->errorResponse('E2017', 403);
             }
 
@@ -143,7 +146,11 @@ class Apl01Controller extends Controller
                 return $this->errorResponse('E2008', 403);
             }
 
-            if ($registration->status_apl01 === Apl01Status::PENDING || $registration->status_apl01 === Apl01Status::PAID || $registration->status_apl01 === Apl01Status::APPROVED) {
+            if (in_array($registration->status, [
+                AssessmentStatus::APL01_PENDING,
+                AssessmentStatus::APL01_PAID,
+                AssessmentStatus::APL01_APPROVED,
+            ])) {
                 return $this->errorResponse('E2017', 403);
             }
 
@@ -225,7 +232,11 @@ class Apl01Controller extends Controller
 
             $registration = $user->registrations()->findOrFail($validated['registration_id']);
 
-            if ($registration->status_apl01 === Apl01Status::PENDING || $registration->status_apl01 === Apl01Status::PAID || $registration->status_apl01 === Apl01Status::APPROVED) {
+            if (in_array($registration->status, [
+                AssessmentStatus::APL01_PENDING,
+                AssessmentStatus::APL01_PAID,
+                AssessmentStatus::APL01_APPROVED,
+            ])) {
                 return $this->errorResponse('E2017', 403);
             }
 
@@ -268,7 +279,7 @@ class Apl01Controller extends Controller
             });
 
             $registration->update([
-                'status_apl01' => Apl01Status::PENDING,
+                'status' => AssessmentStatus::APL01_PENDING,
             ]);
 
             $isPribadi = $user->profile->asesi_type === 'pribadi';
@@ -318,7 +329,7 @@ class Apl01Controller extends Controller
             'registration_id' => $registration->id,
             'asesi_type' => $profile->asesi_type,
             'institution_name' => $profile->institution_name,
-            'status_apl01' => $registration->status_apl01,
+            'status' => $registration->status,
             'certification_purpose' => $registration->certification_purpose,
             'scheme' => $registration->scheme?->only('id', 'code', 'name'),
             'apl_data' => $registration->aplData,

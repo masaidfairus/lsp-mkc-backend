@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\Role;
 use App\Enums\Apl01Status;
 use App\Enums\Apl02Status;
+use App\Enums\Role;
+use App\Enums\AssessmentStatus;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\PortfolioFilesRelationManager;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\SelfAssessmentRelationManager;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\EvidenceRelationManager;
@@ -519,6 +520,10 @@ class AssessmentRegistrationResource extends Resource
                     ->label('Catatan Admin')
                     ->placeholder('Tambah catatan...')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Daftar')
                     ->dateTime()
@@ -526,7 +531,10 @@ class AssessmentRegistrationResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
+                    ->options(AssessmentStatus::class)
+                    ->native(false),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

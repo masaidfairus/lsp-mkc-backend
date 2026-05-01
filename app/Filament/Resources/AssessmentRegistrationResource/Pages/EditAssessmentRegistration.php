@@ -15,38 +15,35 @@ class EditAssessmentRegistration extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('accept')
-                ->label('Setujui APL.01')
+            Actions\Action::make('accept_apl01')
+                ->label('Terima APL-01')
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
                 ->requiresConfirmation()
-                ->action(function(\App\Models\AssessmentRegistration $record) {
-                    $record->update(['status_apl01' => \App\Enums\Apl01Status::APPROVED->value]);
-                    $this->syncAplSignatures($record);
-                    \Filament\Notifications\Notification::make()->title('APL.01 Disetujui & Permintaan TTD Terkirim')->success()->send();
-                })
-                ->visible(fn(\App\Models\AssessmentRegistration $record) => $record->status_apl01 !== \App\Enums\Apl01Status::APPROVED),
-            Actions\Action::make('decline')
-                ->label('Tolak APL.01')
+                ->action(fn(\App\Models\AssessmentRegistration $record) => $record->update(['status' => \App\Enums\AssessmentStatus::APL01_APPROVED]))
+                ->visible(fn(\App\Models\AssessmentRegistration $record) => $record->status->isApl01Pending()),
+            Actions\Action::make('decline_apl01')
+                ->label('Tolak APL-01')
                 ->icon('heroicon-o-x-circle')
                 ->color('danger')
                 ->requiresConfirmation()
-                ->action(fn(\App\Models\AssessmentRegistration $record) => $record->update(['status_apl01' => \App\Enums\Apl01Status::REJECTED->value]))
-                ->visible(fn(\App\Models\AssessmentRegistration $record) => $record->status_apl01 !== \App\Enums\Apl01Status::REJECTED),
-            \Filament\Actions\Action::make('sync_signatures')
-                ->label('Sinkronkan TTD Asesor')
-                ->icon('heroicon-o-arrow-path')
-                ->color('warning')
+                ->action(fn(\App\Models\AssessmentRegistration $record) => $record->update(['status' => \App\Enums\AssessmentStatus::APL01_REJECTED]))
+                ->visible(fn(\App\Models\AssessmentRegistration $record) => $record->status->isApl01Pending()),
+            Actions\Action::make('accept_apl02')
+                ->label('Terima APL-02')
+                ->icon('heroicon-o-check-badge')
+                ->color('success')
                 ->requiresConfirmation()
-                ->action(function () {
-                    $this->syncAplSignatures($this->record);
-                    \Filament\Notifications\Notification::make()
-                        ->title('Sinkronisasi Berhasil')
-                        ->body('Permintaan tanda tangan untuk Asesor telah diperbarui sesuai status APL.')
-                        ->success()
-                        ->send();
-                }),
-            \Filament\Actions\DeleteAction::make(),
+                ->action(fn(\App\Models\AssessmentRegistration $record) => $record->update(['status' => \App\Enums\AssessmentStatus::APL02_APPROVED]))
+                ->visible(fn(\App\Models\AssessmentRegistration $record) => $record->status === \App\Enums\AssessmentStatus::APL02_SUBMITTED),
+            Actions\Action::make('decline_apl02')
+                ->label('Tolak APL-02')
+                ->icon('heroicon-o-x-circle')
+                ->color('danger')
+                ->requiresConfirmation()
+                ->action(fn(\App\Models\AssessmentRegistration $record) => $record->update(['status' => \App\Enums\AssessmentStatus::APL02_REJECTED]))
+                ->visible(fn(\App\Models\AssessmentRegistration $record) => $record->status === \App\Enums\AssessmentStatus::APL02_SUBMITTED),
+            Actions\DeleteAction::make(),
         ];
     }
 

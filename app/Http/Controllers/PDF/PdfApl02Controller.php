@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AssessmentRegistration;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Enums\Apl02Status;
+use App\Enums\AssessmentStatus;
 
 class PdfApl02Controller extends Controller
 {

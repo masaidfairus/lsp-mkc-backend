@@ -17,7 +17,7 @@ class Apl01Data extends Model
         'address',
         'home_postal_code',
         'phone_number',
-        'education_qualifications',
+        'education_id',
         'company_name',
         'job_title',
         'company_address',
@@ -33,5 +33,10 @@ class Apl01Data extends Model
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class);
+    }
+
+    public function education()
+    {
+        return $this->belongsTo(MasterEducation::class, 'education_id');
     }
 }
