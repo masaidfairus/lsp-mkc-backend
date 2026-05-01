@@ -59,10 +59,18 @@ class SelfAssessmentRelationManager extends RelationManager
             ]);
     }
 
+    public function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()->with([
+            'element.competencyUnit',
+            'element.performanceCriteria'
+        ]);
+    }
+
     public function table(Table $table): Table
     {
         return $table
-            ->paginated(false)
+            ->paginated([10, 25, 50])
             ->recordTitleAttribute('is_competent')
             ->columns([
                 Tables\Columns\TextColumn::make('element.competencyUnit.unit_title')

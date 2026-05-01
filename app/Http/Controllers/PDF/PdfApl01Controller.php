@@ -14,8 +14,8 @@ class PdfApl01Controller extends Controller
 {
     public function show(Request $request, AssessmentRegistration $registration)
     {
-        // ── Validasi status APL.01 ───────────────────────────────────
-        if ($registration->status_apl01 !== Apl01Status::APPROVED) {
+        // ── Validasi status APL.01 (Menggunakan Enum baru) ───────────
+        if (!$registration->status->isApl01Complete()) {
             return app(\App\Http\Controllers\PdfFallbackController::class)->show(
                 $registration, 
                 'Dokumen APL.01 Belum Siap', 
@@ -100,15 +100,15 @@ class PdfApl01Controller extends Controller
                 ])
                 ->toArray(),
             'persyaratan_dasar' => $files->filter(function ($file) use ($scheme) {
-                return $file->documentList?->basicRequirementProof()
+                return $file->documentList && $file->documentList->basicRequirementProof
                     ->where('scheme_id', $scheme->id)
-                    ->exists();
+                    ->isNotEmpty();
             })->map(fn($file) => [
                     'nama' => $file->documentList->title,
                     'status' => $file->status,
                 ])->values()->toArray(),
             'bukti_administratif' => $files->filter(function ($file) {
-                return $file->documentList?->administrativeProof()->exists();
+                return $file->documentList && $file->documentList->administrativeProof->isNotEmpty();
             })->map(fn($file) => [
                     'nama' => $file->documentList->title,
                     'status' => $file->status,

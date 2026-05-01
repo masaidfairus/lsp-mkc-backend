@@ -25,17 +25,21 @@ class PdfApl02Controller extends Controller
         $schemeId = $scheme->id;
         $assessor = $registration->assessor;
 
+        // ── Validasi status APL.02 (Menggunakan Enum baru) ───────────
+        if ($registration->status !== AssessmentStatus::APL02_SUBMITTED && !$registration->status->isApl02Complete()) {
+            return app(\App\Http\Controllers\PdfFallbackController::class)->show(
+                $registration, 
+                'Dokumen APL.02 Belum Siap', 
+                'Dokumen FR.APL.02 belum dapat dicetak karena status APL.02 masih dalam proses pengisian atau belum disubmit oleh Asesi.'
+            );
+        }
+
         if (!$assessor) {
             return app(\App\Http\Controllers\PdfFallbackController::class)->show($registration, 'Asesor Belum Ditugaskan', 'Dokumen APL.02 belum dapat dicetak karena Asesor belum ditugaskan untuk pendaftaran ini.');
         }
         $selfAssessments = collect($registration->selfAssessments)->keyBy('element_id');
 
-        // Ambil file secara manual lewat Model FileProfile agar filter lebih transparan
-        $portfolios = \App\Models\FileProfile::where('user_id', $userId)
-            ->whereHas('documentList.portfolioScheme', function ($q) use ($schemeId) {
-                $q->where('scheme_id', $schemeId);
-            })
-            ->get();
+        $portfolios = $registration->portfolioFiles;
 
         // ── Validasi Tanda Tangan Asesor (Kecuali untuk Admin/Asesor Peninjau) ───
         $asesorSig = $this->getUserSignature($registration->assessor?->id, $registration->id, 'APL.02', true);

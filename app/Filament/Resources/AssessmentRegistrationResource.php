@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 class AssessmentRegistrationResource extends Resource
 {
     protected static ?string $model = AssessmentRegistration::class;
+    protected static ?string $globalSearchEloquentKey = null;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'Pendaftaran Sertifikasi';
@@ -66,7 +67,7 @@ class AssessmentRegistrationResource extends Resource
                                             ->relationship('assessor', 'name', fn(Builder $query) => $query->role(Role::ASESOR->value))
                                             ->label('Asesor')
                                             ->searchable()
-                                            ->preload(),
+                                            ->preload(false),
                                         Forms\Components\Select::make('status_apl01')
                                             ->options([
                                                 Apl01Status::PENDING->value => Apl01Status::PENDING->getLabel(),
@@ -93,7 +94,7 @@ class AssessmentRegistrationResource extends Resource
                                             ->options(Apl02Status::class)
                                             ->label('Status APL.02')
                                             ->required()
-                                            ->visible(fn ($record) => $record && $record->selfAssessments->isNotEmpty()),
+                                            ->visible(fn ($record) => $record && $record->status_apl02 !== null),
                                     ])->columns(1),
                             ]),
                         
@@ -500,9 +501,17 @@ class AssessmentRegistrationResource extends Resource
     }
 
 
+    public static function getEloquentQuery(): Builder
+    {
+        // Hanya ambil kolom ID dan Nama dari relasi asesi & skema agar query super ringan
+        return parent::getEloquentQuery()->with(['candidate:id,name', 'scheme:id,name']);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
+            ->deferLoading()
+            ->defaultPaginationPageOption(10)
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('Registration ID')
@@ -516,9 +525,9 @@ class AssessmentRegistrationResource extends Resource
                     ->label('Skema')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextInputColumn::make('admin_notes')
+                Tables\Columns\TextColumn::make('admin_notes')
                     ->label('Catatan Admin')
-                    ->placeholder('Tambah catatan...')
+                    ->limit(50)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')

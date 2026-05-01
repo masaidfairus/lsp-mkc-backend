@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('competency_units', function (Blueprint $table) {
-            $table->foreignId('work_group_id')->nullable()->constrained('work_groups');
+        Schema::create('notifications', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('type');
+            $table->morphs('notifiable');
+            $table->text('data');
+            $table->timestamp('read_at')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -21,8 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('competency_units', function (Blueprint $table) {
-            $table->dropColumn('work_group_id');
-        });
+        Schema::dropIfExists('notifications');
     }
 };

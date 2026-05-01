@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 class SignatureInboxResource extends Resource
 {
     protected static ?string $model = AssessmentRegistration::class;
+    protected static ?string $globalSearchEloquentKey = null;
     protected static ?string $navigationIcon = 'heroicon-o-inbox-arrow-down';
     protected static ?string $navigationGroup = 'Permintaan TTD';
     protected static ?string $navigationLabel = 'Permintaan TTD Saya';
@@ -25,10 +26,18 @@ class SignatureInboxResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         // Hanya tampilkan pendaftaran yang memiliki permintaan tanda tangan PENDING untuk user ini
-        return parent::getEloquentQuery()->whereHas('signatureRequests', function (Builder $query) {
-            $query->where('user_id', auth()->id())
-                ->where('status', 'pending');
-        });
+        // Gunakan withCount agar penghitungan dilakukan dalam satu query (efisien)
+        // Gunakan with untuk eager loading relasi asesi dan skema
+        return parent::getEloquentQuery()
+            ->with(['candidate', 'scheme'])
+            ->withCount(['signatureRequests as pending_requests_count' => function (Builder $query) {
+                $query->where('user_id', auth()->id())
+                    ->where('status', 'pending');
+            }])
+            ->whereHas('signatureRequests', function (Builder $query) {
+                $query->where('user_id', auth()->id())
+                    ->where('status', 'pending');
+            });
     }
 
     public static function form(Form $form): Form
@@ -50,17 +59,10 @@ class SignatureInboxResource extends Resource
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Skema')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('requests_count')
+                Tables\Columns\TextColumn::make('pending_requests_count')
                     ->label('Dokumen Menunggu')
-                    ->counts('signatureRequests')
                     ->badge()
-                    ->color('warning')
-                    ->getStateUsing(function ($record) {
-                        return $record->signatureRequests()
-                            ->where('user_id', auth()->id())
-                            ->where('status', 'pending')
-                            ->count();
-                    }),
+                    ->color('warning'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Pendaftaran')
                     ->dateTime()
