@@ -13,7 +13,9 @@ class PdfMapa02Controller extends Controller
     public function show(Request $request, AssessmentRegistration $registration)
     {
         $user = $request->user();
-        if (!in_array($user?->role ?? '', ['admin', 'asesor'])) {
+        $isAuthorized = $this->isAuthorizedReviewer($user, $registration) || ($user && $user->id === $registration->user_id);
+        
+        if (!$isAuthorized) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
@@ -89,6 +91,37 @@ class PdfMapa02Controller extends Controller
             'validator_date' => $validatorDate,
             'validator_qr_code' => $validatorQr,
         ];
+
+                // --- Inject Signatures for Compilers & Validators ---
+        if (isset($data['compilers']) && is_array($data['compilers'])) {
+            foreach ($data['compilers'] as &$c) {
+                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+                $c['signature'] = $sig['signature'];
+                $c['qr_code']   = $sig['qr_code'];
+            }
+        }
+        if (isset($data['penyusun']) && is_array($data['penyusun'])) {
+            foreach ($data['penyusun'] as &$c) {
+                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+                $c['signature'] = $sig['signature'];
+                $c['qr_code']   = $sig['qr_code'];
+            }
+        }
+        if (isset($data['validators']) && is_array($data['validators'])) {
+            foreach ($data['validators'] as &$v) {
+                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+                $v['signature'] = $sig['signature'];
+                $v['qr_code']   = $sig['qr_code'];
+            }
+        }
+        if (isset($data['validator']) && is_array($data['validator'])) {
+            foreach ($data['validator'] as &$v) {
+                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+                $v['signature'] = $sig['signature'];
+                $v['qr_code']   = $sig['qr_code'];
+            }
+        }
+        // ----------------------------------------------------
 
         $pdf = Pdf::loadView('forms.mapa.mapa02', $data)
             ->setPaper('a4', 'portrait')

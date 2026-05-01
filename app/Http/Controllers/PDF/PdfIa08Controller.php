@@ -14,7 +14,9 @@ class PdfIa08Controller extends Controller
     public function show(Request $request, AssessmentRegistration $registration)
     {
         $user = $request->user();
-        if (!in_array($user?->role ?? '', ['admin', 'asesor'])) {
+        $isAuthorized = $this->isAuthorizedReviewer($user, $registration) || ($user && $user->id === $registration->user_id);
+        
+        if (!$isAuthorized) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
@@ -27,10 +29,21 @@ class PdfIa08Controller extends Controller
             return app(\App\Http\Controllers\PdfFallbackController::class)->show($registration, 'Dokumen IA.08 Belum Siap', 'Dokumen FR.IA.08 belum dapat dicetak karena data belum lengkap atau belum diisi oleh Asesor/Admin.');
         }
 
+        // ── Validasi Tanda Tangan Asesor (Kecuali untuk Admin/Asesor Peninjau) ───
+        $asesorSig = $this->getUserSignature($registration->assessor?->id, $registration->id, 'IA.08', true);
+        $isAuthorizedReviewer = $this->isAuthorizedReviewer($request->user(), $registration);
+
+        if (!$asesorSig['is_signed'] && !$isAuthorizedReviewer) {
+            return app(\App\Http\Controllers\PdfFallbackController::class)->show(
+                $registration, 
+                'Dokumen IA.08 Belum Ditandatangani', 
+                'Dokumen FR.IA.08 belum dapat dicetak karena Asesor belum menandatangani dokumen ini di menu Inbox Tanda Tangan.'
+            );
+        }
+
         $registration->load(['candidate', 'scheme', 'assessor']);
 
         $asesiSig  = $this->getUserSignature($registration->candidate?->id ?? null);
-        $asesorSig = $this->getUserSignature($registration->assessor?->id ?? null);
 
         $mainData = $instrument->main_data ?? [];
         $header   = $mainData['header'] ?? [];
@@ -44,7 +57,7 @@ class PdfIa08Controller extends Controller
         $asesorSignature = $asesorSigData['signature'] ?? $asesorSig['signature'] ?? null;
         $asesorQrCode    = $asesorSigData['qr_code']   ?? $asesorSig['qr_code']   ?? null;
         $asesorName      = $asesorSigData['name']       ?? $registration->assessor?->name ?? '';
-        $asesorReg       = $asesorSigData['reg_number'] ?? $registration->assessor?->reg_number ?? '';
+        $asesorReg       = $asesorSigData['reg_number'] ?? $registration->assessor?->registration_number ?? '';
         $asesorDate      = $asesorSigData['date']       ?? $header['date'] ?? now()->format('d-m-Y');
 
         $formattedPortfolio = [];
@@ -94,6 +107,37 @@ class PdfIa08Controller extends Controller
             'validator' => $docControl['validators'] ?? [],
         ];
 
+                // --- Inject Signatures for Compilers & Validators ---
+        if (isset($data['compilers']) && is_array($data['compilers'])) {
+            foreach ($data['compilers'] as &$c) {
+                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+                $c['signature'] = $sig['signature'];
+                $c['qr_code']   = $sig['qr_code'];
+            }
+        }
+        if (isset($data['penyusun']) && is_array($data['penyusun'])) {
+            foreach ($data['penyusun'] as &$c) {
+                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+                $c['signature'] = $sig['signature'];
+                $c['qr_code']   = $sig['qr_code'];
+            }
+        }
+        if (isset($data['validators']) && is_array($data['validators'])) {
+            foreach ($data['validators'] as &$v) {
+                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+                $v['signature'] = $sig['signature'];
+                $v['qr_code']   = $sig['qr_code'];
+            }
+        }
+        if (isset($data['validator']) && is_array($data['validator'])) {
+            foreach ($data['validator'] as &$v) {
+                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+                $v['signature'] = $sig['signature'];
+                $v['qr_code']   = $sig['qr_code'];
+            }
+        }
+        // ----------------------------------------------------
+
         $pdf = Pdf::loadView('forms.IA.ia08', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
@@ -105,20 +149,5 @@ class PdfIa08Controller extends Controller
         $filename = 'FR_IA_08_' . str_replace([' ', '/', '\\'], '_', $data['nama_asesi']) . '_' . date('YmdHis') . '.pdf';
 
         return $pdf->stream($filename);
-    }
-
-    private function getUserSignature($userId)
-    {
-        if (!$userId) return ['signature' => null, 'qr_code' => null];
-
-        $sig = DB::table('user_signatures')
-            ->where('user_id', $userId)
-            ->latest('created_at')
-            ->first();
-
-        return $sig ? [
-            'signature' => $sig->signature,
-            'qr_code'   => $sig->qr_code,
-        ] : ['signature' => null, 'qr_code' => null];
     }
 }

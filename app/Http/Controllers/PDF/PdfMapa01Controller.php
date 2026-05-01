@@ -13,7 +13,9 @@ class PdfMapa01Controller extends Controller
     public function show(Request $request, AssessmentRegistration $registration)
     {
         $user = $request->user();
-        if (!in_array($user?->role ?? '', ['admin', 'asesor'])) {
+        $isAuthorized = $this->isAuthorizedReviewer($user, $registration) || ($user && $user->id === $registration->user_id);
+        
+        if (!$isAuthorized) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
@@ -149,6 +151,25 @@ class PdfMapa01Controller extends Controller
             'penyusun' => $penyusun,
             'validator' => $validator,
         ];
+
+        // --- Inject Signatures for Compilers & Validators ---
+        if (isset($data['penyusun']) && is_array($data['penyusun'])) {
+            foreach ($data['penyusun'] as &$c) {
+                $sig = $this->getUserSignature($c['user_id'] ?? null, $registration->id, 'Penyusun');
+                $c['signature'] = $sig['signature'];
+                $c['qr_code']   = $sig['qr_code'];
+                $c['date']      = $sig['is_signed'] ? $this->convertDateToLocalTime($sig['signed_at'] ?? now()) : '';
+            }
+        }
+        if (isset($data['validator']) && is_array($data['validator'])) {
+            foreach ($data['validator'] as &$v) {
+                $sig = $this->getUserSignature($v['user_id'] ?? null, $registration->id, 'Validator');
+                $v['signature'] = $sig['signature'];
+                $v['qr_code']   = $sig['qr_code'];
+                $v['date']      = $sig['is_signed'] ? $this->convertDateToLocalTime($sig['signed_at'] ?? now()) : '';
+            }
+        }
+        // ----------------------------------------------------
 
         $pdf = Pdf::loadView('forms.mapa.mapa01', $data)
             ->setPaper('a4', 'portrait')

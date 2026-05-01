@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class AssessmentInstrument extends Model
 {
@@ -21,5 +22,10 @@ class AssessmentInstrument extends Model
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class, 'registration_id');
+    }
+
+    public function signatureRequests(): MorphMany
+    {
+        return $this->morphMany(SignatureRequest::class, 'signable');
     }
 }

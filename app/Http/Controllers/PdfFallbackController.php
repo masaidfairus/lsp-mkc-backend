@@ -6,13 +6,16 @@ use App\Models\AssessmentRegistration;
 
 class PdfFallbackController extends Controller
 {
-    public function show(AssessmentRegistration $registration, $title = 'Belum Dapat Dicetak', $message = 'Dokumen ini belum dapat dicetak karena data belum lengkap atau belum diisi oleh Asesor/Admin.')
+    public function show($registration, $title = 'Dokumen Belum Siap', $message = 'Dokumen belum dapat dicetak.')
     {
-        return view('components.status-page-fallback', [
+        $isSignatureError = str_contains(strtolower($title), 'tanda tangan') || str_contains(strtolower($message), 'tanda tangan');
+        
+        return view('pdf.fallback', [
+            'registration' => $registration,
             'title' => $title,
             'message' => $message,
-            'status' => 'menunggu', // untuk warna icon
-            'registration' => $registration,   
+            'isSignatureError' => $isSignatureError,
+            'icon' => $isSignatureError ? '✍️' : '⌛'
         ]);
     }
 }

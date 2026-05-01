@@ -651,10 +651,10 @@
                         <td style="padding:4px 6px; vertical-align:middle; text-align:center;">
                             @if($asesor_qr_code)
                                 <img src="{{ $asesor_qr_code }}" style="width:50px; height:50px; vertical-align: middle;">
+                                <div style="vertical-align: middle; font-size: 8pt; margin-top: 6px;">
+                                    {{ $asesor_sign_date }}
+                                </div>
                             @endif
-                            <div style="vertical-align: middle; margin-left: 10px; font-size: 8pt; margin-top: 6px;">
-                                {{ $asesor_sign_date }}
-                            </div>
                         </td>
                     </tr>
                 </table>

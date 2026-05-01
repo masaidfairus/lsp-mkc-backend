@@ -16,8 +16,11 @@ class UserSignatureResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
     protected static ?string $navigationGroup = 'Mastering Data';
     protected static ?string $navigationLabel = 'Daftar Tanda Tangan';
-    protected static ?string $modelLabel = 'Tanda Tangan';
-    protected static ?string $pluralModelLabel = 'Daftar Tanda Tangan';
+    protected static ?string $modelLabel = 'Tanda Tangan Lama (Library)';
+    protected static ?string $pluralModelLabel = 'Tanda Tangan Lama (Library)';
+
+    protected static bool $shouldRegisterNavigation = true;
+
     public static function getCreateButtonLabel(): string
     {
         return 'Buat Tanda Tangan';

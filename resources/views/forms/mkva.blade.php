@@ -555,6 +555,38 @@
 
 
     {{-- Signature Section --}}
+    <table class="sig-table">
+        <tr>
+            <td>
+                <div class="sig-label">Asesor Kompetensi:</div>
+                <div style="font-weight:bold; margin-bottom:10px;">{{ $assessor->name ?? '' }}</div>
+                <div class="sig-box" style="display: flex; align-items: center; justify-content: center; height: 100px;">
+                    @if($assessor_qr_code)
+                        <img src="{{ $assessor_qr_code }}" style="width:70px; height:70px;">
+                        <div style="margin-left: 10px; font-size: 8pt; text-align: left;">
+                            Telah divalidasi pada:<br>
+                            {{ $assessor_date }}
+                        </div>
+                    @endif
+                </div>
+                <div class="sig-label">Tanda Tangan / Tanggal</div>
+            </td>
+            <td>
+                <div class="sig-label">Validator:</div>
+                <div style="font-weight:bold; margin-bottom:10px;">{{ $validator->name ?? '' }}</div>
+                <div class="sig-box" style="display: flex; align-items: center; justify-content: center; height: 100px;">
+                    @if($validator_qr_code)
+                        <img src="{{ $validator_qr_code }}" style="width:70px; height:70px;">
+                        <div style="margin-left: 10px; font-size: 8pt; text-align: left;">
+                            Telah divalidasi pada:<br>
+                            {{ $validator_date }}
+                        </div>
+                    @endif
+                </div>
+                <div class="sig-label">Tanda Tangan / Tanggal</div>
+            </td>
+        </tr>
+    </table>
 
 </body>
 </html>

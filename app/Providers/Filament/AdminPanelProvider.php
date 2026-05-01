@@ -36,6 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Admin',
                 'Mastering Data',
+                'Permintaan TTD',
                 'Dokumen',
                 'Pendaftaran',
                 'APL',

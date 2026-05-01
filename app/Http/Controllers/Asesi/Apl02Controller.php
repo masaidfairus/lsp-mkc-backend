@@ -28,7 +28,7 @@ class Apl02Controller extends Controller
             return $this->errorResponse('E1005', 403);
         }
 
-        if ($registration->status_apl01 !== Apl01Status::APPROVED) {
+        if ($registration->getRawOriginal('status_apl01') !== 'approved') {
             return $this->errorResponse('E2009', 403);
         }
 

@@ -291,7 +291,7 @@ class Mapa02Resource extends Resource
             ->schema([
                 Forms\Components\Select::make('user_id')
                     ->label($label)
-                    ->options(User::role('Asesor')->pluck('name', 'id'))
+                    ->options(User::role(strtolower($label))->pluck('name', 'id'))
                     ->live()
                     ->searchable()
                     ->preload()

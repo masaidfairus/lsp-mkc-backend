@@ -121,4 +121,9 @@ class AssessmentRegistration extends Model
     {
         return $this->hasMany(AssessmentValidation::class, 'registration_id');
     }
+
+    public function signatureRequests()
+    {
+        return $this->hasMany(SignatureRequest::class, 'registration_id');
+    }
 }

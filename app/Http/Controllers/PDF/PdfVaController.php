@@ -13,7 +13,9 @@ class PdfVaController extends Controller
     public function show(Request $request, AssessmentRegistration $registration)
     {
         $user = $request->user();
-        if (!in_array($user?->role ?? '', ['admin', 'asesor'])) {
+        $isAuthorized = $this->isAuthorizedReviewer($user, $registration) || ($user && $user->id === $registration->user_id);
+        
+        if (!$isAuthorized) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
@@ -236,6 +238,21 @@ class PdfVaController extends Controller
             'assessor' => $registration->assessor,
             'candidate' => $registration->candidate,
         ];
+
+        // --- Inject Signatures for Compilers & Validators ---
+        // (Assuming $data['penyusun'] and $data['validator'] might be objects or arrays)
+        // If they are single objects, we can handle them directly
+        if ($validator) {
+            $sig = $this->getUserSignature($validator->id, $registration->id, 'Validator');
+            $data['validator_qr_code'] = $sig['qr_code'];
+            $data['validator_date']    = $sig['is_signed'] ? $this->convertDateToLocalTime($sig['signed_at'] ?? now()) : '';
+        }
+
+        // Add assessor signature too for consistency
+        $assessorSig = $this->getUserSignature($registration->assessor?->id, $registration->id, 'Asesor');
+        $data['assessor_qr_code'] = $assessorSig['qr_code'];
+        $data['assessor_date']    = $assessorSig['is_signed'] ? $this->convertDateToLocalTime($assessorSig['signed_at'] ?? $registration->updated_at) : '';
+        // ----------------------------------------------------
 
         $pdf = Pdf::loadView('forms.mkva', $data)
             ->setPaper('a4', 'portrait')

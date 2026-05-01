@@ -455,12 +455,11 @@
                     <tr>
                         <td colspan="2"
                             style="padding:4px 7px; height:70px; vertical-align:top; white-space:nowrap; border-right:1px solid #000;">
-                            Tanda Tangan / Tanggal</td>
-                        <td colspan="2" style="padding:4px 7px; vertical-align:middle;">
+                            Tanda Tangan / Tanggal</td>                        <td colspan="2" style="padding:4px 7px; vertical-align:middle;">
                             @if($asesi_signature)
                                 <img src="{{ $asesi_signature }}" class="ttd-img"><br>
+                                {{ $asesi_date }}
                             @endif
-                            {{ $asesi_date }}
                         </td>
                     </tr>
 
@@ -486,13 +485,17 @@
                         <td colspan="2" style="padding:4px 7px; vertical-align:middle;">
                             @if($asesor_qr_code)
                                 <img src="{{ $asesor_qr_code }}" style="width: 50px; height: 50px; vertical-align: middle;">
+                                <span style="vertical-align: middle; margin-left: 10px;">
+                                    {{ $asesor_date }}
+                                </span>
                             @elseif($asesor_signature ?? null)
                                 <img src="{{ $asesor_signature }}" style="max-height: 50px; vertical-align: middle;">
+                                <span style="vertical-align: middle; margin-left: 10px;">
+                                    {{ $asesor_date }}
+                                </span>
                             @endif
-                            <span style="vertical-align: middle; margin-left: 10px;">
-                                {{ $asesor_date }}
-                            </span>
                         </td>
+
                     </tr>
                 </table>
             </td>
