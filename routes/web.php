@@ -15,6 +15,10 @@ use App\Http\Controllers\PDF\PdfApl02Controller;
 use App\Http\Controllers\PDF\PdfMapa01Controller;
 use App\Http\Controllers\PDF\PdfMapa02Controller;
 
+Route::get('/test-activation', function () {
+    return view('auth.activation');
+});
+
 // Route::get('/active', function () {
 //     return view('auth.activation');
 // })->name('verif');

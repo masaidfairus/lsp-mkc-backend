@@ -2,7 +2,7 @@
 <html class="overflow-hidden-x">
 <head>
     <title>@yield('title')</title>
-     @vite(['resources/css/app.css', 'resources/css/output.css', 'resources/js/app.js', 'resource/js/auth.js'])
+     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/auth.js'])
 </head>
 <body class="bg-white">
 
