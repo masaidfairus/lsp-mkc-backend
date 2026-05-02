@@ -781,26 +781,46 @@ $validator = $validator ?? [['nama' => '', 'met_number' => ''], ['nama' => '', '
             <td style="text-align:center;">1</td>
             <td>{{ $penyusun[0]['name'] ?? '' }}</td>
             <td>{{ $penyusun[0]['met_number'] ?? '' }}</td>
-            <td class="ttd-space">{{ $penyusun[0]['date'] ?? '' }}</td>
+            <td style="text-align:center; vertical-align:middle; padding: 5px;">
+                @if(isset($penyusun[0]['qr_code']) && $penyusun[0]['qr_code'])
+                    <img src="{{ $penyusun[0]['qr_code'] }}" style="width:40px; height:40px;"><br>
+                    <span style="font-size:7pt;">{{ $penyusun[0]['date'] ?? '' }}</span>
+                @endif
+            </td>
         </tr>
         <tr>
             <td style="text-align:center;">2</td>
             <td>{{ $penyusun[1]['name'] ?? '' }}</td>
             <td>{{ $penyusun[1]['met_number'] ?? '' }}</td>
-            <td class="ttd-space">{{ $penyusun[1]['date'] ?? '' }}</td>
+            <td style="text-align:center; vertical-align:middle; padding: 5px;">
+                @if(isset($penyusun[1]['qr_code']) && $penyusun[1]['qr_code'])
+                    <img src="{{ $penyusun[1]['qr_code'] }}" style="width:40px; height:40px;"><br>
+                    <span style="font-size:7pt;">{{ $penyusun[1]['date'] ?? '' }}</span>
+                @endif
+            </td>
         </tr>
         <tr>
             <td rowspan="2" style="font-weight:bold; vertical-align:middle; text-align:center;">VALIDATOR</td>
             <td style="text-align:center;">1</td>
             <td>{{ $validator[0]['name'] ?? '' }}</td>
             <td>{{ $validator[0]['met_number'] ?? '' }}</td>
-            <td class="ttd-space">{{ $validator[0]['date'] ?? '' }}</td>
+            <td style="text-align:center; vertical-align:middle; padding: 5px;">
+                @if(isset($validator[0]['qr_code']) && $validator[0]['qr_code'])
+                    <img src="{{ $validator[0]['qr_code'] }}" style="width:40px; height:40px;"><br>
+                    <span style="font-size:7pt;">{{ $validator[0]['date'] ?? '' }}</span>
+                @endif
+            </td>
         </tr>
         <tr>
             <td style="text-align:center;">2</td>
             <td>{{ $validator[1]['name'] ?? '' }}</td>
             <td>{{ $validator[1]['met_number'] ?? '' }}</td>
-            <td class="ttd-space">{{ $validator[1]['date'] ?? '' }}</td>
+            <td style="text-align:center; vertical-align:middle; padding: 5px;">
+                @if(isset($validator[1]['qr_code']) && $validator[1]['qr_code'])
+                    <img src="{{ $validator[1]['qr_code'] }}" style="width:40px; height:40px;"><br>
+                    <span style="font-size:7pt;">{{ $validator[1]['date'] ?? '' }}</span>
+                @endif
+            </td>
         </tr>
     </table>
 

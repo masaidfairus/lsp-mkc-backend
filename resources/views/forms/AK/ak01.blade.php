@@ -250,7 +250,9 @@
                 @endif
             </td>
             <td style="width: 45%; border-left: none; border-bottom: none; vertical-align: middle; padding: 10px;">
-                Tanggal : {{ $asesor_sign_date }}
+                @if($asesor_qr_code)
+                    Tanggal : {{ $asesor_sign_date }}
+                @endif
             </td>
         </tr>
         <tr style="border-top: none;">

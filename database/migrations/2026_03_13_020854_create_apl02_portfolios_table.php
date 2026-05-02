@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('file_profile_id')->constrained('file_profiles')->cascadeOnDelete();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->unique(['registration_id', 'file_profile_id'], 'reg_file_unique');
         });
     }
 

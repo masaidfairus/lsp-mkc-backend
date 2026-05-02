@@ -327,10 +327,10 @@
                         <td style="padding:4px 6px; vertical-align:middle; text-align:center;">
                             @if($asesor_qr_code)
                                 <img src="{{ $asesor_qr_code }}" style="width:50px; height:50px; vertical-align: middle;">
+                                <div style="vertical-align: middle; font-size: 8pt; margin-top: 6px;">
+                                    {{ $asesor_date ?? '' }}
+                                </div>
                             @endif
-                            <span style="vertical-align: middle; margin-left: 10px; font-size: 8pt;">
-                                {{ $asesor_date ?? '' }}
-                            </span>
                         </td>
                     </tr>
                 </table>

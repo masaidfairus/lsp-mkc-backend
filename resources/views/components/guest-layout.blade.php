@@ -3,7 +3,7 @@
 
 <head>
     <title>LSP MKC</title>
-    @vite(['resources/css/app.css', 'resources/css/output.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body {{ $attributes->merge([

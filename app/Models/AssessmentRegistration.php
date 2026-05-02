@@ -15,6 +15,8 @@ class AssessmentRegistration extends Model
         'assessor_id',
         'tuk',
         'status',
+        'status_apl01',
+        'status_apl02',
         'final_result',
         'assessed_at',
         'admin_notes',
@@ -22,6 +24,8 @@ class AssessmentRegistration extends Model
 
     protected $casts = [
         'status' => AssessmentStatus::class,
+        'status_apl01' => \App\Enums\Apl01Status::class,
+        'status_apl02' => \App\Enums\Apl02Status::class,
         'certification_purpose' => CertificationPurpose::class,
         'assessed_at' => 'datetime',
     ];
@@ -117,5 +121,10 @@ class AssessmentRegistration extends Model
     public function validations()
     {
         return $this->hasMany(AssessmentValidation::class, 'registration_id');
+    }
+
+    public function signatureRequests()
+    {
+        return $this->hasMany(SignatureRequest::class, 'registration_id');
     }
 }

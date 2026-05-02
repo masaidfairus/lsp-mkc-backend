@@ -25,10 +25,15 @@ class PortfolioFilesRelationManager extends RelationManager
             ]);
     }
 
+    public function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()->with(['fileProfile.documentList']);
+    }
+
     public function table(Table $table): Table
     {
         return $table
-            ->paginated(false)
+            ->paginated([10, 25, 50])
             ->recordTitleAttribute('fileProfile.documentList.title')
             ->columns([
                 Tables\Columns\TextColumn::make('fileProfile.documentList.title')

@@ -1,0 +1,143 @@
+<?php
+
+namespace App\Filament\Resources\SignatureInboxResource\Pages;
+
+use App\Filament\Resources\SignatureInboxResource;
+use App\Models\SignatureRequest;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Pages\EditRecord;
+use Filament\Notifications\Notification;
+
+class ViewSignatureInbox extends EditRecord
+{
+    protected static string $resource = SignatureInboxResource::class;
+    
+    protected ?string $heading = 'Tinjau & Tanda Tangani Dokumen';
+
+    public function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Group::make()
+                    ->schema(function ($record) {
+                        if (!$record) return [];
+
+                        $requests = $record->signatureRequests()
+                            ->where('user_id', auth()->id())
+                            ->get();
+
+                        if ($requests->isEmpty()) {
+                            return [
+                                Forms\Components\Placeholder::make('no_req')
+                                    ->label('')
+                                    ->content('Tidak ada dokumen yang perlu ditandatangani untuk pendaftaran ini.')
+                            ];
+                        }
+
+                        $tabs = [];
+                        foreach ($requests as $req) {
+                            $isPending = $req->status === 'pending';
+                            
+                            $pdfUrl = '#';
+                            if ($req->document_label === 'FR.VA') {
+                                $pdfUrl = route('frva.print', ['registration' => $record->id]);
+                            } else {
+                                $routeName = strtolower(str_replace('.', '', $req->document_label)) . '.form';
+                                try {
+                                    $pdfUrl = route($routeName, ['registration' => $record->id]);
+                                } catch (\Exception $e) {
+                                    // Fallback
+                                }
+                            }
+
+                            $tabs[] = Forms\Components\Tabs\Tab::make($req->document_label . ($isPending ? ' ⏳' : ' ✅'))
+                                ->schema([
+                                    Forms\Components\ViewField::make("req_{$req->id}")
+                                        ->label('')
+                                        ->view('filament.forms.components.signature-inbox-detail')
+                                        ->viewData([
+                                            'signatureRequest' => $req,
+                                            'pdfUrl' => $pdfUrl,
+                                        ])
+                                ]);
+                        }
+
+                        return [
+                            Forms\Components\Tabs::make('Dokumen')
+                                ->tabs($tabs)
+                                ->columnSpanFull()
+                        ];
+                    })
+                    ->columnSpanFull()
+            ]);
+    }
+    
+    // Handle the custom submission from Blade view
+    public function submitSignature($requestId, $base64Data)
+    {
+        $req = SignatureRequest::where('id', $requestId)
+            ->where('user_id', auth()->id())
+            ->first();
+            
+        if (!$req) {
+            Notification::make()->title('Data tidak ditemukan atau tidak berhak')->danger()->send();
+            return;
+        }
+
+        if (!$base64Data) {
+            Notification::make()->title('Tanda tangan masih kosong')->warning()->send();
+            return;
+        }
+
+        // Generate QR code using the same logic (simple-qrcode)
+        // Format: Penanda Tangan: {name}\nPeran: {role}\nDokumen: {doc}\nWaktu: {time}
+        $time = now()->format('Y-m-d H:i:s');
+        $name = auth()->user()->name;
+        $role = $req->role;
+        $doc  = $req->document_label;
+        
+        // Generate Verification URL for QR Code
+        $qrText = route('ttd.cek', ['id' => $req->id]);
+        
+        // Build base64 QR (Using SVG format to avoid Imagick dependency)
+        $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->generate($qrText));
+
+        $req->update([
+            'status' => 'signed',
+            'raw_signature' => $base64Data,
+            'qr_code' => $qrBase64,
+            'signed_at' => now(),
+        ]);
+
+        Notification::make()->title("Tanda tangan untuk $doc berhasil disimpan")->success()->send();
+        
+        // Refresh page
+        return redirect(request()->header('Referer'));
+    }
+
+    public function revertSignature($requestId)
+    {
+        $req = SignatureRequest::where('id', $requestId)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (!$req) return;
+
+        $req->update([
+            'status' => 'pending',
+            'raw_signature' => null,
+            'qr_code' => null,
+            'signed_at' => null,
+        ]);
+
+        Notification::make()->title("Tanda tangan untuk {$req->document_label} telah dihapus")->warning()->send();
+        
+        return redirect(request()->header('Referer'));
+    }
+
+    protected function getFormActions(): array
+    {
+        return []; // Sembunyikan tombol save default
+    }
+}

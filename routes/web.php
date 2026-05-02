@@ -15,6 +15,10 @@ use App\Http\Controllers\PDF\PdfApl02Controller;
 use App\Http\Controllers\PDF\PdfMapa01Controller;
 use App\Http\Controllers\PDF\PdfMapa02Controller;
 
+Route::get('/test-activation', function () {
+    return view('auth.activation');
+});
+
 // Route::get('/active', function () {
 //     return view('auth.activation');
 // })->name('verif');
@@ -39,18 +43,30 @@ Route::get('/signature/verify', function (\Illuminate\Http\Request $request) {
     $sigData = null;
 
     if ($id) {
-        $sig = \App\Models\UserSignature::find($id);
-        if ($sig) {
-            // Compress the signature shape (JSON strokes) using zlib (pako equivalent)
-            // The JS expectes a base64 of the compressed string
-            $shape = $sig->signature_shape;
-            $compressed = $shape ? base64_encode(gzcompress($shape, 9)) : null;
-
+        // Coba cari di SignatureRequest dulu (untuk dokumen spesifik)
+        $req = \App\Models\SignatureRequest::find($id);
+        if ($req && $req->status === 'signed') {
             $sigData = [
-                'n' => $sig->name,
-                'd' => $sig->updated_at->format('Y-m-d H:i:s'),
-                's' => $compressed,
+                'n' => $req->user->name,
+                'r' => $req->role,
+                'd' => $req->document_label,
+                't' => $req->signed_at->format('Y-m-d H:i:s'),
+                's' => null, // Sesuai permintaan: sembunyikan bentuk TTD
+                'v' => true,
             ];
+        } else {
+            // Fallback ke UserSignature (library lama)
+            $sig = \App\Models\UserSignature::find($id);
+            if ($sig) {
+                $sigData = [
+                    'n' => $sig->name,
+                    'r' => 'Pemilik Tanda Tangan',
+                    'd' => 'Library Tanda Tangan',
+                    't' => $sig->updated_at->format('Y-m-d H:i:s'),
+                    's' => null,
+                    'v' => true,
+                ];
+            }
         }
     }
 
@@ -62,150 +78,40 @@ Route::get('admin/view-document/{record}', [PrivateFileController::class, 'downl
     ->middleware(['auth']);
 
 // ============================================================
-// APL01
+// PDF Documents (Auth Required for Preview)
 // ============================================================
-Route::get('apl01/{registration}', [PdfApl01Controller::class, 'show'])->name('apl01.form');
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('apl01/{registration}', [PdfApl01Controller::class, 'show'])->name('apl01.form');
+    Route::get('apl02/{registration}', [PdfApl02Controller::class, 'show'])->name('apl02.form');
+    Route::get('ak01/{registration}', [PdfAk01Controller::class, 'show'])->name('ak01.form');
+    Route::get('ak02/{registration}', [PdfAk02Controller::class, 'show'])->name('ak02.form');
+    Route::get('ak03/{registration}', [PdfAk03Controller::class, 'show'])->name('ak03.form');
+    Route::get('ak04/{registration}', [PdfAk04Controller::class, 'show'])->name('ak04.form');
+    Route::get('ak05/{registration}', [PdfAk05Controller::class, 'show'])->name('ak05.form');
+    Route::get('ak06/{registration}', [PdfAk06Controller::class, 'show'])->name('ak06.form');
+    Route::get('ak07/{registration}', [PdfAk07Controller::class, 'show'])->name('ak07.form');
+    Route::get('ia01/{registration}', [\App\Http\Controllers\PDF\PdfIA01Controller::class, 'show'])->name('ia01.form');
+    Route::get('ia02/{registration}', [\App\Http\Controllers\PDF\PdfIa02Controller::class, 'show'])->name('ia02.form');
+    Route::get('ia03/{registration}', [\App\Http\Controllers\PDF\PdfIa03Controller::class, 'show'])->name('ia03.form');
+    Route::get('ia04a/{registration}', [\App\Http\Controllers\PDF\PdfIa04aController::class, 'show'])->name('ia04a.form');
+    Route::get('ia04b/{registration}', [\App\Http\Controllers\PDF\PdfIa04bController::class, 'show'])->name('ia04b.form');
+    Route::get('ia05a/{registration}', [\App\Http\Controllers\PDF\PdfIa05aController::class, 'show'])->name('ia05a.form');
+    Route::get('ia05b/{registration}', [\App\Http\Controllers\PDF\PdfIa05bController::class, 'show'])->name('ia05b.form');
+    Route::get('ia05c/{registration}', [\App\Http\Controllers\PDF\PdfIa05cController::class, 'show'])->name('ia05c.form');
+    Route::get('ia06a/{registration}', [\App\Http\Controllers\PDF\PdfIa06aController::class, 'show'])->name('ia06a.form');
+    Route::get('ia06b/{registration}', [\App\Http\Controllers\PDF\PdfIa06bController::class, 'show'])->name('ia06b.form');
+    Route::get('ia06c/{registration}', [\App\Http\Controllers\PDF\PdfIa06cController::class, 'show'])->name('ia06c.form');
+    Route::get('ia07/{registration}', [\App\Http\Controllers\PDF\PdfIa07Controller::class, 'show'])->name('ia07.form');
+    Route::get('ia08/{registration}', [\App\Http\Controllers\PDF\PdfIa08Controller::class, 'show'])->name('ia08.form');
+    Route::get('ia09/{registration}', [\App\Http\Controllers\PDF\PdfIa09Controller::class, 'show'])->name('ia09.form');
+    Route::get('ia10/{registration}', [\App\Http\Controllers\PDF\PdfIa10Controller::class, 'show'])->name('ia10.form');
+    Route::get('ia11/{registration}', [\App\Http\Controllers\PDF\PdfIa11Controller::class, 'show'])->name('ia11.form');
+    Route::get('va/{registration}', [\App\Http\Controllers\PDF\PdfVaController::class, 'show'])->name('frva.print');
+    Route::get('mapa01/{registration}', [\App\Http\Controllers\PDF\PdfMapa01Controller::class, 'show'])->name('mapa01.form');
+    Route::get('mapa02/{registration}', [\App\Http\Controllers\PDF\PdfMapa02Controller::class, 'show'])->name('mapa02.form');
+});
 
-// ============================================================
-// APL02
-// ============================================================
-Route::get('apl02/{registration}', [PdfApl02Controller::class, 'show'])->name('apl02.form');
-
-// ============================================================
-// AK.01
-// ============================================================
-Route::get('ak01/{registration}', [PdfAk01Controller::class, 'show'])->name('ak01.form');
-
-// ============================================================
-// AK.02
-// ============================================================
-Route::get('ak02/{registration}', [PdfAk02Controller::class, 'show'])->name('ak02.form');
-
-// ============================================================
-// AK.03
-// ============================================================
-Route::get('ak03/{registration}', [PdfAk03Controller::class, 'show'])->name('ak03.form');
-
-// ============================================================
-// AK.04
-// ============================================================
-Route::get('ak04/{registration}', [PdfAk04Controller::class, 'show'])->name('ak04.form');
-
-// ============================================================
-// AK.05
-// ============================================================
-Route::get('ak05/{registration}', [PdfAk05Controller::class, 'show'])->name('ak05.form');
-
-// ============================================================
-// AK.06
-// ============================================================
-Route::get('ak06/{registration}', [PdfAk06Controller::class, 'show'])->name('ak06.form');
-
-// ============================================================
-// AK.07
-// ============================================================
-Route::get('ak07/{registration}', [PdfAk07Controller::class, 'show'])->name('ak07.form');
-
-// ============================================================
-// IA.01
-// ============================================================
-Route::get('ia01/{registration}', [\App\Http\Controllers\PDF\PdfIA01Controller::class, 'show'])->name('ia01.form');
-
-// ============================================================
-// IA.02
-// ============================================================
-Route::get('ia02/{registration}', [\App\Http\Controllers\PDF\PdfIa02Controller::class, 'show'])->name('ia02.form');
-
-// ============================================================
-// IA.03
-// ============================================================
-Route::get('ia03/{registration}', [\App\Http\Controllers\PDF\PdfIa03Controller::class, 'show'])->name('ia03.form');
-
-// ============================================================
-// IA.04A
-// ============================================================
-Route::get('ia04a/{registration}', [\App\Http\Controllers\PDF\PdfIa04aController::class, 'show'])->name('ia04a.form');
-
-// ============================================================
-// IA.04B
-// ============================================================
-Route::get('ia04b/{registration}', [\App\Http\Controllers\PDF\PdfIa04bController::class, 'show'])->name('ia04b.form');
-
-// ============================================================
-// IA.05A
-// ============================================================
-Route::get('ia05a/{registration}', [\App\Http\Controllers\PDF\PdfIa05aController::class, 'show'])->name('ia05a.form');
-
-// ============================================================
-// IA.05B
-// ============================================================
-Route::get('ia05b/{registration}', [\App\Http\Controllers\PDF\PdfIa05bController::class, 'show'])->name('ia05b.form');
-
-// ============================================================
-// IA.05C
-// ============================================================
-Route::get('ia05c/{registration}', [\App\Http\Controllers\PDF\PdfIa05cController::class, 'show'])->name('ia05c.form');
-
-// ============================================================
-// IA.06A
-// ============================================================
-Route::get('ia06a/{registration}', [\App\Http\Controllers\PDF\PdfIa06aController::class, 'show'])->name('ia06a.form');
-
-// ============================================================
-// IA.06B
-// ============================================================
-Route::get('ia06b/{registration}', [\App\Http\Controllers\PDF\PdfIa06bController::class, 'show'])->name('ia06b.form');
-
-// ============================================================
-// IA.06C
-// ============================================================
-Route::get('ia06c/{registration}', [\App\Http\Controllers\PDF\PdfIa06cController::class, 'show'])->name('ia06c.form');
-
-// ============================================================
-// IA.07
-// ============================================================
-Route::get('ia07/{registration}', [\App\Http\Controllers\PDF\PdfIa07Controller::class, 'show'])->name('ia07.form');
-
-// ============================================================
-// IA.08
-// ============================================================
-Route::get('ia08/{registration}', [\App\Http\Controllers\PDF\PdfIa08Controller::class, 'show'])->name('ia08.form');
-
-// ============================================================
-// IA.09
-// ============================================================
-Route::get('ia09/{registration}', [\App\Http\Controllers\PDF\PdfIa09Controller::class, 'show'])->name('ia09.form');
-
-// ============================================================
-// IA.10
-// ============================================================
-Route::get('ia10/{registration}', [\App\Http\Controllers\PDF\PdfIa10Controller::class, 'show'])->name('ia10.form');
-
-// ============================================================
-// IA.11
-// ============================================================
-Route::get('ia11/{registration}', [\App\Http\Controllers\PDF\PdfIa11Controller::class, 'show'])->name('ia11.form');
-
-// ============================================================
-// FR.VA
-// ============================================================
-Route::get('va/{registration}', [\App\Http\Controllers\PDF\PdfVaController::class, 'show'])->name('frva.print');
-
-// ============================================================
-// MAPA01 & MAPA02
-// ============================================================
-Route::get('mapa01/{registration}', [\App\Http\Controllers\PDF\PdfMapa01Controller::class, 'show'])->name('mapa01.form');
-Route::get('mapa02/{registration}', [\App\Http\Controllers\PDF\PdfMapa02Controller::class, 'show'])->name('mapa02.form');
-
-// ============================================================
-// MAPA01
-// ============================================================
-Route::get('mapa01/{registration}', [PdfMapa01Controller::class, 'show'])->name('mapa01.form');
-
-// ============================================================
-// MAPA02
-// ============================================================
-Route::get('mapa02/{registration}', [PdfMapa02Controller::class, 'show'])->name('mapa02.form');
+Route::get('cek-ttd/{id}', [\App\Http\Controllers\SignatureVerificationController::class, 'show'])->name('ttd.cek');
 
 Route::get('/mapa02/preview', function () {
     $data = [

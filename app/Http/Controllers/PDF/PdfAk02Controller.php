@@ -29,9 +29,22 @@ class PdfAk02Controller extends Controller
         $scheme = $registration->scheme;
         $assessor = $registration->assessor;
 
+        if (!$assessor) {
+            return app(\App\Http\Controllers\PdfFallbackController::class)->show($registration, 'Asesor Belum Ditugaskan', 'Dokumen AK.02 belum dapat dicetak karena Asesor belum ditugaskan untuk pendaftaran ini.');
+        }
+
         $assessmentDate = $this->convertDateToLocalTime($ak02Data['date'] ?? now()->format('Y-m-d'));
         
-        $signatureData = $this->getAssessorSignatureData($assessor);
+        $signatureData = $this->getAssessorSignatureData($assessor, $registration->id, 'AK.02', true);
+        $isAuthorizedReviewer = $this->isAuthorizedReviewer($request->user(), $registration);
+
+        if (!$signatureData['is_signed'] && !$isAuthorizedReviewer) {
+            return app(\App\Http\Controllers\PdfFallbackController::class)->show(
+                $registration, 
+                'Dokumen AK.02 Belum Ditandatangani', 
+                'Dokumen FR.AK.02 belum dapat dicetak karena Asesor belum menandatangani dokumen ini di menu Inbox Tanda Tangan.'
+            );
+        }
 
         if (isset($ak02Data['signatures']['assessor'])) {
             $ak02Data['signatures']['assessor']['qr_preview'] = $signatureData['qr_code'];
@@ -50,6 +63,37 @@ class PdfAk02Controller extends Controller
             'assessment_summary' => $ak02Data['assessment_summary'] ?? [],
             'signatures' => $ak02Data['signatures'] ?? [],
         ];
+
+                // --- Inject Signatures for Compilers & Validators ---
+        if (isset($data['compilers']) && is_array($data['compilers'])) {
+            foreach ($data['compilers'] as &$c) {
+                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+                $c['signature'] = $sig['signature'];
+                $c['qr_code']   = $sig['qr_code'];
+            }
+        }
+        if (isset($data['penyusun']) && is_array($data['penyusun'])) {
+            foreach ($data['penyusun'] as &$c) {
+                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+                $c['signature'] = $sig['signature'];
+                $c['qr_code']   = $sig['qr_code'];
+            }
+        }
+        if (isset($data['validators']) && is_array($data['validators'])) {
+            foreach ($data['validators'] as &$v) {
+                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+                $v['signature'] = $sig['signature'];
+                $v['qr_code']   = $sig['qr_code'];
+            }
+        }
+        if (isset($data['validator']) && is_array($data['validator'])) {
+            foreach ($data['validator'] as &$v) {
+                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+                $v['signature'] = $sig['signature'];
+                $v['qr_code']   = $sig['qr_code'];
+            }
+        }
+        // ----------------------------------------------------
 
         $pdf = Pdf::loadView('forms.ak.ak02', $data)
             ->setPaper('a4', 'portrait')

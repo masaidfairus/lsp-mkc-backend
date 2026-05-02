@@ -24,29 +24,49 @@ class PdfApl02Controller extends Controller
         $scheme = $registration->scheme;
         $schemeId = $scheme->id;
         $assessor = $registration->assessor;
+
+        // ── Validasi status APL.02 (Menggunakan Enum baru) ───────────
+        if ($registration->status !== AssessmentStatus::APL02_SUBMITTED && !$registration->status->isApl02Complete()) {
+            return app(\App\Http\Controllers\PdfFallbackController::class)->show(
+                $registration, 
+                'Dokumen APL.02 Belum Siap', 
+                'Dokumen FR.APL.02 belum dapat dicetak karena status APL.02 masih dalam proses pengisian atau belum disubmit oleh Asesi.'
+            );
+        }
+
+        if (!$assessor) {
+            return app(\App\Http\Controllers\PdfFallbackController::class)->show($registration, 'Asesor Belum Ditugaskan', 'Dokumen APL.02 belum dapat dicetak karena Asesor belum ditugaskan untuk pendaftaran ini.');
+        }
         $selfAssessments = collect($registration->selfAssessments)->keyBy('element_id');
 
-        // Ambil file secara manual lewat Model FileProfile agar filter lebih transparan
-        $portfolios = \App\Models\FileProfile::where('user_id', $userId)
-            ->whereHas('documentList.portfolioScheme', function ($q) use ($schemeId) {
-                $q->where('scheme_id', $schemeId);
-            })
-            ->get();
+        $portfolios = $registration->portfolioFiles;
 
-        $signatureData = $this->getAssessorSignatureData($assessor);
+        // ── Validasi Tanda Tangan Asesor (Kecuali untuk Admin/Asesor Peninjau) ───
+        $asesorSig = $this->getUserSignature($registration->assessor?->id, $registration->id, 'APL.02', true);
+        $isAuthorizedReviewer = $this->isAuthorizedReviewer($request->user(), $registration);
+
+        if (!$asesorSig['is_signed'] && !$isAuthorizedReviewer) {
+            return app(\App\Http\Controllers\PdfFallbackController::class)->show(
+                $registration, 
+                'Dokumen APL.02 Belum Ditandatangani', 
+                'Dokumen FR.APL.02 belum dapat dicetak karena Asesor belum menandatangani dokumen ini di menu Inbox Tanda Tangan.'
+            );
+        }
 
         $data = [
             'nama_skema' => $scheme->name,
             'kode_skema' => $scheme->code,
             'nama_asesi' => strtoupper($candidate->name),
             'nama_asesor' => $assessor?->name ?? 'Belum Ditugaskan',
-            'no_reg_asesor' => $signatureData['reg_number'],
-            'asesor_qr_code' => $signatureData['qr_code'],
-            'asesor_date' => $registration->status->isApl02Complete() ? $this->convertDateToLocalTime($registration->updated_at) : '',
+            'no_reg_asesor' => $asesorSig['reg_number'] ?? '',
+            'asesor_qr_code' => $asesorSig['qr_code'],
+            'asesor_date' => $asesorSig['is_signed'] ? $this->convertDateToLocalTime($asesorSig['signed_at'] ?? $registration->updated_at) : '',
             'unit_kompetensi' => $scheme->competencyUnits ?? [],
             'asesmen_mandiri' => $selfAssessments ?? [],
             'portfolios' => $portfolios,
         ];
+
+
 
         $pdf = Pdf::loadView('forms.APL.apl02', $data)
             ->setPaper('a4', 'portrait')

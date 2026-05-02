@@ -596,8 +596,9 @@ class Mapa01Resource extends Resource
             ->schema([
                 Forms\Components\Select::make('user_id')
                     ->label($label)
-                    ->options(function (\Filament\Forms\Get $get) use ($excludeKey) {
-                        $query = User::role('Asesor');
+                    ->options(function (\Filament\Forms\Get $get) use ($excludeKey, $label) {
+                        $role = str_contains(strtolower($label), 'penyusun') ? 'penyusun' : (str_contains(strtolower($label), 'validator') ? 'validator' : 'asesor');
+                        $query = User::role($role);
                         if ($excludeKey && $get('../../' . $excludeKey . '/user_id')) {
                             $query->where('id', '!=', $get('../../' . $excludeKey . '/user_id'));
                         }
