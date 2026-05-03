@@ -23,11 +23,15 @@ class Apl01Data extends Model
         'company_address',
         'company_postal_code',
         'company_contact',
+        'asesi_signature',
+        'asesi_qr_code',
+        'asesi_signature_date',
     ];
 
     protected $casts = [
         'gender' => Gender::class,
         'date_of_birth' => 'date',
+        'asesi_signature_date' => 'datetime',
     ];
 
     public function registration()

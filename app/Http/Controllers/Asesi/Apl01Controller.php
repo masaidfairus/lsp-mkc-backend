@@ -40,6 +40,8 @@ class Apl01Controller extends Controller
                 'company_address' => ['required', 'string', 'max:1000'],
                 'company_postal_code' => ['required', 'numeric', 'digits:5', 'between:10000,99999'],
                 'company_contact' => ['required', 'string', 'max:20'],
+                'registration_id' => ['nullable', 'exists:assessment_registrations,id'],
+                'scheme_id' => ['required', 'exists:schemes,id'],
             ]);
 
             $asesiType = $request->validate([
@@ -47,12 +49,26 @@ class Apl01Controller extends Controller
                 'institution_name' => ['required_if:asesi_type,institusi', 'nullable', 'string', 'max:255'],
             ]);
 
-            $user->profile()->updateOrCreate([], array_merge($validated, $asesiType));
+            $user->profile()->updateOrCreate([], array_merge(collect($validated)->except('registration_id')->toArray(), $asesiType));
 
-            $registration = $user->registrations()
-                ->whereNull('scheme_id')
-                ->firstOrCreate([]);
-            $registration->aplData()->create($validated);
+            if (!empty($validated['registration_id'])) {
+                $registration = $user->registrations()->findOrFail($validated['registration_id']);
+                $registration->update(['scheme_id' => $validated['scheme_id']]);
+                
+                $registration->aplData()->updateOrCreate(
+                    ['registration_id' => $registration->id],
+                    collect($validated)->except(['registration_id', 'scheme_id'])->toArray()
+                );
+            } else {
+                $registration = $user->registrations()->firstOrCreate([
+                    'scheme_id' => $validated['scheme_id'],
+                    'status' => \App\Enums\AssessmentStatus::APL01_DRAFT,
+                ]);
+                $registration->aplData()->updateOrCreate(
+                    ['registration_id' => $registration->id],
+                    collect($validated)->except(['registration_id', 'scheme_id'])->toArray()
+                );
+            }
 
             return $this->successResponse([
                 'next_step' => 'data-sertifikasi',
@@ -63,35 +79,29 @@ class Apl01Controller extends Controller
         if ($step == 'data-sertifikasi') {
             $validated = $request->validate([
                 'registration_id' => ['required', 'exists:assessment_registrations,id'],
-                'certification_purpose' => ['required', new Enum(CertificationPurpose::class)],
-                'scheme_id' => ['required', 'exists:schemes,id'],
+                'asesi_type' => ['required', 'string'],
+                'institution_name' => ['required_if:asesi_type,institusi', 'nullable', 'string'],
+                'certification_purpose' => ['required', 'string'],
             ]);
 
             $registration = $user->registrations()->findOrFail($validated['registration_id']);
-
-            if (in_array($registration->status, [
-                AssessmentStatus::APL01_PENDING,
-                AssessmentStatus::APL01_PAID,
-                AssessmentStatus::APL01_APPROVED,
-            ])) {
-                return $this->errorResponse('E2017', 403);
-            }
-
-            if (!$registration->aplData()->exists()) {
-                return $this->errorResponse('E2006', 403);
-            }
-
-            $profile = $user->profile;
+            
+            // Update data di pendaftaran (isolasi)
             $registration->update([
+                'asesi_type' => $validated['asesi_type'],
+                'institution_name' => $validated['institution_name'],
                 'certification_purpose' => $validated['certification_purpose'],
-                'scheme_id' => $validated['scheme_id'],
-                'asesi_type' => $profile->asesi_type,
-                'institution_name' => $profile->institution_name,
+            ]);
+
+            // Update juga di profil untuk data default di masa depan
+            $user->profile()->update([
+                'asesi_type' => $validated['asesi_type'],
+                'institution_name' => $validated['institution_name'],
             ]);
 
             $userFiles = FileProfile::where('user_id', $user->id)->get()->keyBy('list_id');
 
-            $buktiDasar = BasicRequirementProof::where('scheme_id', $validated['scheme_id'])
+            $buktiDasar = BasicRequirementProof::where('scheme_id', $registration->scheme_id)
                 ->with('documentList')
                 ->get()
                 ->map(function ($req) use ($userFiles) {
@@ -126,7 +136,7 @@ class Apl01Controller extends Controller
             return $this->successResponse([
                 'next_step' => 'bukti-persyaratan-dasar',
                 'registration_id' => $registration->id,
-                'asesi_type' => $profile->asesi_type,
+                'asesi_type' => $registration->asesi_type,
                 'bukti_persyaratan_dasar' => $buktiDasar,
                 'bukti_administratif' => $buktiAdmin,
             ], 'Bagian 2 tersimpan. Lanjutkan ke bagian berikutnya.');
@@ -228,6 +238,7 @@ class Apl01Controller extends Controller
                 'evidence' => ['required', 'array', 'min:1'],
                 'evidence.*.list_id' => ['required', 'exists:administrative_proofs,list_id'],
                 'evidence.*.file' => ['nullable', 'file', 'mimes:pdf,jpg,png', 'max:2048'],
+                'signature' => ['nullable', 'image', 'max:1024'],
             ]);
 
             $registration = $user->registrations()->findOrFail($validated['registration_id']);
@@ -255,13 +266,16 @@ class Apl01Controller extends Controller
                 }
             }
 
-            DB::transaction(function () use ($validated, $registration, $user) {
+            DB::transaction(function () use ($validated, $registration, $user, $request) {
                 foreach ($validated['evidence'] as $item) {
+                    if (!isset($item['file'])) continue;
+                    
                     $file = $item['file'];
                     $filename = "user_{$user->id}_list_{$item['list_id']}_" . uniqid() . "." . $file->getClientOriginalExtension();
                     $path = $file->storeAs("bukti-admin/{$registration->id}", $filename, 'local');
 
                     $existing = FileProfile::where([
+                        'user_id' => $user->id,
                         'list_id' => $item['list_id'],
                     ])->first();
 
@@ -274,6 +288,31 @@ class Apl01Controller extends Controller
                         'user_id' => $user->id,
                         'list_id' => $item['list_id'],
                         'upload_document' => $path,
+                    ]);
+                }
+
+                if ($request->hasFile('signature')) {
+                    $sig = $request->file('signature');
+                    $sigName = "sig_user_{$user->id}_" . uniqid() . "." . $sig->getClientOriginalExtension();
+                    $sigPath = $sig->storeAs("signatures", $sigName, 'local');
+
+                    // 1. Update Profile Signature
+                    $user->userSignature()->updateOrCreate(
+                        ['user_id' => $user->id],
+                        [
+                            'name' => $user->name,
+                            'signature_image' => $sigPath,
+                        ]
+                    );
+
+                    // 2. Snapshot to APL.01 Data
+                    $qrText = route('signature.verify', ['id' => $registration->id, 'type' => 'apl01']);
+                    $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->generate($qrText));
+
+                    $registration->aplData()->update([
+                        'asesi_signature' => $sigPath,
+                        'asesi_qr_code' => $qrBase64,
+                        'asesi_signature_date' => now(),
                     ]);
                 }
             });
@@ -323,10 +362,16 @@ class Apl01Controller extends Controller
             ->whereIn('list_id', $buktiAdminListIds)
             ->get();
 
-        $profile = $registration->candidate->profile;
+        $registration->load(['candidate.profile', 'scheme', 'aplData']);
+        $profile = $registration->candidate?->profile;
+
+        if (!$profile) {
+            return $this->errorResponse('E2001', 404);
+        }
 
         return $this->successResponse([
             'registration_id' => $registration->id,
+            'candidate_name' => $registration->candidate?->name ?? 'User',
             'asesi_type' => $profile->asesi_type,
             'institution_name' => $profile->institution_name,
             'status' => $registration->status,

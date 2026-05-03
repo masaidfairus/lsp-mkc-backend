@@ -17,9 +17,16 @@ class AssessmentRegistration extends Model
         'status',
         'status_apl01',
         'status_apl02',
+        'certification_purpose',
+        'asesi_type',
+        'institution_name',
         'final_result',
         'assessed_at',
         'admin_notes',
+        'apl02_signature',
+        'apl02_qr_code',
+        'apl02_signature_date',
+        'certificate',
     ];
 
     protected $casts = [
@@ -28,6 +35,7 @@ class AssessmentRegistration extends Model
         'status_apl02' => \App\Enums\Apl02Status::class,
         'certification_purpose' => CertificationPurpose::class,
         'assessed_at' => 'datetime',
+        'apl02_signature_date' => 'datetime',
     ];
 
     public function candidate()

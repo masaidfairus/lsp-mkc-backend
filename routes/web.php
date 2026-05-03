@@ -40,32 +40,59 @@ Route::get('/logout', [AuthController::class, 'logout']);
 
 Route::get('/signature/verify', function (\Illuminate\Http\Request $request) {
     $id = $request->query('id');
+    $type = $request->query('type');
     $sigData = null;
 
     if ($id) {
-        // Coba cari di SignatureRequest dulu (untuk dokumen spesifik)
-        $req = \App\Models\SignatureRequest::find($id);
-        if ($req && $req->status === 'signed') {
-            $sigData = [
-                'n' => $req->user->name,
-                'r' => $req->role,
-                'd' => $req->document_label,
-                't' => $req->signed_at->format('Y-m-d H:i:s'),
-                's' => null, // Sesuai permintaan: sembunyikan bentuk TTD
-                'v' => true,
-            ];
-        } else {
-            // Fallback ke UserSignature (library lama)
-            $sig = \App\Models\UserSignature::find($id);
-            if ($sig) {
+        if ($type === 'apl01') {
+            $reg = \App\Models\AssessmentRegistration::with(['aplData', 'candidate'])->find($id);
+            if ($reg && $reg->aplData && $reg->aplData->asesi_qr_code) {
                 $sigData = [
-                    'n' => $sig->name,
-                    'r' => 'Pemilik Tanda Tangan',
-                    'd' => 'Library Tanda Tangan',
-                    't' => $sig->updated_at->format('Y-m-d H:i:s'),
+                    'n' => $reg->candidate->name,
+                    'r' => 'Asesi / Kandidat',
+                    'd' => 'FR.APL.01 - Permohonan Sertifikasi',
+                    't' => $reg->aplData->asesi_signature_date?->format('Y-m-d H:i:s') ?? '-',
                     's' => null,
                     'v' => true,
                 ];
+            }
+        } elseif ($type === 'apl02') {
+            $reg = \App\Models\AssessmentRegistration::with('candidate')->find($id);
+            if ($reg && $reg->apl02_qr_code) {
+                $sigData = [
+                    'n' => $reg->candidate->name,
+                    'r' => 'Asesi / Kandidat',
+                    'd' => 'FR.APL.02 - Asesmen Mandiri',
+                    't' => $reg->apl02_signature_date?->format('Y-m-d H:i:s') ?? '-',
+                    's' => null,
+                    'v' => true,
+                ];
+            }
+        } else {
+            // Coba cari di SignatureRequest dulu (untuk dokumen spesifik)
+            $req = \App\Models\SignatureRequest::find($id);
+            if ($req && $req->status === 'signed') {
+                $sigData = [
+                    'n' => $req->user->name,
+                    'r' => $req->role,
+                    'd' => $req->document_label,
+                    't' => $req->signed_at->format('Y-m-d H:i:s'),
+                    's' => null, // Sesuai permintaan: sembunyikan bentuk TTD
+                    'v' => true,
+                ];
+            } else {
+                // Fallback ke UserSignature (library lama)
+                $sig = \App\Models\UserSignature::find($id);
+                if ($sig) {
+                    $sigData = [
+                        'n' => $sig->name,
+                        'r' => 'Pemilik Tanda Tangan',
+                        'd' => 'Library Tanda Tangan',
+                        't' => $sig->updated_at->format('Y-m-d H:i:s'),
+                        's' => null,
+                        'v' => true,
+                    ];
+                }
             }
         }
     }

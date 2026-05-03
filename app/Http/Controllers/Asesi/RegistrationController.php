@@ -12,79 +12,85 @@ class RegistrationController extends Controller
     {
         $user = $request->user();
 
-        $registrations = AssessmentRegistration::where('user_id', $user->id)
-            ->with(['scheme:id,name,code', 'plannings'])
-            ->orderByDesc('created_at')
-            ->get()
-            ->map(function ($reg) {
-                $planning = $reg->plannings->first();
+        // Eager load relationships to prevent N+1 queries and ensure fast loading
+        $registrations = AssessmentRegistration::with(['scheme', 'plannings', 'aplData'])
+            ->where('user_id', $user->id)
+            ->whereNotNull('scheme_id')
+            ->latest()
+            ->get();
 
-                // ── Status AK.01 ──────────────────────────────────
-                $ak01Status = 'draft';
-                if ($planning && $planning->ak01_data) {
-                    $asesiSig = $planning->ak01_data['signatures']['asesi']['signature'] ?? null;
-                    $asesorSig = $planning->ak01_data['signatures']['asesor']['signature'] ?? null;
+        $data = $registrations->map(function ($reg) use ($user) {
+            $profile = $reg->candidate?->profile;
 
-                    if ($asesiSig && $asesorSig) {
-                        $ak01Status = 'approved';
-                    } elseif ($asesiSig) {
-                        $ak01Status = 'submitted';
-                    } elseif ($asesorSig) {
-                        $ak01Status = 'pending';
+            // ── APL01 Next Step Logic ────────────────────────
+            $apl01NextStep = 1;
+
+            // Jika sudah ada data APL01 (Bagian 1 done)
+            if ($reg->aplData()->exists()) {
+                $apl01NextStep = 2;
+
+                // Jika sudah ada tipe asesi DI PENDAFTARAN (Bagian 2 done)
+                if ($reg->asesi_type) {
+                    $apl01NextStep = 3;
+
+                    // Cek apakah sudah upload bukti dasar (Bagian 3 done)
+                    // Bukti dasar disimpan di file_profiles, match dengan basic_requirement_proofs
+                    $basicReqListIds = \App\Models\BasicRequirementProof::where('scheme_id', $reg->scheme_id)
+                        ->pluck('list_id')
+                        ->toArray();
+
+                    $hasBasicProof = !empty($basicReqListIds) && \App\Models\FileProfile::where('user_id', $user->id)
+                        ->whereIn('list_id', $basicReqListIds)
+                        ->exists();
+
+                    if ($hasBasicProof) {
+                        $apl01NextStep = 4;
+
+                        // Cek apakah sudah upload bukti administratif (Bagian 4 done = submitted)
+                        // Status APL01 sudah pending/approved berarti semua step selesai
+                        if ($reg->status && $reg->status->isApl01Complete()) {
+                            $apl01NextStep = 5;
+                        }
                     }
                 }
+            }
 
-                // ── Status AK.04 ──────────────────────────────────
-                $ak04Status = 'draft';
-                if ($planning && $planning->ak04_data) {
-                    $asesiSig = $planning->ak04_data['signatures']['asesi']['signature'] ?? null;
-                    $ak04Status = $asesiSig ? 'submitted' : 'pending';
-                }
+            // Jika status APL01 sudah complete, paksa step 5 (lanjut ke APL02)
+            if ($reg->status && $reg->status->isApl01Complete()) {
+                $apl01NextStep = 5; 
+            }
 
-                // ── Status AK.07 ──────────────────────────────────
-                $ak07Status = 'draft';
-                if ($planning && $planning->ak07_data) {
-                    $asesiSig = $planning->ak07_data['signatures']['asesi']['signature'] ?? null;
-                    $ak07Status = $asesiSig ? 'submitted' : 'pending';
-                }
-
-                return [
-                    'registration_id' => $reg->id,
-                    'scheme_name' => $reg->scheme?->name ?? '-',
-                    'scheme_code' => $reg->scheme?->code ?? '-',
-                    'created_at' => $reg->created_at?->format('Y-m-d'),
-                    'forms' => [
-                        [
-                            'code' => 'APL.01',
-                            'label' => 'Permohonan Sertifikasi',
-                            'status' => $reg->status?->apl01Value() ?? 'not_started',
-                        ],
-                        [
-                            'code' => 'APL.02',
-                            'label' => 'Asesmen Mandiri',
-                            'status' => $reg->status?->apl02Value() ?? 'not_started',
-                        ],
-                        [
-                            'code' => 'AK.01',
-                            'label' => 'Persetujuan Asesmen',
-                            'status' => $ak01Status,
-                        ],
-                        [
-                            'code' => 'AK.04',
-                            'label' => 'Banding Asesmen',
-                            'status' => $ak04Status,
-                        ],
-                        [
-                            'code' => 'AK.07',
-                            'label' => 'Ceklis Penyesuaian',
-                            'status' => $ak07Status,
-                        ],
+            return [
+                'registration_id' => $reg->id,
+                'scheme_id' => $reg->scheme_id,
+                'scheme_name' => $reg->scheme?->name ?? 'Pilih Skema Sertifikasi',
+                'scheme_code' => $reg->scheme?->code ?? '-',
+                'candidate_name' => $reg->candidate?->name ?? '-',
+                'created_at' => $reg->created_at?->toDateTimeString(),
+                'apl01_next_step' => $apl01NextStep,
+                'status' => $reg->status,
+                'forms' => [
+                    [
+                        'code' => 'APL.01',
+                        'label' => 'Permohonan Sertifikasi',
+                        'status' => $reg->status?->apl01Value() ?? 'not_started',
                     ],
-                ];
-            });
+                    [
+                        'code' => 'APL.02',
+                        'label' => 'Asesmen Mandiri',
+                        'status' => $reg->status?->apl02Value() ?? 'not_started',
+                    ],
+                    [
+                        'code' => 'AK.01',
+                        'label' => 'Persetujuan Asesmen',
+                        'status' => 'not_started',
+                    ],
+                ],
+            ];
+        });
 
         return $this->successResponse(
-            $registrations,
+            $data,
             'Data registrasi berhasil ditampilkan'
         );
     }

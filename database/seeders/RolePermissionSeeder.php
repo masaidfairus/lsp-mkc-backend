@@ -12,27 +12,71 @@ class RolePermissionSeeder extends Seeder
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Ambil semua permission yang sudah digenerate shield
-        $aplPermissions     = Permission::where('name', 'like', '%_apl%')->pluck('name');
-        $akPermissions      = Permission::where('name', 'like', '%_ak%')->pluck('name');
-        $userPermissions    = Permission::where('name', 'like', '%_user%')->pluck('name');
-        $shieldPermissions  = Permission::where('name', 'like', '%_role%')
-                                ->orWhere('name', 'like', '%_permission%')
-                                ->pluck('name');
-
-        // Admin — hanya APL
         $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $admin->syncPermissions($aplPermissions);
-
-        // Asesor — hanya AK
         $asesor = Role::firstOrCreate(['name' => 'asesor', 'guard_name' => 'web']);
-        $asesor->syncPermissions($akPermissions);
-
-        // Asesi — tidak ada akses Filament
+        $validator = Role::firstOrCreate(['name' => 'validator', 'guard_name' => 'web']);
+        $penyusun = Role::firstOrCreate(['name' => 'penyusun', 'guard_name' => 'web']);
         Role::firstOrCreate(['name' => 'asesi', 'guard_name' => 'web']);
-
-        // Superadmin — semua permission
         $superadmin = Role::firstOrCreate(['name' => 'superadmin', 'guard_name' => 'web']);
+
+        // Custom permission
+        Permission::firstOrCreate(['name' => 'upload_certificate_assessment_registration', 'guard_name' => 'web']);
+
+        $allPermissions = Permission::all();
+        
+        $adminPermissions = collect();
+        $asesorPermissions = collect();
+
+        foreach ($allPermissions as $perm) {
+            $name = $perm->name;
+
+            // Superadmin gets everything (handled at the end)
+
+            // --- ADMIN LOGIC ---
+            // 1. Hak akses read semua dokumen
+            if (str_starts_with($name, 'view_') || str_starts_with($name, 'view_any_')) {
+                // Ignore shield, users, roles, etc. unless explicitly needed. But "semua dokumen" means all assessment docs.
+                if (preg_match('/(assessment_registration|apl|ak|appeal|fr_ia|mapa|fr_va|assessment_instrument|competency|scheme)/', $name)) {
+                    $adminPermissions->push($name);
+                }
+            }
+            // 2. Hak akses update APL.01 (AssessmentRegistration)
+            if (str_contains($name, 'assessment_registration') && str_starts_with($name, 'update_')) {
+                $adminPermissions->push($name);
+            }
+
+            // --- ASESOR LOGIC ---
+            $isAk04 = str_contains($name, 'appeal') || str_contains($name, 'ak04');
+            $isApl = str_contains($name, 'assessment_registration') || str_contains($name, 'apl');
+            $isAk = str_contains($name, 'ak0') || str_contains($name, 'ak_');
+            $isIa = str_contains($name, 'fr_ia') || str_contains($name, 'ia0');
+            $isMapa = str_contains($name, 'mapa');
+            $isVa = str_contains($name, 'fr_va');
+            
+            // Hak akses view untuk semua dokumen terkait asesmen
+            if (str_starts_with($name, 'view_') || str_starts_with($name, 'view_any_')) {
+                if ($isAk04 || $isApl || $isAk || $isIa || $isMapa || $isVa) {
+                    $asesorPermissions->push($name);
+                }
+            }
+            
+            // Hak akses update untuk APL.02 (AssessmentRegistration)
+            if (str_contains($name, 'assessment_registration') && str_starts_with($name, 'update_')) {
+                $asesorPermissions->push($name);
+            }
+
+            // Hak akses Insert & Update untuk semua dokumen selain APL.01, APL.02, AK.04
+            if (str_starts_with($name, 'create_') || str_starts_with($name, 'update_')) {
+                if (($isAk && !$isAk04) || $isIa || $isMapa || $isVa) {
+                    $asesorPermissions->push($name);
+                }
+            }
+        }
+        
+        $adminPermissions->push('upload_certificate_assessment_registration');
+        
+        $admin->syncPermissions($adminPermissions);
+        $asesor->syncPermissions($asesorPermissions);
         $superadmin->syncPermissions(Permission::all());
     }
 }

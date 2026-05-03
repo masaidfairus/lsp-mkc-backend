@@ -61,6 +61,8 @@ class PdfApl02Controller extends Controller
             'no_reg_asesor' => $asesorSig['reg_number'] ?? '',
             'asesor_qr_code' => $asesorSig['qr_code'],
             'asesor_date' => $asesorSig['is_signed'] ? $this->convertDateToLocalTime($asesorSig['signed_at'] ?? $registration->updated_at) : '',
+            'asesi_qr_code' => $registration->apl02_qr_code ?? '',
+            'asesi_date' => $registration->apl02_signature_date ? $this->convertDateToLocalTime($registration->apl02_signature_date) : '',
             'unit_kompetensi' => $scheme->competencyUnits ?? [],
             'asesmen_mandiri' => $selfAssessments ?? [],
             'portfolios' => $portfolios,
