@@ -306,9 +306,16 @@
                         <td style="border-bottom:1px solid #000; padding:4px 6px;">{{ $nama_asesi ?? '' }}</td>
                     </tr>
                     <tr>
-                        <td style="border-bottom:1px solid #000; padding:4px 6px; height:45px; vertical-align:top;">
+                        <td style="border-bottom:1px solid #000; padding:4px 6px; height:80px; vertical-align:top;">
                             Tanda tangan/<br>Tanggal</td>
-                        <td style="border-bottom:1px solid #000; padding:4px 6px;"></td>
+                        <td style="border-bottom:1px solid #000; padding:4px 6px; vertical-align:middle; text-align:center;">
+                            @if(!empty($asesi_qr_code))
+                                <img src="{{ $asesi_qr_code }}" style="width:50px; height:50px; vertical-align: middle;">
+                                <div style="vertical-align: middle; font-size: 8pt; margin-top: 6px;">
+                                    {{ $asesi_date ?? '' }}
+                                </div>
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <td style="border-bottom:1px solid #000; padding:4px 6px; font-weight:bold;" colspan="2">

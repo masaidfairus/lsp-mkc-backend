@@ -96,6 +96,18 @@ class AssessmentRegistrationResource extends Resource
                                             ->required()
                                             ->visible(fn ($record) => $record && $record->status_apl02 !== null),
                                     ])->columns(1),
+                                
+                                Forms\Components\Section::make('Penerbitan Sertifikat')
+                                    ->schema([
+                                        Forms\Components\FileUpload::make('certificate')
+                                            ->label('Upload Sertifikat (PDF/Image)')
+                                            ->directory('certificates')
+                                            ->acceptedFileTypes(['application/pdf', 'image/*'])
+                                            ->maxSize(5120) // 5MB max
+                                            ->visible(fn () => auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin'))
+                                            ->hint('Pastikan semua tahapan asesmen sudah selesai sebelum mengunggah sertifikat.')
+                                            ->columnSpanFull(),
+                                    ]),
                             ]),
                         
                         Forms\Components\Tabs\Tab::make('APL.01')

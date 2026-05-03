@@ -166,6 +166,8 @@ class Ak04Resource extends Resource
                     ->options(AppealStatus::class),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->label('Detail'),
                 Tables\Actions\EditAction::make()
                     ->label('Verifikasi')
                     ->icon('heroicon-o-check-badge')

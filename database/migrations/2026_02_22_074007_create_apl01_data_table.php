@@ -24,6 +24,12 @@ return new class extends Migration
             $table->text('company_address')->nullable();
             $table->string('company_postal_code')->nullable();
             $table->string('company_contact')->nullable();
+            
+            // TTD Asesi APL.01
+            $table->longText('asesi_signature')->nullable();
+            $table->longText('asesi_qr_code')->nullable();
+            $table->timestamp('asesi_signature_date')->nullable();
+            
             $table->timestamps();
         });
     }

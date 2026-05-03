@@ -25,9 +25,18 @@ return new class extends Migration {
             $table->string('status_apl01')->default(Apl01Status::NOT_STARTED->value)->index();
             $table->string('status_apl02')->default(Apl02Status::NOT_STARTED->value)->index();
             $table->string('certification_purpose')->default(CertificationPurpose::SERTIFIKASI);
+            $table->string('asesi_type')->nullable();
+            $table->string('institution_name')->nullable();
             $table->string('status')->default(AssessmentStatus::APL01_DRAFT);
+            $table->string('certificate')->nullable();
             $table->string('final_result')->default(Result::BELUM_KOMPETEN)->nullable();
             $table->timestamp('assessed_at')->nullable();
+            
+            // TTD Asesi APL.02
+            $table->longText('apl02_signature')->nullable();
+            $table->longText('apl02_qr_code')->nullable();
+            $table->timestamp('apl02_signature_date')->nullable();
+            
             $table->timestamps();
             $table->softDeletes();
         });

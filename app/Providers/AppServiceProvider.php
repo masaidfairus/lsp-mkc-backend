@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Gate::before(function ($user, $ability) {
-            return ($user->hasRole('super_admin') || $user->hasRole('admin')) ? true : null;
+            return $user->hasRole('superadmin') ? true : null;
         });
 
         \App\Models\UserSignature::observe(\App\Observers\UserSignatureObserver::class);

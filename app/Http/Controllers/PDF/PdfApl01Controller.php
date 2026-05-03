@@ -123,6 +123,8 @@ class PdfApl01Controller extends Controller
             'asesor_qr_code' => $signatureData['qr_code'],
             'asesor_name' => $registration->assessor?->name ?? '',
             'asesor_sign_date' => $registration->status->isApl01Complete() ? $this->convertDateToLocalTime($registration->updated_at) : '',
+            'asesi_qr_code' => $aplData->asesi_qr_code ?? '',
+            'asesi_sign_date' => $aplData->asesi_signature_date ? $this->convertDateToLocalTime($aplData->asesi_signature_date) : '',
         ];
 
         $pdf = Pdf::loadView('forms.APL.apl01', $data)

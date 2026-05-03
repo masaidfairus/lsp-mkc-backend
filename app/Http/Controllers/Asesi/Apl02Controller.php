@@ -103,6 +103,7 @@ class Apl02Controller extends Controller
             'answers' => ['required', 'array', 'min:1'],
             'answers.*.element_id' => ['required', 'integer'],
             'answers.*.is_competent' => ['required', 'boolean'],
+            'signature' => ['nullable', 'image', 'max:1024'],
         ]);
 
         $mandatoryIds = $registration->scheme->portfolios
@@ -180,7 +181,34 @@ class Apl02Controller extends Controller
                 ['is_competent', 'updated_at']
             );
 
-            $registration->update(['status' => AssessmentStatus::APL02_SUBMITTED, 'assessed_at' => Carbon::now()]);
+            // ── Signature Processing ──────────────────────────────────
+            $updateData = [
+                'status' => AssessmentStatus::APL02_SUBMITTED,
+                'assessed_at' => \Carbon\Carbon::now()
+            ];
+
+            if (request()->hasFile('signature')) {
+                $sig = request()->file('signature');
+                $user = auth()->user();
+                $sigName = "sig_user_{$user->id}_apl02_" . uniqid() . "." . $sig->getClientOriginalExtension();
+                $sigPath = $sig->storeAs("signatures", $sigName, 'local');
+
+                // 1. Update Profile Signature
+                $user->userSignature()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    ['name' => $user->name, 'signature_image' => $sigPath]
+                );
+
+                // 2. Build QR Code for APL.02
+                $qrText = route('signature.verify', ['id' => $registration->id, 'type' => 'apl02']);
+                $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->generate($qrText));
+
+                $updateData['apl02_signature'] = $sigPath;
+                $updateData['apl02_qr_code'] = $qrBase64;
+                $updateData['apl02_signature_date'] = now();
+            }
+
+            $registration->update($updateData);
         });
 
         return $this->successResponse(
