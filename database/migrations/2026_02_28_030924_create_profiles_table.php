@@ -25,6 +25,8 @@ return new class extends Migration {
             $table->string('job_title')->nullable();
             $table->text('company_address')->nullable();
             $table->string('company_postal_code')->nullable();
+            $table->string('company_fax')->nullable();
+            $table->string('company_email')->nullable();
             $table->string('company_contact')->nullable();
             $table->string('asesi_type')->default('pribadi');
             $table->string('institution_name')->nullable();

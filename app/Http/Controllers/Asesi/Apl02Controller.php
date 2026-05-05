@@ -31,12 +31,8 @@ class Apl02Controller extends Controller
             return $this->errorResponse('E2009', 403);
         }
 
-        if ($registration->asesi_type === 'pribadi') {
-            $payment = $registration->payments()->first();
-            if (!$payment || $payment->status !== PaymentStatus::PAID) {
-                return $this->errorResponse('E2010', 403);
-            }
-        }
+        // Payment is considered settled if APL.01 is approved.
+
 
         $scheme = $registration->scheme->load([
             'competencyUnits.competencyElements.performanceCriteria'
@@ -153,15 +149,12 @@ class Apl02Controller extends Controller
                 ->update(['is_active' => false]);
 
             foreach ($newFileProfileIds as $fileProfileId) {
-                $fileProfile = FileProfile::find($fileProfileId);
-
                 Apl02Portfolio::updateOrCreate(
                     [
                         'registration_id' => $registration->id,
-                        'list_id' => $fileProfile->list_id,
+                        'file_profile_id' => $fileProfileId,
                     ],
                     [
-                        'file_profile_id' => $fileProfileId,
                         'is_active' => true,
                     ]
                 );
@@ -183,7 +176,7 @@ class Apl02Controller extends Controller
 
             // ── Signature Processing ──────────────────────────────────
             $updateData = [
-                'status' => AssessmentStatus::APL02_SUBMITTED,
+                'status_apl02' => \App\Enums\Apl02Status::SUBMITTED,
                 'assessed_at' => \Carbon\Carbon::now()
             ];
 

@@ -41,7 +41,7 @@ class DocumentProfileController extends Controller
     {
         $user = $request->user();
 
-        if ($user->role !== 'admin' && $document->getAttribute('user_id') !== $user->id) {
+        if (!$user->hasRole(['admin', 'superadmin', 'asesor']) && $document->getAttribute('user_id') !== $user->id) {
             return $this->errorResponse('E1005', 403);
         }
 

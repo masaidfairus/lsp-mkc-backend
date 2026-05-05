@@ -78,6 +78,7 @@ $scheme_name = $scheme_name ?? '';
 $scheme_code = $scheme_code ?? '';
 $reason_notes = $reason_notes ?? '';
 $asesi_sign = $asesi_sign ?? '';
+$asesi_qr_code = $asesi_qr_code ?? '';
 $asesi_sign_date = $asesi_sign_date ?? '';
 $appeal_questions = $appeal_questions ?? '';
     @endphp
@@ -113,10 +114,10 @@ $appeal_questions = $appeal_questions ?? '';
 
         {{-- Header Ya/Tidak --}}
         <tr>
-            <td colspan="5" style="font-style:italic;">Jawablah dengan Ya atau Tidak pertanyaan-pertanyaan berikut ini :
+            <td colspan="5" style="font-style:italic; vertical-align:middle; height: 40px; padding: 5px 10px;">Jawablah dengan Ya atau Tidak pertanyaan-pertanyaan berikut ini :
             </td>
-            <td colspan="1" style="text-align:center; font-weight:bold;">YA</td>
-            <td style="text-align:center; font-weight:bold;">TIDAK</td>
+            <td colspan="1" style="text-align:center; font-weight:bold; vertical-align:middle; height: 40px;">YA</td>
+            <td colspan="1" style="text-align:center; font-weight:bold; vertical-align:middle; height: 40px;">TIDAK</td>
         </tr>
 
         {{-- Pertanyaan 1 --}}
@@ -174,10 +175,23 @@ $appeal_questions = $appeal_questions ?? '';
 
         {{-- TTD --}}
         <tr>
-            <td colspan="7" style="height:50px; vertical-align:middle; padding-bottom:6px;">
-                Tanda tangan Asesi : {{ $asesi_name }}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <span style="margin-left: 1rem;">Tanggal : {{ $asesi_sign_date }}</span>
+            <td colspan="7" style="height:100px; vertical-align:middle; padding:10px;">
+                <table style="width:100%; border:none;">
+                    <tr>
+                        <td style="width:30%; border:none; text-align:center;">
+                            @if($asesi_qr_code)
+                                <img src="{{ $asesi_qr_code }}" style="width:80px; height:80px;">
+                                <div style="font-size:7pt; margin-top:2px;">Terverifikasi Digital</div>
+                            @else
+                                (Tanda Tangan Asesi)
+                            @endif
+                        </td>
+                        <td style="width:70%; border:none; vertical-align:middle;">
+                            Nama Asesi : <strong>{{ $asesi_name }}</strong><br>
+                            Tanggal : {{ $asesi_sign_date }}
+                        </td>
+                    </tr>
+                </table>
             </td>
         </tr>
 

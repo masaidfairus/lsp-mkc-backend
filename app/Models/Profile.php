@@ -17,6 +17,8 @@ class Profile extends Model
         'education_id',
         'company_name',
         'company_postal_code',
+        'company_fax',
+        'company_email',
         'job_title',
         'company_address',
         'company_contact',

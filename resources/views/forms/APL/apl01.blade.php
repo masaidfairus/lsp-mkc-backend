@@ -245,34 +245,46 @@
         <tr>
             <td class="lbl" style="vertical-align:top; padding-top:3px;">Alamat rumah</td>
             <td class="colon" style="vertical-align:top; padding-top:3px;">:</td>
-            <td class="val" style="vertical-align:top; padding-top:3px;">{{ $alamat }}</td>
+            <td class="val" style="vertical-align:top; padding-top:3px;">{!! $alamat ?: '&nbsp;' !!}</td>
+        </tr>
+        <tr class="spacer">
+            <td colspan="3"></td>
         </tr>
         {{-- Alamat baris 2 --}}
         <tr>
             <td class="lbl" style="vertical-align:top; padding-top:3px;"></td>
             <td class="colon" style="vertical-align:top; padding-top:3px;"></td>
             <td class="val" style="vertical-align:top; padding-top:3px;">
-                {{ $rt_rw ? 'RT/RW ' . $rt_rw . ', ' : '' }}{{ $kelurahan }}, {{ $kecamatan }}
+                @php
+                    $baris2 = trim(($rt_rw ? 'RT/RW ' . $rt_rw . ', ' : '') . $kelurahan . ' ' . $kecamatan);
+                @endphp
+                {!! $baris2 ?: '&nbsp;' !!}
             </td>
+        </tr>
+        <tr class="spacer">
+            <td colspan="3"></td>
         </tr>
         {{-- Alamat baris 3 + kode pos --}}
         <tr>
             <td class="lbl" style="vertical-align:top; padding-top:3px;"></td>
-            <td class="colon" style="vertical-align:top; padding-top:3px;">:</td>
+            <td class="colon" style="vertical-align:top; padding-top:3px;"></td>
             <td style="vertical-align:top; padding-top:3px; padding-bottom:0;">
                 <table style="width:100%; border-collapse:collapse;">
                     <tr>
+                        @php
+                            $baris3 = trim(trim($kabupaten . ', ' . $provinsi, ', '));
+                        @endphp
                         <td
-                            style="width:52%; border-bottom:2px solid #000; padding-bottom:2px; font-size:9.5pt; vertical-align:top; word-wrap:break-word;">
-                            {{ $kabupaten }}, {{ $provinsi }}
+                            style="width:52%; border-bottom:1px solid #000; padding-bottom:2px; font-size:9.5pt; vertical-align:top; word-wrap:break-word;">
+                            {!! $baris3 ?: '&nbsp;' !!}
                         </td>
                         <td style="width:2%;"></td>
                         <td
                             style="width:18%; font-size:9pt; vertical-align:bottom; padding-bottom:3px; white-space:nowrap;">
                             Kode pos :</td>
                         <td
-                            style="width:28%; border-bottom:2px solid #000; padding-bottom:2px; text-align:center; font-size:9.5pt;">
-                            {{ $kode_pos }}
+                            style="width:28%; border-bottom:1px solid #000; padding-bottom:2px; text-align:center; font-size:9.5pt;">
+                            {!! $kode_pos ?: '&nbsp;' !!}
                         </td>
                     </tr>
                 </table>
@@ -288,25 +300,12 @@
             <td class="colon">:</td>
             <td style="vertical-align:bottom; padding-bottom:0;">
                 <table style="width:100%; border-collapse:collapse;">
-                    <tr>
-                        <td style="font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px;">Rumah
-                            :</td>
-                        <td style="width:32%; border-bottom:1px solid #000; padding-bottom:2px;"></td>
-                        <td
-                            style="font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px; padding-left:8px;">
-                            Kantor :</td>
-                        <td style="width:32%; border-bottom:1px solid #000; padding-bottom:2px;"></td>
-                    </tr>
                     <tr style="height:5px;"></tr>
                     <tr>
-                        <td style="font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px;">HP :
-                        </td>
-                        <td style="border-bottom:1px solid #000; padding-bottom:2px; font-size:9.5pt;">{{ $no_telp }}
-                        </td>
-                        <td
-                            style="font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px; padding-left:8px;">
-                            E-mail :</td>
-                        <td style="border-bottom:1px solid #000; padding-bottom:2px; font-size:9.5pt;">{{ $email }}</td>
+                        <td style="width:8%; font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px;">HP :</td>
+                        <td style="width:40%; border-bottom:1px solid #000; padding-bottom:2px; font-size:9.5pt;">{{ $no_telp }}</td>
+                        <td style="width:10%; font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px; padding-left:8px;">E-mail :</td>
+                        <td style="width:42%; border-bottom:1px solid #000; padding-bottom:2px; font-size:9.5pt;">{{ $email }}</td>
                     </tr>
                 </table>
             </td>
@@ -347,7 +346,10 @@
         <tr>
             <td class="lbl">Alamat Kantor</td>
             <td class="colon">:</td>
-            <td class="val" style="vertical-align:top; padding-top:3px;">{{ $alamat_instansi ?? '' }}</td>
+            <td class="val" style="vertical-align:top; padding-top:3px;">{!! $alamat_instansi ?: '&nbsp;' !!}</td>
+        </tr>
+        <tr class="spacer">
+            <td colspan="3"></td>
         </tr>
         {{-- Baris 2 alamat kantor + kode pos --}}
         <tr>
@@ -356,12 +358,12 @@
             <td style="vertical-align:bottom; padding-bottom:0;">
                 <table style="width:100%; border-collapse:collapse;">
                     <tr>
-                        <td style="width:52%; border-bottom:2px solid #000; padding-bottom:2px;"></td>
+                        <td style="width:52%; border-bottom:1px solid #000; padding-bottom:2px;">&nbsp;</td>
                         <td style="width:2%;"></td>
                         <td
                             style="width:18%; font-size:9pt; vertical-align:bottom; padding-bottom:3px; white-space:nowrap;">
                             Kode pos :</td>
-                        <td style="width:28%; border-bottom:2px solid #000; padding-bottom:2px;">
+                        <td style="width:28%; border-bottom:1px solid #000; padding-bottom:2px; text-align:center;">
                             {{ $kode_pos_kantor }}
                         </td>
                     </tr>
@@ -379,20 +381,15 @@
             <td style="vertical-align:bottom; padding-bottom:0;">
                 <table style="width:100%; border-collapse:collapse;">
                     <tr>
-                        <td style="font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px;">Telp :
-                        </td>
-                        <td style="width:35%; border-bottom:1px solid #000; padding-bottom:2px;"></td>
-                        <td
-                            style="font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px; padding-left:8px;">
-                            Fax :</td>
-                        <td style="width:35%; border-bottom:1px solid #000; padding-bottom:2px;"></td>
+                        <td style="width:8%; font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px;">Telp :</td>
+                        <td style="width:40%; border-bottom:1px solid #000; padding-bottom:2px;">{{ $telp_kantor ?? '' }}</td>
+                        <td style="width:10%; font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px; padding-left:8px;">Fax :</td>
+                        <td style="width:42%; border-bottom:1px solid #000; padding-bottom:2px;">{{ $fax_kantor ?? '' }}</td>
                     </tr>
                     <tr style="height:5px;"></tr>
                     <tr>
-                        <td style="font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px;">E-mail
-                            :</td>
-                        <td style="width:50%; border-bottom:1px solid #000; padding-bottom:2px;">{{ $email }}</td>
-                        <td colspan="2"></td>
+                        <td style="width:8%; font-size:9pt; white-space:nowrap; vertical-align:bottom; padding-bottom:3px;">E-mail :</td>
+                        <td style="width:92%; border-bottom:1px solid #000; padding-bottom:2px;" colspan="3">{{ $email_kantor ?? $email }}</td>
                     </tr>
                 </table>
             </td>
@@ -522,13 +519,13 @@
                         <td class="center">{{ $i + 1 }}.</td>
                         <td>{{ $syarat['nama'] }}</td>
                         <td class="center">
-                            <span class="{{ $syarat['status']->value === 'valid' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ $syarat['status']->value === 'valid' && $syarat['validation_result']?->value === 'ms' ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                         <td class="center">
-                            <span class="{{ $syarat['status']->value === 'invalid' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ $syarat['status']->value === 'valid' && $syarat['validation_result']?->value === 'tms' ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                         <td class="center">
-                            <span class="{{ $syarat['status']->value === 'pending' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ $syarat['status']->value !== 'valid' ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                     </tr>
                 @endforeach
@@ -574,13 +571,13 @@
                         <td class="center">{{ $i + 1 }}.</td>
                         <td>{{ $bukti['nama'] }}</td>
                         <td class="center">
-                            <span class="{{ $bukti['status']->value === 'valid' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ $bukti['status']->value === 'valid' && $bukti['validation_result']?->value === 'ms' ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                         <td class="center">
-                            <span class="{{ $bukti['status']->value === 'invalid' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ $bukti['status']->value === 'valid' && $bukti['validation_result']?->value === 'tms' ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                         <td class="center">
-                            <span class="{{ $bukti['status']->value === 'pending' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ $bukti['status']->value !== 'valid' ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                     </tr>
                 @endforeach
@@ -612,7 +609,9 @@
                 <div><strong>{{$status_terima}}</strong> sebagai peserta sertifikasi</div>
                 <br><br>
                 <div style="font-weight:bold;">Catatan :</div>
-                <br><br><br>
+                <div style="margin-top: 4px; font-style: italic; min-height: 40px;">
+                    {{ $admin_notes ?: '-' }}
+                </div>
             </td>
             <td style="width:45%; vertical-align:top; padding:0;">
                 <table style="width:100%; border-collapse:collapse;">

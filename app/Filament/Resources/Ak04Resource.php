@@ -29,104 +29,124 @@ class Ak04Resource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Status Verifikasi')
+                    ->icon('heroicon-m-check-badge')
                     ->schema([
-                        Forms\Components\Grid::make(3)
+                        Forms\Components\Grid::make(12)
                             ->schema([
                                 Forms\Components\Select::make('registration_id')
-                                    ->label('ID Pendaftaran')
+                                    ->label('Pendaftaran Terkait')
                                     ->relationship('registration', 'id')
                                     ->getOptionLabelFromRecordUsing(function ($record) {
                                         $candidate = $record->candidate?->name ?? 'Unknown';
-                                        $scheme = $record->scheme?->name ?? 'No Scheme';
-                                        return "{$candidate} — {$scheme} — #{$record->id}";
+                                        return "{$candidate} (#{$record->id})";
                                     })
-                                    ->searchable()
-                                    ->preload()
-                                    ->reactive()
-                                    ->hint('Hanya pendaftaran yang SUDAH mengajukan banding yang akan muncul di sini.')
-                                    ->hintColor('primary')
-                                    ->hintIcon('heroicon-m-information-circle')
                                     ->disabled()
-                                    ->dehydrated(),
+                                    ->dehydrated()
+                                    ->columnSpan(4),
                                 
                                 Forms\Components\Select::make('status')
-                                    ->label('Status Banding')
+                                    ->label('Status Verifikasi')
                                     ->options(AppealStatus::class)
                                     ->required()
-                                    ->native(false),
+                                    ->native(false)
+                                    ->columnSpan(4),
                                 
                                 Forms\Components\Placeholder::make('created_at')
-                                    ->label('Tanggal Pengajuan')
-                                    ->content(fn ($record) => $record?->created_at?->translatedFormat('d F Y H:i') ?? '-'),
+                                    ->label('Waktu Pengajuan')
+                                    ->content(fn ($record) => $record?->created_at?->translatedFormat('d F Y H:i') ?? '-')
+                                    ->columnSpan(4),
                             ]),
                     ]),
 
                 Forms\Components\Section::make('Detail Banding (AK.04)')
-                    ->statePath('ak04_data')
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Forms\Components\Grid::make(12)
                             ->schema([
-                                Forms\Components\TextInput::make('asesi_name')
+                                Forms\Components\Placeholder::make('asesi_name')
                                     ->label('Nama Asesi')
-                                    ->disabled(),
-                                Forms\Components\TextInput::make('asesor_name')
+                                    ->content(fn ($record) => $record?->ak04_data['asesi_name'] ?? '-')
+                                    ->columnSpan(6),
+                                Forms\Components\Placeholder::make('asesor_name')
                                     ->label('Nama Asesor')
-                                    ->disabled(),
-                                Forms\Components\TextInput::make('assessment_date')
+                                    ->content(fn ($record) => $record?->ak04_data['asesor_name'] ?? '-')
+                                    ->columnSpan(6),
+                                Forms\Components\Placeholder::make('assessment_date')
                                     ->label('Tanggal Asesmen')
-                                    ->disabled(),
-                                Forms\Components\Group::make([
-                                    Forms\Components\TextInput::make('appeal_target.scheme_name')
-                                        ->label('Skema Sertifikasi')
-                                        ->disabled(),
-                                    Forms\Components\TextInput::make('appeal_target.scheme_code')
-                                        ->label('Kode Skema')
-                                        ->disabled(),
-                                ])->columns(2),
+                                    ->content(fn ($record) => $record?->ak04_data['assessment_date'] ?? '-')
+                                    ->columnSpan(6),
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\Placeholder::make('scheme_name')
+                                            ->label('Skema Sertifikasi')
+                                            ->content(fn ($record) => $record?->ak04_data['appeal_target']['scheme_name'] ?? '-'),
+                                        Forms\Components\Placeholder::make('scheme_code')
+                                            ->label('Kode Skema')
+                                            ->content(fn ($record) => $record?->ak04_data['appeal_target']['scheme_code'] ?? '-'),
+                                    ])->columnSpan(6),
                             ]),
                         
                         Forms\Components\Section::make('Pertanyaan Banding')
                             ->schema([
-                                Forms\Components\Repeater::make('appeal_questions')
+                                Forms\Components\Placeholder::make('appeal_questions_view')
                                     ->label('')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('label')
-                                            ->label('Pertanyaan')
-                                            ->disabled()
-                                            ->columnSpan(3),
-                                        Forms\Components\Toggle::make('answer')
-                                            ->label('Jawaban (Ya/Tidak)')
-                                            ->disabled()
-                                            ->onIcon('heroicon-m-check')
-                                            ->offIcon('heroicon-m-x-mark')
-                                            ->columnSpan(1),
-                                    ])
-                                    ->columns(4)
-                                    ->addable(false)
-                                    ->deletable(false)
-                                    ->reorderable(false),
+                                    ->content(function ($record) {
+                                        $questions = $record?->ak04_data['appeal_questions'] ?? [];
+                                        if (empty($questions)) return 'Tidak ada data pertanyaan.';
+                                        
+                                        $html = '<div class="space-y-3">';
+                                        foreach ($questions as $q) {
+                                            $answer = ($q['answer'] ?? false) ? 'YA' : 'TIDAK';
+                                            $isYa = ($q['answer'] ?? false);
+                                            
+                                            $itemBg = $isYa ? 'bg-emerald-50/50 dark:bg-emerald-500/5' : 'bg-rose-50/50 dark:bg-rose-500/5';
+                                            $itemBorder = $isYa ? 'border-emerald-200 dark:border-emerald-500/20' : 'border-rose-200 dark:border-rose-500/20';
+                                            
+                                            $labelColor = $isYa ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400';
+                                            $badgeBg = $isYa ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-rose-600 dark:bg-rose-500';
+                                            
+                                            $html .= "
+                                                <div class='flex justify-between items-center p-4 {$itemBg} rounded-xl border {$itemBorder} shadow-sm'>
+                                                    <div class='text-sm font-medium text-gray-800 dark:text-gray-200 pr-4'>{$q['label']}</div>
+                                                    <div class='flex-shrink-0 px-4 py-1.5 rounded-lg {$badgeBg} text-white text-[10px] font-black tracking-[0.2em] shadow-lg'>
+                                                        {$answer}
+                                                    </div>
+                                                </div>";
+                                        }
+                                        $html .= '</div>';
+                                        return new HtmlString($html);
+                                    }),
                             ]),
 
-                        Forms\Components\Textarea::make('reason_notes')
+                        Forms\Components\Placeholder::make('reason_notes')
                             ->label('Alasan Banding')
-                            ->rows(4)
-                            ->disabled()
+                            ->content(fn ($record) => $record?->ak04_data['reason_notes'] ?? '-')
                             ->columnSpanFull(),
 
                         Forms\Components\Section::make('Tanda Tangan Asesi')
                             ->schema([
                                 Forms\Components\Placeholder::make('signature_preview')
-                                    ->label('Tanda Tangan')
-                                    ->content(function ($get) {
-                                        $sig = $get('signature.asesi_signature');
-                                        if (!$sig) return 'Belum ada tanda tangan';
+                                    ->label('Verifikasi Digital (QR Code)')
+                                    ->content(function ($record) {
+                                        if (!$record) return '-';
                                         
-                                        // Usually it's base64 from Ak04Controller logic
-                                        return new HtmlString("<img src='{$sig}' style='max-height:150px; border:1px solid #e5e7eb; border-radius:8px;' />");
+                                        $qrCode = $record->asesi_qr_code;
+                                        
+                                        if (!$qrCode) {
+                                            return new HtmlString("<div class='p-4 bg-gray-50 border border-dashed rounded-lg text-gray-500 text-xs'>
+                                                Belum ada tanda tangan digital yang terverifikasi (QR Code tidak ditemukan).
+                                            </div>");
+                                        }
+                                        
+                                        return new HtmlString("
+                                            <div class='flex flex-col gap-2'>
+                                                <img src='{$qrCode}' style='max-height:150px; width:150px; border:1px solid #e5e7eb; border-radius:8px;' />
+                                                <span class='text-[10px] text-gray-400'>Terverifikasi secara digital</span>
+                                            </div>
+                                        ");
                                     }),
-                                Forms\Components\TextInput::make('signature.date')
+                                Forms\Components\Placeholder::make('signature_date')
                                     ->label('Tanggal Tanda Tangan')
-                                    ->disabled(),
+                                    ->content(fn ($record) => $record?->ak04_data['signature']['date'] ?? '-'),
                             ])->columns(2),
                     ])->collapsible(),
             ]);

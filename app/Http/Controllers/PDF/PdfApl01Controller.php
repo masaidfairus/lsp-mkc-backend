@@ -50,12 +50,12 @@ class PdfApl01Controller extends Controller
 
         // ── Load semua relasi sekaligus (N+1 safe) ───────────────────
         $registration->load([
-            'candidate',
-            'aplData',
+            'candidate.profile',
+            'aplData.education',
             'scheme',
             'scheme.competencyUnits',
-            'filteredAplUserFiles.documentList.basicRequirementProof',
-            'filteredAplUserFiles.documentList.administrativeProof',
+            'filteredAplUserFiles.documentList.basicRequirementProofs',
+            'filteredAplUserFiles.documentList.administrativeProofs',
         ]);
 
         $aplData = $registration->aplData;
@@ -69,15 +69,15 @@ class PdfApl01Controller extends Controller
 
         $data = [
             'nama' => strtoupper($candidate->name),
-            'nik' => $candidate->identity_number ?? '-',
+            'nik' => $candidate->identity_number ?? ($candidate->profile?->identity_number ?? '-'),
             'email' => $candidate->email,
             'tempat_lahir' => $aplData->place_of_birth ?? '-',
-            'tanggal_lahir' => Carbon::parse($aplData->date_of_birth)->translatedFormat('d F Y'),
-            'jenis_kelamin' => $aplData->gender === 'male' ? 'Laki-laki' : 'Perempuan',
+            'tanggal_lahir' => $aplData->date_of_birth ? Carbon::parse($aplData->date_of_birth)->translatedFormat('d F Y') : '-',
+            'jenis_kelamin' => $aplData->gender && $aplData->gender->value === 'male' ? 'Laki-laki' : 'Perempuan',
             'no_telp' => $aplData->phone_number,
-            'pendidikan' => $aplData->education_qualifications,
+            'pendidikan' => $aplData->education?->title ?? '-',
             'alamat' => $aplData->address,
-            'rt_rw' => null,
+            'rt_rw' => null, // Belum ada di skema database apl01_data
             'kelurahan' => '',
             'kecamatan' => '',
             'kabupaten' => '',
@@ -88,6 +88,9 @@ class PdfApl01Controller extends Controller
             'pekerjaan' => $aplData->job_title,
             'alamat_instansi' => $aplData->company_address,
             'kode_pos_kantor' => $aplData->company_postal_code ?? '',
+            'telp_kantor' => $aplData->company_contact ?? '',
+            'fax_kantor' => $aplData->company_fax ?? '',
+            'email_kantor' => $aplData->company_email ?? $candidate->email,
             'nama_skema' => $scheme->name,
             'kode_skema' => $scheme->code,
             'tujuan_asesmen' => $registration->certification_purpose instanceof \BackedEnum
@@ -100,19 +103,22 @@ class PdfApl01Controller extends Controller
                 ])
                 ->toArray(),
             'persyaratan_dasar' => $files->filter(function ($file) use ($scheme) {
-                return $file->documentList && $file->documentList->basicRequirementProof
+                return $file->documentList && $file->documentList->basicRequirementProofs
                     ->where('scheme_id', $scheme->id)
                     ->isNotEmpty();
             })->map(fn($file) => [
                     'nama' => $file->documentList->title,
                     'status' => $file->status,
+                    'validation_result' => $file->validation_result,
                 ])->values()->toArray(),
             'bukti_administratif' => $files->filter(function ($file) {
-                return $file->documentList && $file->documentList->administrativeProof->isNotEmpty();
+                return $file->documentList && $file->documentList->administrativeProofs->isNotEmpty();
             })->map(fn($file) => [
                     'nama' => $file->documentList->title,
                     'status' => $file->status,
+                    'validation_result' => $file->validation_result,
                 ])->values()->toArray(),
+            'admin_notes' => $registration->admin_notes ?? '',
             'status_terima' => match (true) {
                 $registration->status === AssessmentStatus::APL01_APPROVED,
                 $registration->status->isApl01Complete() => 'DITERIMA',

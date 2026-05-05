@@ -20,6 +20,9 @@ return new class extends Migration {
             $table->json('methods')->nullable();
             $table->string('version')->default('1.0');
             $table->timestamp('confirmed_at')->nullable();
+            $table->string('ak01_asesi_signature')->nullable();
+            $table->text('ak01_asesi_qr_code')->nullable();
+            $table->timestamp('ak01_asesi_signature_date')->nullable();
             $table->timestamps();
         });
     }

@@ -12,7 +12,7 @@ use Filament\Notifications\Notification;
 class ViewSignatureInbox extends EditRecord
 {
     protected static string $resource = SignatureInboxResource::class;
-    
+
     protected ?string $heading = 'Tinjau & Tanda Tangani Dokumen';
 
     public function form(Form $form): Form
@@ -21,7 +21,8 @@ class ViewSignatureInbox extends EditRecord
             ->schema([
                 Forms\Components\Group::make()
                     ->schema(function ($record) {
-                        if (!$record) return [];
+                        if (!$record)
+                            return [];
 
                         $requests = $record->signatureRequests()
                             ->where('user_id', auth()->id())
@@ -38,14 +39,14 @@ class ViewSignatureInbox extends EditRecord
                         $tabs = [];
                         foreach ($requests as $req) {
                             $isPending = $req->status === 'pending';
-                            
+
                             $pdfUrl = '#';
                             if ($req->document_label === 'FR.VA') {
-                                $pdfUrl = route('frva.print', ['registration' => $record->id]);
+                                $pdfUrl = \Illuminate\Support\Facades\URL::signedRoute('frva.print', ['registration' => $record->id]);
                             } else {
                                 $routeName = strtolower(str_replace('.', '', $req->document_label)) . '.form';
                                 try {
-                                    $pdfUrl = route($routeName, ['registration' => $record->id]);
+                                    $pdfUrl = \Illuminate\Support\Facades\URL::signedRoute($routeName, ['registration' => $record->id]);
                                 } catch (\Exception $e) {
                                     // Fallback
                                 }
@@ -72,14 +73,14 @@ class ViewSignatureInbox extends EditRecord
                     ->columnSpanFull()
             ]);
     }
-    
+
     // Handle the custom submission from Blade view
     public function submitSignature($requestId, $base64Data)
     {
         $req = SignatureRequest::where('id', $requestId)
             ->where('user_id', auth()->id())
             ->first();
-            
+
         if (!$req) {
             Notification::make()->title('Data tidak ditemukan atau tidak berhak')->danger()->send();
             return;
@@ -95,11 +96,11 @@ class ViewSignatureInbox extends EditRecord
         $time = now()->format('Y-m-d H:i:s');
         $name = auth()->user()->name;
         $role = $req->role;
-        $doc  = $req->document_label;
-        
+        $doc = $req->document_label;
+
         // Generate Verification URL for QR Code
         $qrText = route('ttd.cek', ['id' => $req->id]);
-        
+
         // Build base64 QR (Using SVG format to avoid Imagick dependency)
         $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->generate($qrText));
 
@@ -112,7 +113,17 @@ class ViewSignatureInbox extends EditRecord
 
         Notification::make()->title("Tanda tangan untuk $doc berhasil disimpan")->success()->send();
         
-        // Refresh page
+        // Check if there are any other pending requests for this record
+        $hasPending = $req->registration->signatureRequests()
+            ->where('user_id', auth()->id())
+            ->where('status', 'pending')
+            ->exists();
+
+        if (!$hasPending) {
+            return redirect(static::getResource()::getUrl('index'));
+        }
+
+        // Refresh page if there are still pending items
         return redirect(request()->header('Referer'));
     }
 
@@ -122,7 +133,8 @@ class ViewSignatureInbox extends EditRecord
             ->where('user_id', auth()->id())
             ->first();
 
-        if (!$req) return;
+        if (!$req)
+            return;
 
         $req->update([
             'status' => 'pending',
@@ -132,7 +144,7 @@ class ViewSignatureInbox extends EditRecord
         ]);
 
         Notification::make()->title("Tanda tangan untuk {$req->document_label} telah dihapus")->warning()->send();
-        
+
         return redirect(request()->header('Referer'));
     }
 

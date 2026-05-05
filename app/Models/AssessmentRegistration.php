@@ -135,4 +135,33 @@ class AssessmentRegistration extends Model
     {
         return $this->hasMany(SignatureRequest::class, 'registration_id');
     }
+
+    protected static function booted()
+    {
+        static::saving(function ($model) {
+            // Sinkronisasi status global berdasarkan status sub-form (APL.01 & APL.02)
+            // Prioritas status APL.02 karena ini adalah tahapan selanjutnya
+            if ($model->status_apl02 === \App\Enums\Apl02Status::APPROVED) {
+                $model->status = \App\Enums\AssessmentStatus::APL02_APPROVED;
+            } elseif ($model->status_apl02 === \App\Enums\Apl02Status::REJECTED) {
+                $model->status = \App\Enums\AssessmentStatus::APL02_REJECTED;
+            } elseif ($model->status_apl02 === \App\Enums\Apl02Status::SUBMITTED) {
+                $model->status = \App\Enums\AssessmentStatus::APL02_SUBMITTED;
+            } 
+            // Jika APL.02 belum dimulai, gunakan status APL.01
+            else {
+                if ($model->status_apl01 === \App\Enums\Apl01Status::APPROVED) {
+                    $model->status = \App\Enums\AssessmentStatus::APL01_APPROVED;
+                } elseif ($model->status_apl01 === \App\Enums\Apl01Status::REJECTED) {
+                    $model->status = \App\Enums\AssessmentStatus::APL01_REJECTED;
+                } elseif ($model->status_apl01 === \App\Enums\Apl01Status::PAID) {
+                    $model->status = \App\Enums\AssessmentStatus::APL01_PAID;
+                } elseif ($model->status_apl01 === \App\Enums\Apl01Status::PENDING) {
+                    $model->status = \App\Enums\AssessmentStatus::APL01_PENDING;
+                } else {
+                    $model->status = \App\Enums\AssessmentStatus::APL01_DRAFT;
+                }
+            }
+        });
+    }
 }

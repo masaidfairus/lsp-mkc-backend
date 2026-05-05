@@ -11,6 +11,7 @@ class Apl01Data extends Model
 
     protected $fillable = [
         'registration_id',
+        'identity_number',
         'gender',
         'place_of_birth',
         'date_of_birth',
@@ -22,6 +23,8 @@ class Apl01Data extends Model
         'job_title',
         'company_address',
         'company_postal_code',
+        'company_fax',
+        'company_email',
         'company_contact',
         'asesi_signature',
         'asesi_qr_code',

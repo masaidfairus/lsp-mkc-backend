@@ -16,9 +16,19 @@ class DocumentList extends Model
         return $this->hasOne(BasicRequirementProof::class, 'list_id');
     }
 
+    public function basicRequirementProofs()
+    {
+        return $this->hasMany(BasicRequirementProof::class, 'list_id');
+    }
+
     public function administrativeProof()
     {
         return $this->hasOne(AdministrativeProof::class, 'list_id');
+    }
+
+    public function administrativeProofs()
+    {
+        return $this->hasMany(AdministrativeProof::class, 'list_id');
     }
 
     public function portfolioScheme()

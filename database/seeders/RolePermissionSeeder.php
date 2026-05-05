@@ -36,7 +36,7 @@ class RolePermissionSeeder extends Seeder
             // 1. Hak akses read semua dokumen
             if (str_starts_with($name, 'view_') || str_starts_with($name, 'view_any_')) {
                 // Ignore shield, users, roles, etc. unless explicitly needed. But "semua dokumen" means all assessment docs.
-                if (preg_match('/(assessment_registration|apl|ak|appeal|fr_ia|mapa|fr_va|assessment_instrument|competency|scheme)/', $name)) {
+                if (preg_match('/(assessment_registration|assessment::registration|apl|ak|appeal|fr_ia|fr::ia|mapa|fr_va|fr::va|assessment_instrument|competency|scheme|signature::inbox)/', $name)) {
                     $adminPermissions->push($name);
                 }
             }
@@ -47,27 +47,28 @@ class RolePermissionSeeder extends Seeder
 
             // --- ASESOR LOGIC ---
             $isAk04 = str_contains($name, 'appeal') || str_contains($name, 'ak04');
-            $isApl = str_contains($name, 'assessment_registration') || str_contains($name, 'apl');
-            $isAk = str_contains($name, 'ak0') || str_contains($name, 'ak_');
-            $isIa = str_contains($name, 'fr_ia') || str_contains($name, 'ia0');
+            $isApl = str_contains($name, 'assessment_registration') || str_contains($name, 'assessment::registration') || str_contains($name, 'apl');
+            $isAk = str_contains($name, 'ak0') || str_contains($name, 'ak_') || str_contains($name, 'ak::');
+            $isIa = str_contains($name, 'fr_ia') || str_contains($name, 'fr::ia') || str_contains($name, 'ia0') || str_contains($name, 'ia1');
             $isMapa = str_contains($name, 'mapa');
-            $isVa = str_contains($name, 'fr_va');
+            $isVa = str_contains($name, 'fr_va') || str_contains($name, 'fr::va');
+            $isSigInbox = str_contains($name, 'signature::inbox');
             
             // Hak akses view untuk semua dokumen terkait asesmen
             if (str_starts_with($name, 'view_') || str_starts_with($name, 'view_any_')) {
-                if ($isAk04 || $isApl || $isAk || $isIa || $isMapa || $isVa) {
+                if ($isAk04 || $isApl || $isAk || $isIa || $isMapa || $isVa || $isSigInbox) {
                     $asesorPermissions->push($name);
                 }
             }
             
             // Hak akses update untuk APL.02 (AssessmentRegistration)
-            if (str_contains($name, 'assessment_registration') && str_starts_with($name, 'update_')) {
+            if ((str_contains($name, 'assessment_registration') || str_contains($name, 'assessment::registration')) && str_starts_with($name, 'update_')) {
                 $asesorPermissions->push($name);
             }
 
-            // Hak akses Insert & Update untuk semua dokumen selain APL.01, APL.02, AK.04
+            // Hak akses Insert & Update untuk semua dokumen selain APL.01, APL.02
             if (str_starts_with($name, 'create_') || str_starts_with($name, 'update_')) {
-                if (($isAk && !$isAk04) || $isIa || $isMapa || $isVa) {
+                if ($isAk || $isIa || $isMapa || $isVa || $isSigInbox) {
                     $asesorPermissions->push($name);
                 }
             }
