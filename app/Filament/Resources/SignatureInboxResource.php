@@ -23,6 +23,11 @@ class SignatureInboxResource extends Resource
     protected static ?string $pluralModelLabel = 'Permintaan TTD Saya';
     protected static ?string $slug = 'signature-inbox';
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->can('view_any_signature::inbox');
+    }
+
     public static function getEloquentQuery(): Builder
     {
         // Hanya tampilkan pendaftaran yang memiliki permintaan tanda tangan PENDING untuk user ini
@@ -35,8 +40,7 @@ class SignatureInboxResource extends Resource
                     ->where('status', 'pending');
             }])
             ->whereHas('signatureRequests', function (Builder $query) {
-                $query->where('user_id', auth()->id())
-                    ->where('status', 'pending');
+                $query->where('user_id', auth()->id());
             });
     }
 
@@ -52,6 +56,10 @@ class SignatureInboxResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('signatureRequests', function (Builder $query) {
+                $query->where('user_id', auth()->id())
+                    ->where('status', 'pending');
+            }))
             ->columns([
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')

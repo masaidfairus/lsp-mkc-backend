@@ -41,6 +41,10 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('superadmin') ? true : null;
         });
 
+        Gate::define('view_document', function ($user) {
+            return $user->hasRole(['admin', 'superadmin', 'asesor']);
+        });
+
         \App\Models\UserSignature::observe(\App\Observers\UserSignatureObserver::class);
 
         Table::configureUsing(function (Table $table): void {

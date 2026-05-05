@@ -17,6 +17,9 @@ return new class extends Migration
             $table->foreignId('registration_id')->constrained('assessment_registrations')->cascadeOnDelete();
             $table->json('ak04_data')->nullable();
             $table->string('status')->default(AppealStatus::PENDING);
+            $table->string('asesi_signature')->nullable();
+            $table->text('asesi_qr_code')->nullable();
+            $table->timestamp('asesi_signature_date')->nullable();
             $table->timestamps();
         });
     }

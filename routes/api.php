@@ -49,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Invoice
     Route::get('registrations/{registration}/invoice', [PaymentController::class, 'show']);
+    Route::post('registrations/{registration}/pay-dummy', [PaymentController::class, 'simulate']);
 
     // Profil Asesi
     Route::apiResource('profile', ProfileController::class)->only([

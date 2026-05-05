@@ -41,7 +41,8 @@ class PdfAk04Controller extends Controller
                 'Dokumen FR.AK.04 belum dapat dicetak karena Asesor belum menandatangani dokumen ini di menu Inbox Tanda Tangan.'
             );
         }
-        $ak04Data = $registration->appeals->pluck('ak04_data')->first();
+        $appeal = $registration->appeals->first();
+        $ak04Data = $appeal?->ak04_data;
 
         if (!$ak04Data) {
             return view('components.status-page', [
@@ -54,12 +55,23 @@ class PdfAk04Controller extends Controller
             ]);
         }
 
-        $rawAssessmentDate = $ak04Data['assessment_date'];
-        $assessmentDate = $this->convertDateToLocalTime($rawAssessmentDate);
-        $notes = $ak04Data['reason_notes'];
+        $rawAssessmentDate = $ak04Data['assessment_date'] ?? null;
+        if (!$rawAssessmentDate) {
+            return view('components.status-page', [
+                'type' => 'danger',
+                'title' => 'Data AK.04 Tidak Lengkap',
+                'message' => 'Beberapa informasi penting dalam dokumen AK.04 tidak ditemukan.',
+                'details' => ['Kemungkinan data terhapus atau format tidak sesuai. Silakan hubungi admin.'],
+                'button_text' => 'Kembali',
+                'button_url' => url()->previous(),
+            ]);
+        }
 
-        $asesiSign = $ak04Data['signature'];
-        $appealQuestions = collect($ak04Data['appeal_questions'])->pluck('answer', 'id')->toArray();
+        $assessmentDate = $this->convertDateToLocalTime($rawAssessmentDate);
+        $notes = $ak04Data['reason_notes'] ?? '-';
+
+        $asesiSign = $ak04Data['signature'] ?? ['asesi_signature' => null, 'date' => null];
+        $appealQuestions = collect($ak04Data['appeal_questions'] ?? [])->pluck('answer', 'id')->toArray();
       
         $data = [
             'scheme_name' => $scheme?->name ?? '-',
@@ -69,8 +81,9 @@ class PdfAk04Controller extends Controller
             'assessment_date' => $assessmentDate,
             'appeal_questions' => $appealQuestions,
             'reason_notes' => $notes,
-            'asesi_sign' => $asesiSign['asesi_signature'],
-            'asesi_sign_date' => $this->convertDateToLocalTime($asesiSign['date']),
+            'asesi_sign' => $asesiSign['asesi_signature'] ?? null,
+            'asesi_qr_code' => $appeal->asesi_qr_code,
+            'asesi_sign_date' => $asesiSign['date'] ? $this->convertDateToLocalTime($asesiSign['date']) : '-',
         ];
 
                 // --- Inject Signatures for Compilers & Validators ---

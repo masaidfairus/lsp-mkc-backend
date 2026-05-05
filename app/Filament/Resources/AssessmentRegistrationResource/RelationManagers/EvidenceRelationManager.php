@@ -59,7 +59,7 @@ class EvidenceRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('upload_document')
                     ->label('Berkas')
                     ->formatStateUsing(fn($state) => $state ? 'Lihat Dokumen' : 'Tidak Ada File')
-                    ->url(fn($record) => $record->upload_document ? Storage::url($record->upload_document) : null)
+                    ->url(fn($record) => $record->upload_document ? route('private.file.view', ['record' => $record->id]) : null)
                     ->openUrlInNewTab()
                     ->color('primary'),
                 Tables\Columns\TextColumn::make('status')

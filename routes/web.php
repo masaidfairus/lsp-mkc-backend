@@ -52,19 +52,33 @@ Route::get('/signature/verify', function (\Illuminate\Http\Request $request) {
                     'r' => 'Asesi / Kandidat',
                     'd' => 'FR.APL.01 - Permohonan Sertifikasi',
                     't' => $reg->aplData->asesi_signature_date?->format('Y-m-d H:i:s') ?? '-',
-                    's' => null,
+                    's' => $reg->aplData->asesi_signature ? route('signature.stream', ['id' => $reg->id, 'type' => 'apl01']) : null,
                     'v' => true,
                 ];
             }
-        } elseif ($type === 'apl02') {
-            $reg = \App\Models\AssessmentRegistration::with('candidate')->find($id);
-            if ($reg && $reg->apl02_qr_code) {
+        } elseif ($type === 'ak04') {
+            $reg = \App\Models\AssessmentRegistration::with(['candidate', 'appeals'])->find($id);
+            $appeal = $reg?->appeals->first();
+            if ($reg && $appeal && isset($appeal->ak04_data['signature']['qr_code'])) {
                 $sigData = [
                     'n' => $reg->candidate->name,
                     'r' => 'Asesi / Kandidat',
-                    'd' => 'FR.APL.02 - Asesmen Mandiri',
-                    't' => $reg->apl02_signature_date?->format('Y-m-d H:i:s') ?? '-',
-                    's' => null,
+                    'd' => 'FR.AK.04 - Banding Asesmen',
+                    't' => $appeal->ak04_data['signature']['date'] ?? $appeal->created_at->format('Y-m-d H:i:s'),
+                    's' => isset($appeal->ak04_data['signature']['asesi_signature']) ? route('signature.stream', ['id' => $reg->id, 'type' => 'ak04']) : null,
+                    'v' => true,
+                ];
+            }
+        } elseif ($type === 'ak01') {
+            $reg = \App\Models\AssessmentRegistration::with(['candidate', 'plannings'])->find($id);
+            $planning = $reg?->plannings->first();
+            if ($reg && $planning && isset($planning->ak01_data['signatures']['asesi']['qr_code'])) {
+                $sigData = [
+                    'n' => $reg->candidate->name,
+                    'r' => 'Asesi / Kandidat',
+                    'd' => 'FR.AK.01 - Persetujuan Asesmen & Kerahasiaan',
+                    't' => $planning->ak01_data['signatures']['asesi']['date'] ?? $planning->updated_at->format('Y-m-d H:i:s'),
+                    's' => isset($planning->ak01_data['signatures']['asesi']['signature']) ? route('signature.stream', ['id' => $reg->id, 'type' => 'ak01']) : null,
                     'v' => true,
                 ];
             }
@@ -77,7 +91,7 @@ Route::get('/signature/verify', function (\Illuminate\Http\Request $request) {
                     'r' => $req->role,
                     'd' => $req->document_label,
                     't' => $req->signed_at->format('Y-m-d H:i:s'),
-                    's' => null, // Sesuai permintaan: sembunyikan bentuk TTD
+                    's' => $req->raw_signature, 
                     'v' => true,
                 ];
             } else {
@@ -105,9 +119,9 @@ Route::get('admin/view-document/{record}', [PrivateFileController::class, 'downl
     ->middleware(['auth']);
 
 // ============================================================
-// PDF Documents (Auth Required for Preview)
+// PDF Documents (Supports Signed URLs for Mobile)
 // ============================================================
-Route::middleware(['web', 'auth'])->group(function () {
+Route::middleware(['web', 'signed'])->group(function () {
     Route::get('apl01/{registration}', [PdfApl01Controller::class, 'show'])->name('apl01.form');
     Route::get('apl02/{registration}', [PdfApl02Controller::class, 'show'])->name('apl02.form');
     Route::get('ak01/{registration}', [PdfAk01Controller::class, 'show'])->name('ak01.form');
@@ -139,6 +153,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 });
 
 Route::get('cek-ttd/{id}', [\App\Http\Controllers\SignatureVerificationController::class, 'show'])->name('ttd.cek');
+Route::get('signature-img/{id}/{type}', [\App\Http\Controllers\SignatureVerificationController::class, 'stream'])->name('signature.stream');
 
 Route::get('/mapa02/preview', function () {
     $data = [

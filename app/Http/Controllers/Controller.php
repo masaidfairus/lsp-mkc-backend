@@ -85,10 +85,15 @@ abstract class Controller
 
     public function isAuthorizedReviewer($user, $registration)
     {
+        // ✅ Berikan akses jika request memiliki signature yang valid (untuk mobile/link eksternal)
+        if (request()->hasValidSignature()) {
+            return true;
+        }
+
         if (!$user) return false;
 
         // Admin selalu boleh
-        if (in_array($user->role, ['admin']) || (method_exists($user, 'hasRole') && $user->hasRole('admin'))) {
+        if (in_array($user->role, ['admin', 'superadmin']) || (method_exists($user, 'hasRole') && ($user->hasRole('admin') || $user->hasRole('superadmin')))) {
             return true;
         }
 

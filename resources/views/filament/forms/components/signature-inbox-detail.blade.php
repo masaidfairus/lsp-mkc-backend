@@ -29,12 +29,12 @@
     @if($signatureRequest->status === 'pending')
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
             <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Area Tanda Tangan</h4>
-            
+
             <div x-data="{
                 signaturePad: null,
                 isDrawing: false,
                 charCount: 0,
-                
+
                 init() {
                     if (typeof SignaturePad === 'undefined') {
                         const script = document.createElement('script');
@@ -45,7 +45,7 @@
                         this.$nextTick(() => this.setup());
                     }
                 },
-                
+
                 setup() {
                     const canvas = this.$refs.canvas;
                     this.signaturePad = new SignaturePad(canvas, {
@@ -54,34 +54,34 @@
                         minWidth: 0.5,
                         maxWidth: 2.5,
                     });
-                    
+
                     this.resizeCanvas();
                     window.addEventListener('resize', () => this.resizeCanvas());
-                    
+
                     this.signaturePad.addEventListener('beginStroke', () => { this.isDrawing = true; });
                     this.signaturePad.addEventListener('endStroke', () => { 
                         this.isDrawing = false; 
                         this.charCount = JSON.stringify(this.signaturePad.toData()).length;
                     });
                 },
-                
+
                 resizeCanvas() {
                     const canvas = this.$refs.canvas;
                     const container = this.$refs.container;
                     if (!canvas || !container) return;
-                    
+
                     const ratio = Math.max(window.devicePixelRatio || 1, 1);
                     canvas.width = container.offsetWidth * ratio;
                     canvas.height = container.offsetHeight * ratio;
                     canvas.getContext('2d').scale(ratio, ratio);
                     this.signaturePad.clear();
                 },
-                
+
                 clear() {
                     this.signaturePad.clear();
                     this.charCount = 0;
                 },
-                
+
                 submit() {
                     if (this.signaturePad.isEmpty()) {
                         alert('Tanda tangan tidak boleh kosong!');
@@ -100,17 +100,17 @@
                         Bersihkan Canvas
                     </button>
                 </div>
-                
+
                 <div x-ref="container" class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden bg-white" style="height: 300px; width: 100%;">
                     <canvas x-ref="canvas" style="touch-action: none; cursor: crosshair; display: block; width: 100%; height: 100%;"></canvas>
                 </div>
-                
+
                 <div class="mt-6 flex justify-end">
                     <button type="button" 
                         @click="submit()" 
                         wire:loading.attr="disabled"
                         class="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm">
-                        
+
                         <svg wire:loading.remove class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
@@ -129,7 +129,7 @@
     @else
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-sm">
             <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-6 uppercase tracking-wide">Data Tanda Tangan Tersimpan</h4>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <p class="text-xs text-gray-500 mb-2 uppercase tracking-wide font-medium">Tanda Tangan</p>

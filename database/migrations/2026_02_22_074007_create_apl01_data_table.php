@@ -12,6 +12,7 @@ return new class extends Migration
         Schema::create('apl01_data', function (Blueprint $table) {
             $table->id();
             $table->foreignId('registration_id')->constrained('assessment_registrations')->cascadeOnDelete();
+            $table->string('identity_number')->nullable();
             $table->string('gender')->default(Gender::MALE);
             $table->string('place_of_birth')->nullable();
             $table->date('date_of_birth')->nullable();
@@ -23,6 +24,8 @@ return new class extends Migration
             $table->string('job_title')->nullable();
             $table->text('company_address')->nullable();
             $table->string('company_postal_code')->nullable();
+            $table->string('company_fax')->nullable();
+            $table->string('company_email')->nullable();
             $table->string('company_contact')->nullable();
             
             // TTD Asesi APL.01

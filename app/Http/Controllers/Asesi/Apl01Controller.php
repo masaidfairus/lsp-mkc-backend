@@ -28,6 +28,7 @@ class Apl01Controller extends Controller
 
         if ($step == 'data-pemohon-sertifikasi') {
             $validated = $request->validate([
+                'identity_number' => ['required', 'numeric', 'digits:16'],
                 'gender' => ['required', new Enum(Gender::class)],
                 'place_of_birth' => ['required', 'string', 'max:1000'],
                 'date_of_birth' => ['required', 'date', 'before:today'],
@@ -39,6 +40,8 @@ class Apl01Controller extends Controller
                 'job_title' => ['required', 'string', 'max:255'],
                 'company_address' => ['required', 'string', 'max:1000'],
                 'company_postal_code' => ['required', 'numeric', 'digits:5', 'between:10000,99999'],
+                'company_fax' => ['nullable', 'string', 'max:20'],
+                'company_email' => ['nullable', 'email', 'max:255'],
                 'company_contact' => ['required', 'string', 'max:20'],
                 'registration_id' => ['nullable', 'exists:assessment_registrations,id'],
                 'scheme_id' => ['required', 'exists:schemes,id'],
@@ -113,7 +116,7 @@ class Apl01Controller extends Controller
                         'is_mandatory' => $req->is_mandatory,
                         'or_group' => $req->or_group,
                         'is_uploaded' => $uploaded ? true : false,
-                        'file_url' => $uploaded ? asset('storage/' . $uploaded->upload_document) : null,
+                        'file_url' => $uploaded ? route('documents.stream', ['document' => $uploaded->id]) : null,
                         'file_profile_id' => $uploaded?->id,
                     ];
                 });
@@ -128,7 +131,7 @@ class Apl01Controller extends Controller
                         'title' => $adm->documentList?->title ?? 'Dokumen Tidak Ditemukan',
                         'is_mandatory' => true,
                         'is_uploaded' => $uploaded ? true : false,
-                        'file_url' => $uploaded ? asset('storage/' . $uploaded->upload_document) : null,
+                        'file_url' => $uploaded ? route('documents.stream', ['document' => $uploaded->id]) : null,
                         'file_profile_id' => $uploaded?->id,
                     ];
                 });
@@ -148,6 +151,7 @@ class Apl01Controller extends Controller
                 'evidence' => ['required', 'array', 'min:1'],
                 'evidence.*.list_id' => ['required', 'exists:document_lists,id'],
                 'evidence.*.file' => ['nullable', 'file', 'mimes:pdf,jpg,png', 'max:2048'],
+                'evidence.*.file_profile_id' => ['nullable', 'exists:file_profiles,id'],
             ]);
 
             $registration = $user->registrations()->findOrFail($validated['registration_id']);
@@ -179,7 +183,9 @@ class Apl01Controller extends Controller
                     ->where('list_id', $item['list_id'])
                     ->exists();
 
-                if (!$alreadyUploaded && !isset($item['file'])) {
+                $hasFileId = !empty($item['file_profile_id']);
+
+                if (!$alreadyUploaded && !$hasFileId && !isset($item['file'])) {
                     return $this->errorResponse('E2013', 422);
                 }
             }
@@ -205,24 +211,33 @@ class Apl01Controller extends Controller
 
             DB::transaction(function () use ($validated, $registration, $user) {
                 foreach ($validated['evidence'] as $item) {
-                    $file = $item['file'];
-                    $filename = "user_{$user->id}_req_{$item['list_id']}_" . uniqid() . "." . $file->getClientOriginalExtension();
-                    $path = $file->storeAs("bukti-dasar/{$registration->id}", $filename, 'local');
-
-                    $existing = FileProfile::where([
-                        'list_id' => $item['list_id'],
-                    ])->first();
-
-                    if ($existing) {
-                        Storage::disk('local')->delete($existing->upload_document);
-                        $existing->delete();
+                    if (!empty($item['file_profile_id'])) {
+                        $fileProfile = FileProfile::where('user_id', $user->id)->findOrFail($item['file_profile_id']);
+                        $fileProfile->update(['list_id' => $item['list_id']]);
+                        continue;
                     }
 
-                    FileProfile::create([
-                        'user_id' => $user->id,
-                        'list_id' => $item['list_id'],
-                        'upload_document' => $path,
-                    ]);
+                    if (isset($item['file'])) {
+                        $file = $item['file'];
+                        $filename = "user_{$user->id}_req_{$item['list_id']}_" . uniqid() . "." . $file->getClientOriginalExtension();
+                        $path = $file->storeAs("bukti-dasar/{$registration->id}", $filename, 'local');
+
+                        $existing = FileProfile::where([
+                            'user_id' => $user->id,
+                            'list_id' => $item['list_id'],
+                        ])->first();
+
+                        if ($existing) {
+                            Storage::disk('local')->delete($existing->upload_document);
+                            $existing->delete();
+                        }
+
+                        FileProfile::create([
+                            'user_id' => $user->id,
+                            'list_id' => $item['list_id'],
+                            'upload_document' => $path,
+                        ]);
+                    }
                 }
             });
 
@@ -238,6 +253,7 @@ class Apl01Controller extends Controller
                 'evidence' => ['required', 'array', 'min:1'],
                 'evidence.*.list_id' => ['required', 'exists:administrative_proofs,list_id'],
                 'evidence.*.file' => ['nullable', 'file', 'mimes:pdf,jpg,png', 'max:2048'],
+                'evidence.*.file_profile_id' => ['nullable', 'exists:file_profiles,id'],
                 'signature' => ['nullable', 'image', 'max:1024'],
             ]);
 
@@ -268,27 +284,33 @@ class Apl01Controller extends Controller
 
             DB::transaction(function () use ($validated, $registration, $user, $request) {
                 foreach ($validated['evidence'] as $item) {
-                    if (!isset($item['file'])) continue;
-                    
-                    $file = $item['file'];
-                    $filename = "user_{$user->id}_list_{$item['list_id']}_" . uniqid() . "." . $file->getClientOriginalExtension();
-                    $path = $file->storeAs("bukti-admin/{$registration->id}", $filename, 'local');
-
-                    $existing = FileProfile::where([
-                        'user_id' => $user->id,
-                        'list_id' => $item['list_id'],
-                    ])->first();
-
-                    if ($existing) {
-                        Storage::disk('local')->delete($existing->upload_document);
-                        $existing->delete();
+                    if (!empty($item['file_profile_id'])) {
+                        $fileProfile = FileProfile::where('user_id', $user->id)->findOrFail($item['file_profile_id']);
+                        $fileProfile->update(['list_id' => $item['list_id']]);
+                        continue;
                     }
 
-                    FileProfile::create([
-                        'user_id' => $user->id,
-                        'list_id' => $item['list_id'],
-                        'upload_document' => $path,
-                    ]);
+                    if (isset($item['file'])) {
+                        $file = $item['file'];
+                        $filename = "user_{$user->id}_list_{$item['list_id']}_" . uniqid() . "." . $file->getClientOriginalExtension();
+                        $path = $file->storeAs("bukti-admin/{$registration->id}", $filename, 'local');
+
+                        $existing = FileProfile::where([
+                            'user_id' => $user->id,
+                            'list_id' => $item['list_id'],
+                        ])->first();
+
+                        if ($existing) {
+                            Storage::disk('local')->delete($existing->upload_document);
+                            $existing->delete();
+                        }
+
+                        FileProfile::create([
+                            'user_id' => $user->id,
+                            'list_id' => $item['list_id'],
+                            'upload_document' => $path,
+                        ]);
+                    }
                 }
 
                 if ($request->hasFile('signature')) {
@@ -318,7 +340,7 @@ class Apl01Controller extends Controller
             });
 
             $registration->update([
-                'status' => AssessmentStatus::APL01_PENDING,
+                'status_apl01' => \App\Enums\Apl01Status::PENDING,
             ]);
 
             $isPribadi = $user->profile->asesi_type === 'pribadi';
@@ -349,18 +371,37 @@ class Apl01Controller extends Controller
             return $this->errorResponse('E1005', 403);
         }
 
-        $buktiDasarListIds = BasicRequirementProof::where('scheme_id', $registration->scheme_id)
-            ->pluck('list_id');
+        $userFiles = FileProfile::where('user_id', $registration->user_id)->get()->keyBy('list_id');
 
-        $buktiDasar = FileProfile::where('user_id', $registration->user_id)
-            ->whereIn('list_id', $buktiDasarListIds)
-            ->get();
+        $buktiDasar = BasicRequirementProof::where('scheme_id', $registration->scheme_id)
+            ->with('documentList')
+            ->get()
+            ->map(function ($req) use ($userFiles) {
+                $uploaded = $userFiles->get($req->list_id);
+                return [
+                    'list_id' => $req->list_id,
+                    'title' => $req->documentList?->title ?? 'Dokumen Tidak Ditemukan',
+                    'is_mandatory' => $req->is_mandatory,
+                    'or_group' => $req->or_group,
+                    'is_uploaded' => $uploaded ? true : false,
+                    'file_url' => $uploaded ? asset('storage/' . $uploaded->upload_document) : null,
+                    'file_profile_id' => $uploaded?->id,
+                ];
+            });
 
-        $buktiAdminListIds = AdministrativeProof::pluck('list_id');
-
-        $buktiAdmin = FileProfile::where('user_id', $registration->user_id)
-            ->whereIn('list_id', $buktiAdminListIds)
-            ->get();
+        $buktiAdmin = AdministrativeProof::with('documentList')
+            ->get()
+            ->map(function ($adm) use ($userFiles) {
+                $uploaded = $userFiles->get($adm->list_id);
+                return [
+                    'list_id' => $adm->list_id,
+                    'title' => $adm->documentList?->title ?? 'Dokumen Tidak Ditemukan',
+                    'is_mandatory' => true,
+                    'is_uploaded' => $uploaded ? true : false,
+                    'file_url' => $uploaded ? asset('storage/' . $uploaded->upload_document) : null,
+                    'file_profile_id' => $uploaded?->id,
+                ];
+            });
 
         $registration->load(['candidate.profile', 'scheme', 'aplData']);
         $profile = $registration->candidate?->profile;
@@ -378,8 +419,8 @@ class Apl01Controller extends Controller
             'certification_purpose' => $registration->certification_purpose,
             'scheme' => $registration->scheme?->only('id', 'code', 'name'),
             'apl_data' => $registration->aplData,
-            'evidence' => $buktiDasar,
-            'administrative_evidence' => $buktiAdmin,
+            'bukti_persyaratan_dasar' => $buktiDasar,
+            'bukti_administratif' => $buktiAdmin,
             'payment' => $profile->asesi_type === 'pribadi'
                 ? $registration->payments()->first()?->only('invoice_number', 'amount', 'status')
                 : null

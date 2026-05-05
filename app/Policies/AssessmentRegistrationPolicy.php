@@ -15,7 +15,7 @@ class AssessmentRegistrationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_signature::inbox');
+        return $user->can('view_any_assessment::registration');
     }
 
     /**
@@ -23,7 +23,7 @@ class AssessmentRegistrationPolicy
      */
     public function view(User $user, AssessmentRegistration $assessmentRegistration): bool
     {
-        return $user->can('view_signature::inbox');
+        return $user->can('view_assessment::registration');
     }
 
     /**
@@ -31,7 +31,7 @@ class AssessmentRegistrationPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_signature::inbox');
+        return $user->can('create_assessment::registration');
     }
 
     /**
@@ -39,7 +39,7 @@ class AssessmentRegistrationPolicy
      */
     public function update(User $user, AssessmentRegistration $assessmentRegistration): bool
     {
-        return $user->can('update_signature::inbox');
+        return $user->can('update_assessment::registration');
     }
 
     /**
@@ -47,7 +47,7 @@ class AssessmentRegistrationPolicy
      */
     public function delete(User $user, AssessmentRegistration $assessmentRegistration): bool
     {
-        return $user->can('delete_signature::inbox');
+        return $user->can('delete_assessment::registration');
     }
 
     /**
@@ -55,7 +55,7 @@ class AssessmentRegistrationPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_signature::inbox');
+        return $user->can('delete_any_assessment::registration');
     }
 
     /**
@@ -63,7 +63,7 @@ class AssessmentRegistrationPolicy
      */
     public function forceDelete(User $user, AssessmentRegistration $assessmentRegistration): bool
     {
-        return $user->can('force_delete_signature::inbox');
+        return $user->can('force_delete_assessment::registration');
     }
 
     /**
@@ -71,7 +71,7 @@ class AssessmentRegistrationPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_signature::inbox');
+        return $user->can('force_delete_any_assessment::registration');
     }
 
     /**
@@ -79,7 +79,7 @@ class AssessmentRegistrationPolicy
      */
     public function restore(User $user, AssessmentRegistration $assessmentRegistration): bool
     {
-        return $user->can('restore_signature::inbox');
+        return $user->can('restore_assessment::registration');
     }
 
     /**
@@ -87,7 +87,7 @@ class AssessmentRegistrationPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_signature::inbox');
+        return $user->can('restore_any_assessment::registration');
     }
 
     /**
@@ -95,7 +95,7 @@ class AssessmentRegistrationPolicy
      */
     public function replicate(User $user, AssessmentRegistration $assessmentRegistration): bool
     {
-        return $user->can('replicate_signature::inbox');
+        return $user->can('replicate_assessment::registration');
     }
 
     /**
@@ -103,6 +103,6 @@ class AssessmentRegistrationPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_signature::inbox');
+        return $user->can('reorder_assessment::registration');
     }
 }
