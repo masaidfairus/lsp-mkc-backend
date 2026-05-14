@@ -172,6 +172,10 @@ class FrIa09Resource extends Resource
                 $set('main_data.header.date', now()->format('d-m-Y'));
             }
 
+            if ($reg->assessor_id) {
+                self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.assessor');
+            }
+
             // Only reset portfolio_evidence_list if empty or user changed registration
             $existingList = $get ? (array) $get('main_data.portfolio_evidence_list') : [];
             if ($isUpdate || empty($existingList) || empty(array_filter(array_column($existingList, 'evidence_name')))) {

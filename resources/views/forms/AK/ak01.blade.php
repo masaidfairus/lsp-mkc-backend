@@ -57,8 +57,8 @@
             display: inline-block;
             content: '';
             position: absolute;
-            left: 4px;
-            top: 0px;
+            left: 2px;
+            top: -1px;
             width: 3px;
             height: 6px;
             border: solid black;
@@ -158,26 +158,26 @@
         <tr>
             <td colspan="3" style="vertical-align:middle;">Bukti yang akan dikumpulkan :</td>
             <td style="padding: 8px; line-height: 2; border-right: 1px solid white" colspan="2">
-                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Verifikasi Portofolio'] ?? false) ? '☑' : '☐' !!}</span>
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Verifikasi Portofolio'] ?? false) ? '<span class="cb-checked"></span>' : '<span class="cb"></span>' !!}</span>
                     Hasil Verifikasi Portofolio</span>
-                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Reviu Produk'] ?? false) ? '☑' : '☐' !!}</span>
- Hasil
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Reviu Produk'] ?? false) ? '<span class="cb-checked"></span>' : '<span class="cb"></span>' !!}</span>
+  Hasil
                     Reviu Produk</span>
-                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Observasi Langsung'] ?? false) ? '☑' : '☐' !!}</span>
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Observasi Langsung'] ?? false) ? '<span class="cb-checked"></span>' : '<span class="cb"></span>' !!}</span>
                     Hasil Observasi Langsung</span>
-                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Kegiatan Terstruktur'] ?? false) ? '☑' : '☐' !!}</span>
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Kegiatan Terstruktur'] ?? false) ? '<span class="cb-checked"></span>' : '<span class="cb"></span>' !!}</span>
                     Hasil Kegiatan Terstruktur</span>
-                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Lainnya'] ?? false) ? '☑' : '☐' !!}</span>
- Lainnya
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Lainnya'] ?? false) ? '<span class="cb-checked"></span>' : '<span class="cb"></span>' !!}</span>
+  Lainnya
                     ......</span>
             </td>
             <td style="padding: 8px; line-height: 2; border-left: 1px solid white" colspan="2">
-                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Tanya Jawab'] ?? false) ? '☑' : '☐' !!}</span>
- Hasil
+                <span class="cb-set"><span style="font-size: 11pt;">{!! ($evidence_map['Hasil Tanya Jawab'] ?? false) ? '<span class="cb-checked"></span>' : '<span class="cb"></span>' !!}</span>
+  Hasil
                     Tanya Jawab</span>
-                <span class="cb-set"><span style="font-size: 11pt;">☐</span> Daftar Pertanyaan Tertulis</span>
-                <span class="cb-set"><span style="font-size: 11pt;">☐</span> Daftar Pertanyaan Lisan</span>
-                <span class="cb-set"><span style="font-size: 11pt;">☐</span> Daftar Pertanyaan Wawancara</span>
+                <span class="cb-set"><span style="font-size: 11pt;"><span class="cb"></span></span> Daftar Pertanyaan Tertulis</span>
+                <span class="cb-set"><span style="font-size: 11pt;"><span class="cb"></span></span> Daftar Pertanyaan Lisan</span>
+                <span class="cb-set"><span style="font-size: 11pt;"><span class="cb"></span></span> Daftar Pertanyaan Wawancara</span>
             </td>
         </tr>
 
@@ -258,7 +258,12 @@
         <tr style="border-top: none;">
             <td
                 style="width: 55%; border-right: none; border-top: none; height: 60px; vertical-align: middle; padding: 10px;">
-                Tanda tangan Asesi : {{ $asesi_name }}
+                Tanda tangan Asesi : 
+                @if($asesi_qr_code)
+                    <img src="{{ $asesi_qr_code }}" style="width:50px; height:50px; vertical-align: middle; margin-left: 5px;">
+                @else
+                    {{ $asesi_name }}
+                @endif
             </td>
             <td style="width: 45%; border-left: none; border-top: none; vertical-align: middle; padding: 10px;">
                 Tanggal : {{ $asesi_sign_date }}

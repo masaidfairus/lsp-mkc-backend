@@ -182,6 +182,10 @@ class FrIa10Resource extends Resource
                 $set('main_data.header.date', now()->format('d-m-Y'));
             }
 
+            if ($reg->assessor_id) {
+                self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.assessor');
+            }
+
             // Only repopulate work_groups if empty, missing units, or user changed registration
             $existingGroups = $get ? (array) $get('main_data.work_groups') : [];
             $hasUnits = false;

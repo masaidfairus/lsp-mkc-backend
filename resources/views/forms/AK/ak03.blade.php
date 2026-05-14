@@ -195,12 +195,12 @@
                 <td rowspan="2">Tanggal Asesmen</td>
                 <td>Mulai</td>
                 <td style="text-align:center">:</td>
-                <td>{{ $assessment_date }}</td>
+                <td>{{ $assessment_date_start }}</td>
             </tr>
             <tr>
                 <td>Selesai</td>
                 <td style="text-align:center">:</td>
-                <td>{{ $assessment_date }}</td>
+                <td>{{ $assessment_date_end }}</td>
             </tr>
         </table>
 

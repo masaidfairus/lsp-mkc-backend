@@ -183,6 +183,10 @@ class FrIa05bResource extends Resource
                 $workGroups = self::getMasterWorkGroups($reg->scheme_id);
                 $set('main_data.work_groups', $workGroups);
             }
+
+            if ($reg->assessor_id) {
+                self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.assessor');
+            }
         }
     }
 
@@ -235,7 +239,11 @@ class FrIa05bResource extends Resource
                 Tables\Columns\TextColumn::make('registration.candidate.name')->label('Asesi'),
                 Tables\Columns\TextColumn::make('registration.scheme.name')->label('Skema'),
             ])
-            ->actions([Tables\Actions\EditAction::make()]);
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ]);
     }
 
     public static function getPages(): array

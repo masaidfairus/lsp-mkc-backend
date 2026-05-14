@@ -56,6 +56,7 @@ class PdfApl01Controller extends Controller
             'scheme.competencyUnits',
             'filteredAplUserFiles.documentList.basicRequirementProofs',
             'filteredAplUserFiles.documentList.administrativeProofs',
+            'aplPortfolio.fileProfile.documentList',
         ]);
 
         $aplData = $registration->aplData;
@@ -131,7 +132,14 @@ class PdfApl01Controller extends Controller
             'asesor_sign_date' => $registration->status->isApl01Complete() ? $this->convertDateToLocalTime($registration->updated_at) : '',
             'asesi_qr_code' => $aplData->asesi_qr_code ?? '',
             'asesi_sign_date' => $aplData->asesi_signature_date ? $this->convertDateToLocalTime($aplData->asesi_signature_date) : '',
+            // ── Portfolio Dokumen Asesi ────────────────────────────────────────
+            'portfolio_documents' => $registration->aplPortfolio->map(fn($p) => [
+                'title' => $p->fileProfile->documentList->title ?? 'Dokumen Tanpa Nama',
+                'is_uploaded' => true,
+                'exists' => true,
+            ])->unique('title')->values()->toArray(),
         ];
+
 
         $pdf = Pdf::loadView('forms.APL.apl01', $data)
             ->setPaper('a4', 'portrait')

@@ -43,39 +43,59 @@ trait HasStandardIaForm
 
     /**
      * Standard signature block untuk Asesor.
-     * (Signature & QR tidak lagi diambil dari library — akan datang dari SignatureRequest setelah sign)
+     * Tidak ada picker manual — asesor otomatis dari data pendaftaran.
      */
     protected static function standardAssessorSignatureBlock(string $statePath): Forms\Components\Section
     {
         return Forms\Components\Section::make('Tanda Tangan Asesor')
             ->statePath($statePath)
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->label('Pilih Asesor')
-                    ->options(User::role('asesor')->pluck('name', 'id'))
-                    ->live()
-                    ->searchable()
-                    ->preload()
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if ($user = User::find($state)) {
-                            $set('name', $user->name);
-                            $set('reg_number', $user->registration_number ?? '');
-                            $set('date', now()->format('d-m-Y'));
-                        } else {
-                            $set('name', null);
-                            $set('reg_number', null);
-                            $set('date', null);
-                        }
-                    }),
-
+                Forms\Components\Hidden::make('user_id'),
                 Forms\Components\Hidden::make('name'),
                 Forms\Components\Hidden::make('reg_number'),
                 Forms\Components\Hidden::make('date'),
 
-                Forms\Components\Placeholder::make('sig_status')
+                Forms\Components\Placeholder::make('assessor_info')
                     ->label('')
-                    ->content(fn($get) => self::renderSignatureStatus($get, 'Asesor')),
+                    ->content(fn($get) => $get('name')
+                        ? new HtmlString("
+                            <div style='font-family:system-ui,sans-serif;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;'>
+                                <div style='display:flex;align-items:center;gap:12px;'>
+                                    <div style='width:38px;height:38px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;'>
+                                        <svg width='18' height='18' fill='none' stroke='#16a34a' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'/></svg>
+                                    </div>
+                                    <div>
+                                        <p style='font-size:13px;font-weight:600;color:#15803d;margin:0;'>{$get('name')}</p>
+                                        <p style='font-size:11px;color:#16a34a;margin:2px 0 0;'>Asesor &middot; Reg: {$get('reg_number')}</p>
+                                    </div>
+                                </div>
+                                <div style='margin-top:10px;padding:8px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#92400e;line-height:1.5;'>
+                                    &#9203; Permintaan tanda tangan akan dikirim ke <strong>{$get('name')}</strong> setelah dokumen disimpan.
+                                </div>
+                            </div>
+                        ")
+                        : new HtmlString("
+                            <div style='background:#f8fafc;border:1px dashed #cbd5e1;border-radius:10px;padding:14px;color:#94a3b8;font-size:12px;text-align:center;'>
+                                Asesor otomatis diisi dari data pendaftaran. Pilih pendaftaran terlebih dahulu.
+                            </div>
+                        ")),
             ]);
+    }
+
+    /**
+     * Helper: populate assessor signature from registration's assigned assessor.
+     * Call this inside afterStateUpdated / afterStateHydrated of registration_id.
+     */
+    protected static function populateAssessorSignature(int|string|null $assessorId, callable $set, string $sigPath = 'main_data.signatures.assessor'): void
+    {
+        if (!$assessorId) return;
+        $user = \App\Models\User::find($assessorId);
+        if ($user) {
+            $set("{$sigPath}.user_id", $user->id);
+            $set("{$sigPath}.name", $user->name);
+            $set("{$sigPath}.reg_number", $user->registration_number ?? '');
+            $set("{$sigPath}.date", now()->format('d-m-Y'));
+        }
     }
 
     /**

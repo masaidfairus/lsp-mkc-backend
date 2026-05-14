@@ -147,7 +147,30 @@
             background: #e0e0e0;
             font-weight: bold;
         }
-                .page-break { page-break-before: always; }
+        
+        .cb,
+        .cb-checked {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border: 1px solid #000;
+            position: relative;
+            vertical-align: middle;
+        }
+
+        .cb-checked::after {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: -1px;
+            width: 3px;
+            height: 7px;
+            border: solid black;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .page-break { page-break-before: always; }
     </style>
 </head>
 <body>
@@ -296,11 +319,11 @@
                         {{ $p['jawaban_asesi'] ?: '...' }}
                     </div>
                 </td>
-                <td style="text-align:center; vertical-align: middle; font-family: DejaVu Sans, sans-serif; border-bottom: 2px solid #000;">
-                    {!! ($p['is_yes'] ?? false) ? '&#9745;' : '&#9744;' !!}
+                <td style="text-align:center; vertical-align: middle; border-bottom: 2px solid #000;">
+                    <span class="{!! ($p['is_yes'] ?? false) ? 'cb-checked' : 'cb' !!}"></span>
                 </td>
-                <td style="text-align:center; vertical-align: middle; font-family: DejaVu Sans, sans-serif; border-bottom: 2px solid #000;">
-                    {!! ($p['is_no'] ?? false) ? '&#9745;' : '&#9744;' !!}
+                <td style="text-align:center; vertical-align: middle; border-bottom: 2px solid #000;">
+                    <span class="{!! ($p['is_no'] ?? false) ? 'cb-checked' : 'cb' !!}"></span>
                 </td>
             </tr>
             @endforeach
@@ -313,8 +336,8 @@
                     <div style="padding: 8px; border-bottom: 1px solid #000;"><strong>Kunci Jawaban:</strong></div>
                     <div style="padding: 8px; min-height: 40px;"><strong>Jawaban Asesi:</strong></div>
                 </td>
-                <td style="text-align:center; vertical-align: middle; font-family: DejaVu Sans, sans-serif;">&#9744;</td>
-                <td style="text-align:center; vertical-align: middle; font-family: DejaVu Sans, sans-serif;">&#9744;</td>
+                <td style="text-align:center; vertical-align: middle;"><span class="cb"></span></td>
+                <td style="text-align:center; vertical-align: middle;"><span class="cb"></span></td>
             </tr>
             @endfor
         @endif

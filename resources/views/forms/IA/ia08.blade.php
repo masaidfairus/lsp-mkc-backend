@@ -135,6 +135,28 @@
             display: block;
             margin-bottom: 5px;
         }
+
+        .cb,
+        .cb-checked {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border: 1px solid #000;
+            position: relative;
+            vertical-align: middle;
+        }
+
+        .cb-checked::after {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: -1px;
+            width: 3px;
+            height: 7px;
+            border: solid black;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
     </style>
 </head>
 <body>
@@ -237,14 +259,14 @@
             <tr style="page-break-inside: avoid;">
                 <td>{{ $i + 1 }}.</td>
                 <td colspan="6" class="bukti-col" style="text-align: left;">{{ $b['nama_bukti'] }}</td>
-                <td style="font-family: DejaVu Sans, sans-serif;">{!! $b['v'] ? '&#9745;' : '&#9744;' !!}</td>
-                <td style="font-family: DejaVu Sans, sans-serif;">{!! !$b['v'] ? '&#9745;' : '&#9744;' !!}</td>
-                <td style="font-family: DejaVu Sans, sans-serif;">{!! $b['a'] ? '&#9745;' : '&#9744;' !!}</td>
-                <td style="font-family: DejaVu Sans, sans-serif;">{!! !$b['a'] ? '&#9745;' : '&#9744;' !!}</td>
-                <td style="font-family: DejaVu Sans, sans-serif;">{!! $b['t'] ? '&#9745;' : '&#9744;' !!}</td>
-                <td style="font-family: DejaVu Sans, sans-serif;">{!! !$b['t'] ? '&#9745;' : '&#9744;' !!}</td>
-                <td style="font-family: DejaVu Sans, sans-serif;">{!! $b['m'] ? '&#9745;' : '&#9744;' !!}</td>
-                <td style="font-family: DejaVu Sans, sans-serif;">{!! !$b['m'] ? '&#9745;' : '&#9744;' !!}</td>
+                <td><span class="{!! $b['v'] ? 'cb-checked' : 'cb' !!}"></span></td>
+                <td><span class="{!! !$b['v'] ? 'cb-checked' : 'cb' !!}"></span></td>
+                <td><span class="{!! $b['a'] ? 'cb-checked' : 'cb' !!}"></span></td>
+                <td><span class="{!! !$b['a'] ? 'cb-checked' : 'cb' !!}"></span></td>
+                <td><span class="{!! $b['t'] ? 'cb-checked' : 'cb' !!}"></span></td>
+                <td><span class="{!! !$b['t'] ? 'cb-checked' : 'cb' !!}"></span></td>
+                <td><span class="{!! $b['m'] ? 'cb-checked' : 'cb' !!}"></span></td>
+                <td><span class="{!! !$b['m'] ? 'cb-checked' : 'cb' !!}"></span></td>
             </tr>
             @endforeach
         @else
@@ -252,7 +274,7 @@
             <tr>
                 <td>{{ $i }}.</td>
                 <td style="height: 25px;"></td>
-                <td>&#9744;</td><td>&#9744;</td><td>&#9744;</td><td>&#9744;</td><td>&#9744;</td><td>&#9744;</td><td>&#9744;</td><td>&#9744;</td>
+                <td><span class="cb"></span></td><td><span class="cb"></span></td><td><span class="cb"></span></td><td><span class="cb"></span></td><td><span class="cb"></span></td><td><span class="cb"></span></td><td><span class="cb"></span></td><td><span class="cb"></span></td>
             </tr>
             @endfor
         @endif
@@ -275,7 +297,7 @@
         @if(count($follow_up_verification) > 0)
             @foreach($follow_up_verification as $i => $f)
             <tr style="page-break-inside: avoid;">
-                <td style="text-align:center; font-family: DejaVu Sans, sans-serif;">{!! ($f['is_checked'] ?? false) ? '&#9745;' : '&#9744;' !!}</td>
+                <td style="text-align:center;"><span class="{!! ($f['is_checked'] ?? false) ? 'cb-checked' : 'cb' !!}"></span></td>
                 <td style="text-align:center;">{{ $f['unit_code'] ?? '' }}</td>
                 <td style="text-align:center;">{{ $f['element_no'] ?? '' }}</td>
                 <td>{{ $f['interview_substance'] ?? '' }}</td>
@@ -284,7 +306,7 @@
         @else
             @for($i=1; $i<=5; $i++)
             <tr>
-                <td style="text-align:center; font-family: DejaVu Sans, sans-serif;">&#9744;</td>
+                <td style="text-align:center;"><span class="cb"></span></td>
                 <td style="height: 25px;"></td>
                 <td></td>
                 <td></td>
@@ -330,7 +352,7 @@
                 </div>
             @else
                 <div style="margin-bottom: 15px; display: flex; align-items: flex-start;">
-                    <span style="font-family: DejaVu Sans, sans-serif; font-size: 14pt;">&#9744;</span>
+                    <span class="cb"></span>
                     <div style="margin-left: 10px; display: inline-block; vertical-align: top;">
                         Asesi telah memenuhi pencapaian seluruh kriteria unjuk kerja, direkomendasikan <strong>KOMPETEN</strong>
                     </div>
@@ -386,7 +408,7 @@
         <td>
             <div class="sig-block">
                 @if($asesor_qr_code)
-                    <img src="{{ $asesor_qr_code }}" class="sig-image" style="width:60px;height:60px;">
+                    <img src="{{ $asesor_qr_code }}" class="sig-image" style="width:50px;height:50px;">
                 @elseif($asesor_signature)
                     <img src="{{ $asesor_signature }}" class="sig-image" style="max-height:65px;">
                 @endif

@@ -20,6 +20,19 @@ class Ak01Resource extends Resource
     protected static ?string $modelLabel = 'AK.01';
     protected static ?string $pluralModelLabel = 'AK.01';
     protected static ?int $navigationSort = 1;
+    
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        
+        if (auth()->user()->hasRole('asesor')) {
+            $query->whereHas('registration', function ($q) {
+                $q->where('assessor_id', auth()->id());
+            });
+        }
+        
+        return $query;
+    }
 
     public static function form(Form $form): Form
     {
@@ -61,6 +74,9 @@ class Ak01Resource extends Resource
                                                 }
                                                 if ($reg->assessor) {
                                                     $set('ak01_data.asesor_name', $reg->assessor->name);
+                                                    
+                                                    // Auto-populate assessor signature info
+                                                    self::populateAssessorSignature($reg->assessor_id, $set, 'signatures.asesor');
                                                 }
                                             }
                                         }
@@ -165,6 +181,7 @@ class Ak01Resource extends Resource
             ])
             ->filters([])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

@@ -43,7 +43,7 @@ abstract class Controller
         return $this->resolveSignature($userId, $registrationId, $docLabel, $requireSigned, $user?->name, $user?->registration_number);
     }
 
-    private function resolveSignature($userId, $registrationId, $docLabel, $requireSigned, $name = null, $regNumber = null)
+    protected function resolveSignature($userId, $registrationId, $docLabel, $requireSigned, $name = null, $regNumber = null)
     {
         $sig = null;
 

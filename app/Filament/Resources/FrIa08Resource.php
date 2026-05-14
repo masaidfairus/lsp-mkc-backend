@@ -199,6 +199,10 @@ class FrIa08Resource extends Resource
                 $set('main_data.header.date', now()->format('d-m-Y'));
             }
 
+            if ($reg->assessor_id) {
+                self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.assessor');
+            }
+
             // Only repopulate follow_up_verification if empty or user changed registration
             $existingFollowUps = $get ? (array) $get('main_data.follow_up_verification') : [];
             if (($isUpdate || empty($existingFollowUps) || empty(array_filter(array_column($existingFollowUps, 'unit_code')))) && $reg->scheme) {

@@ -15,6 +15,7 @@ use Illuminate\Support\HtmlString;
 
 class Ak06Resource extends Resource
 {
+    use \App\Filament\Traits\HasStandardIaForm;
     protected static ?string $model = Ak06::class;
     protected static ?string $navigationIcon = 'heroicon-o-magnifying-glass-circle';
     protected static ?string $navigationGroup = 'AK';
@@ -22,7 +23,6 @@ class Ak06Resource extends Resource
     protected static ?string $modelLabel = 'AK.06';
     protected static ?string $pluralModelLabel = 'AK.06';
     protected static ?int $navigationSort = 6;
-
     public static function form(Form $form): Form
     {
         return $form
@@ -62,6 +62,9 @@ class Ak06Resource extends Resource
                                         if ($reg->assessor) {
                                             $set('main_data.header.assessor_name', $reg->assessor->name);
                                             $set('main_data.assessor_footer.lead_assessor_name', $reg->assessor->name);
+                                            
+                                            // Auto-populate signature
+                                            self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.assessor_footer');
                                         }
                                     }),
                             ]),
@@ -207,40 +210,7 @@ class Ak06Resource extends Resource
                                             ->rows(3)
                                             ->columnSpanFull(),
 
-                                        Forms\Components\Grid::make(3)
-                                            ->schema([
-                                                Forms\Components\Select::make('_signature_id')
-                                                    ->label('Pilih Tanda Tangan Asesor')
-                                                    ->options(UserSignature::pluck('name', 'id'))
-                                                    ->reactive()
-                                                    ->dehydrated(false)
-                                                    ->afterStateUpdated(function ($state, callable $set) {
-                                                        $sig = UserSignature::find($state);
-                                                        if ($sig) {
-                                                            $set('signature', $sig->signature_image);
-                                                            $set('qr_preview', $sig->qr_code);
-                                                        }
-                                                    }),
-
-                                                Forms\Components\TextInput::make('date')
-                                                    ->label('Tanggal TTD')
-                                                    ->type('date')
-                                                    ->default(fn () => now()->toDateString()),
-
-                                                Forms\Components\Placeholder::make('qr_preview')
-                                                    ->label('QR Code Asesor')
-                                                    ->content(fn ($get) => $get('qr_preview')
-                                                        ? new HtmlString("<img src='{$get('qr_preview')}' width='100' />")
-                                                        : '-'),
-                                            ]),
-
-                                        Forms\Components\Hidden::make('signature'),
-
-                                        Forms\Components\Placeholder::make('_sig_preview')
-                                            ->label('Preview Tanda Tangan Asesor')
-                                            ->content(fn ($get) => $get('signature')
-                                                ? new HtmlString("<img src='{$get('signature')}' style='max-height:90px;border:1px solid #e5e7eb;border-radius:6px;padding:4px;' />")
-                                                : new HtmlString('<span class="text-sm text-gray-400 italic">Pilih tanda tangan untuk preview.</span>')),
+                                        self::standardAssessorSignatureBlock(''),
                                     ]),
                             ]),
                     ]),

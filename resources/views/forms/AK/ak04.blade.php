@@ -180,7 +180,7 @@ $appeal_questions = $appeal_questions ?? '';
                     <tr>
                         <td style="width:30%; border:none; text-align:center;">
                             @if($asesi_qr_code)
-                                <img src="{{ $asesi_qr_code }}" style="width:80px; height:80px;">
+                                <img src="{{ $asesi_qr_code }}" style="width:50px; height:50px;">
                                 <div style="font-size:7pt; margin-top:2px;">Terverifikasi Digital</div>
                             @else
                                 (Tanda Tangan Asesi)

@@ -16,7 +16,7 @@ class PdfApl02Controller extends Controller
             'candidate',
             'scheme.competencyUnits.competencyElements',
             'selfAssessments',
-            'portfolioFiles'
+            'aplPortfolio.fileProfile.documentList'
         ]);
 
         $candidate = $registration->candidate;
@@ -39,7 +39,9 @@ class PdfApl02Controller extends Controller
         }
         $selfAssessments = collect($registration->selfAssessments)->keyBy('element_id');
 
-        $portfolios = $registration->portfolioFiles;
+        $portfolios = $registration->aplPortfolio->map(function ($p) {
+            return $p->fileProfile->documentList->title ?? 'Dokumen Tanpa Nama';
+        })->unique();
 
         // ── Validasi Tanda Tangan Asesor (Kecuali untuk Admin/Asesor Peninjau) ───
         $asesorSig = $this->getUserSignature($registration->assessor?->id, $registration->id, 'APL.02', true);
@@ -66,6 +68,8 @@ class PdfApl02Controller extends Controller
             'unit_kompetensi' => $scheme->competencyUnits ?? [],
             'asesmen_mandiri' => $selfAssessments ?? [],
             'portfolios' => $portfolios,
+            'is_apl02_continuable' => $registration->is_apl02_continuable,
+            'apl02_approach' => $registration->apl02_approach,
         ];
 
 

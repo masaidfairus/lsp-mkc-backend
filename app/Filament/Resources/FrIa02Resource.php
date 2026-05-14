@@ -158,6 +158,10 @@ class FrIa02Resource extends Resource
                 $set('main_data.header.assessment_date', now()->format('d-m-Y'));
             }
 
+            if ($reg->assessor_id) {
+                self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.assessor');
+            }
+
             // Populate demonstration_tasks if empty
             $existingTasks = $get ? (array) $get('main_data.demonstration_tasks') : [];
             if (($isUpdate || empty($existingTasks) || empty(array_filter(array_column($existingTasks, 'work_group')))) && $reg->scheme) {
@@ -192,7 +196,11 @@ class FrIa02Resource extends Resource
                 Tables\Columns\TextColumn::make('registration.scheme.name')->label('Skema')->searchable(),
                 Tables\Columns\TextColumn::make('created_at')->label('Dibuat')->dateTime()->sortable(),
             ])
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 

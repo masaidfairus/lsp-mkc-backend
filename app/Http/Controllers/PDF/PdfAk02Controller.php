@@ -36,6 +36,7 @@ class PdfAk02Controller extends Controller
         $assessmentDate = $this->convertDateToLocalTime($ak02Data['date'] ?? now()->format('Y-m-d'));
         
         $signatureData = $this->getAssessorSignatureData($assessor, $registration->id, 'AK.02', true);
+        $asesiSignatureData = $this->resolveSignature($candidate->id, $registration->id, 'AK.02', false);
         $isAuthorizedReviewer = $this->isAuthorizedReviewer($request->user(), $registration);
 
         if (!$signatureData['is_signed'] && !$isAuthorizedReviewer) {
@@ -60,6 +61,7 @@ class PdfAk02Controller extends Controller
             'competency_units' => $ak02Data['competency_units'] ?? [],
             'asesor_reg' => $signatureData['reg_number'],
             'asesor_qr_code' => $signatureData['qr_code'],
+            'asesi_qr_code' => $asesiSignatureData['qr_code'],
             'assessment_summary' => $ak02Data['assessment_summary'] ?? [],
             'signatures' => $ak02Data['signatures'] ?? [],
         ];

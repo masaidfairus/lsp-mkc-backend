@@ -149,6 +149,10 @@ class FrIa05aResource extends Resource
             if ($get && !$get('main_data.header.assessment_date')) {
                 $set('main_data.header.assessment_date', now()->format('Y-m-d'));
             }
+
+            if ($reg->assessor_id) {
+                self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.assessor');
+            }
         }
     }
 
@@ -161,7 +165,11 @@ class FrIa05aResource extends Resource
                 Tables\Columns\TextColumn::make('registration.candidate.name')->label('Asesi'),
                 Tables\Columns\TextColumn::make('registration.scheme.name')->label('Skema'),
             ])
-            ->actions([Tables\Actions\EditAction::make()]);
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ]);
     }
 
     public static function getPages(): array

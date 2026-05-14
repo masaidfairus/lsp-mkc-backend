@@ -13,7 +13,7 @@ class RegistrationController extends Controller
         $user = $request->user();
 
         // Eager load relationships to prevent N+1 queries and ensure fast loading
-        $registrations = AssessmentRegistration::with(['scheme', 'plannings', 'aplData', 'appeals', 'results'])
+        $registrations = AssessmentRegistration::with(['scheme', 'plannings', 'aplData', 'appeals', 'results', 'signatureRequests'])
             ->where('user_id', $user->id)
             ->whereNotNull('scheme_id')
             ->latest()
@@ -76,9 +76,15 @@ class RegistrationController extends Controller
                 $apl01NextStep = 5; 
             }
 
-            // Jika status APL02 sudah complete, paksa step 6 (lanjut ke AK.04)
+            // Jika status APL02 sudah complete, paksa step 6 (lanjut ke AK.02)
             if ($reg->status && $reg->status->isApl02Complete()) {
                 $apl01NextStep = 6; 
+            }
+
+            // Jika AK.02 sudah dibuat asesor, paksa step 7 (lanjut ke AK.04)
+            $ak02Exists = $reg->results->where('document_type', 'FR.AK.02')->isNotEmpty();
+            if ($reg->status && $reg->status->isApl02Complete() && $ak02Exists) {
+                $apl01NextStep = 7;
             }
 
             $statusObj = $reg->status;
@@ -92,31 +98,70 @@ class RegistrationController extends Controller
             }
 
             $apl02Status = $statusObj ? $statusObj->apl02Value() : 'not_started';
+            // 'approved' from admin panel = APL-02 Diterima → map to 'finished'
+            if ($apl02Status === 'approved') {
+                $apl02Status = 'finished';
+            }
 
             // Mapping Status ke Bahasa Indonesia
             $statusMap = [
-                'not_started' => 'Belum dimulai',
-                'incomplete'  => 'Belum selesai',
-                'pending'     => ($reg->asesi_type === 'pribadi') ? 'Menunggu Pembayaran' : 'Sedang ditinjau',
-                'paid'        => 'Sedang ditinjau',
-                'approved'    => 'Diterima',
-                'rejected'    => 'Ditolak',
-                'submitted'   => 'Sedang ditinjau',
-                'locked'      => 'Belum bisa diakses',
+                'not_started'       => 'Belum dimulai',
+                'incomplete'        => 'Belum selesai',
+                'pending'           => ($reg->asesi_type === 'pribadi') ? 'Menunggu Pembayaran' : 'Sedang ditinjau',
+                'paid'              => 'Sedang ditinjau',
+                'approved'          => 'Diterima',
+                'finished'          => 'Selesai',
+                'rejected'          => 'Ditolak',
+                'submitted'         => 'Sedang ditinjau',
+                'locked'            => 'Belum bisa diakses',
+                'waiting_assessor'  => 'Menunggu Asesor',
+                'waiting_signature' => 'Butuh TTD Asesi',
             ];
 
             // Prerequisite Logic
             $isApl01Approved = ($apl01Status === 'approved');
-            $isApl02Approved = ($apl02Status === 'approved');
-            
-            $ak04Status = 'not_started';
-            $appeal = $reg->appeals->first();
-            if ($appeal) {
-                $ak04Status = $appeal->status->value ?? 'submitted';
-            }
+            $isApl02Approved = ($apl02Status === 'finished');
+
+            // AK.02 harus sudah ada (dibuat asesor) sebelum AK.04 bisa diakses
+            $ak02Exists = $reg->results->where('document_type', 'FR.AK.02')->isNotEmpty();
 
             $finalApl02Status = $isApl01Approved ? $apl02Status : 'locked';
-            $finalAk04Status  = ($isApl01Approved && $isApl02Approved) ? $ak04Status : 'locked';
+            
+            // AK.02 logic (Rekaman Asesmen)
+            $ak02Status = 'not_started';
+            if ($isApl02Approved) {
+                if ($ak02Exists) {
+                    // Check signature status from database directly to ensure accuracy
+                    $sigs = \App\Models\SignatureRequest::where('registration_id', $reg->id)
+                        ->whereIn('document_label', ['AK.02', 'FR.AK.02'])
+                        ->get();
+
+                    $asesiSig = $sigs->where('role', 'asesi')->first();
+                    // Check both 'Asesor' and 'asesor' for robustness
+                    $assessorSig = $sigs->whereIn('role', ['Asesor', 'asesor'])->first();
+
+                    if ($asesiSig && $asesiSig->status === 'signed' && $assessorSig && $assessorSig->status === 'signed') {
+                        $ak02Status = 'finished';
+                    } elseif ($assessorSig && $assessorSig->status === 'signed') {
+                        $ak02Status = 'waiting_signature';
+                    } else {
+                        // Jika asesor belum tanda tangan, atau request belum dibuat
+                        $ak02Status = 'waiting_assessor';
+                    }
+                } else {
+                    $ak02Status = 'waiting_assessor';
+                }
+            } else {
+                $ak02Status = 'locked';
+            }
+
+            // AK.03 (Umpan Balik Asesi)
+            $ak03Exists = $reg->results->where('document_type', 'FR.AK.03')->isNotEmpty();
+            $ak03Status = ($ak02Status === 'finished') ? ($ak03Exists ? 'finished' : 'not_started') : 'locked';
+            
+            // AK.04 (Banding Asesmen)
+            $ak04Exists = $reg->appeals->isNotEmpty();
+            $ak04Status = ($ak02Status === 'finished') ? ($ak04Exists ? 'finished' : 'not_started') : 'locked';
 
             return [
                 'id' => $reg->id,
@@ -130,17 +175,27 @@ class RegistrationController extends Controller
                     [
                         'code' => 'APL.01',
                         'label' => 'Permohonan Sertifikasi',
-                        'status' => $statusMap[$apl01Status] ?? $apl01Status,
+                        'status' => $apl01Status,
                     ],
                     [
                         'code' => 'APL.02',
                         'label' => 'Asesmen Mandiri',
-                        'status' => $statusMap[$finalApl02Status] ?? $finalApl02Status,
+                        'status' => $finalApl02Status,
+                    ],
+                    [
+                        'code' => 'AK.02',
+                        'label' => 'Rekaman Asesmen',
+                        'status' => $ak02Status,
+                    ],
+                    [
+                        'code' => 'AK.03',
+                        'label' => 'Umpan Balik Asesi',
+                        'status' => $ak03Status,
                     ],
                     [
                         'code' => 'AK.04',
                         'label' => 'Banding Asesmen',
-                        'status' => ($finalAk04Status === 'pending') ? 'Sedang ditinjau' : ($statusMap[$finalAk04Status] ?? $finalAk04Status),
+                        'status' => $ak04Status,
                     ],
                 ],
                 'documents' => [
@@ -166,7 +221,7 @@ class RegistrationController extends Controller
                         'code' => 'AK.02',
                         'title' => 'Formulir AK.02 (Rekaman Asesmen)',
                         'url' => \Illuminate\Support\Facades\URL::temporarySignedRoute('ak02.form', now()->addHours(2), ['registration' => $reg->id]),
-                        'is_available' => $reg->results->where('document_type', 'AK02')->isNotEmpty(),
+                        'is_available' => $ak02Status === 'finished', // ✅ Only after BOTH parties signed
                     ],
                     [
                         'code' => 'AK.04',
@@ -187,6 +242,16 @@ class RegistrationController extends Controller
                         'is_available' => $reg->certificate !== null,
                     ],
                 ],
+                'signature_requests' => $reg->signatureRequests
+                    ->where('role', 'asesi')
+                    ->where('status', 'pending')
+                    ->map(function ($req) {
+                        return [
+                            'id' => $req->id,
+                            'document_label' => $req->document_label,
+                            'status' => $req->status,
+                        ];
+                    })->values()->toArray(),
             ];
         });
 

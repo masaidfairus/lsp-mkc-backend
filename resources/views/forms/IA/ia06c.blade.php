@@ -96,8 +96,12 @@
                 <tr>
                     <td style="text-align: center; vertical-align: top;">{{ $j['no'] }}</td>
                     <td style="min-height:70px; vertical-align: top;">{!! nl2br(e($j['jawaban_asesi'] ?? '')) !!}</td>
-                    <td style="text-align:center; vertical-align: middle; font-family: DejaVu Sans, sans-serif;">{!! ($j['is_yes'] ?? false) ? '&#9745;' : '&#9744;' !!}</td>
-                    <td style="text-align:center; vertical-align: middle; font-family: DejaVu Sans, sans-serif;">{!! ($j['is_no'] ?? false) ? '&#9745;' : '&#9744;' !!}</td>
+                    <td style="text-align:center; vertical-align: middle;">
+                        <span class="{!! ($j['is_yes'] ?? false) ? 'cb-checked' : 'cb' !!}"></span>
+                    </td>
+                    <td style="text-align:center; vertical-align: middle;">
+                        <span class="{!! ($j['is_no'] ?? false) ? 'cb-checked' : 'cb' !!}"></span>
+                    </td>
                 </tr>
             @endforeach
         @else

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Asesi\Ak01Controller;
+use App\Http\Controllers\Asesi\Ak03Controller;
 use App\Http\Controllers\Asesi\Ak04Controller;
 use App\Http\Controllers\Asesi\Ak07Controller;
 use App\Http\Controllers\Asesi\SchemeController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Asesi\DocumentProfileController;
 use App\Http\Controllers\Asesi\MasterEducationController;
 use App\Http\Controllers\Asesi\PaymentController;
 use App\Http\Controllers\Asesi\RegistrationController;
+use App\Http\Controllers\Asesi\SignatureRequestController;
 use App\Http\Controllers\PDF\PdfApl01Controller;
 use App\Http\Controllers\PDF\PdfApl02Controller;
 use App\Http\Middleware\EnsureApiKeyIsValid;
@@ -104,10 +106,20 @@ Route::middleware('auth:sanctum')->group(function () {
     // AK-04
     Route::get('registrations/{registration}/ak04', [Ak04Controller::class, 'show']);
     Route::post('registrations/{registration}/ak04', [Ak04Controller::class, 'store']);
+    Route::delete('registrations/{registration}/ak04', [Ak04Controller::class, 'destroy']);
+
+    // AK-03
+    Route::get('registrations/{registration}/ak03', [Ak03Controller::class, 'show']);
+    Route::post('registrations/{registration}/ak03', [Ak03Controller::class, 'store']);
 
     // AK-07
     Route::get('registrations/{registration}/ak07', [Ak07Controller::class, 'show']);
     Route::post('registrations/{registration}/ak07', [Ak07Controller::class, 'store']);
+
+    // Signature Requests (IA Forms)
+    Route::get('signature-requests', [SignatureRequestController::class, 'index']);
+    Route::get('signature-requests/{id}', [SignatureRequestController::class, 'show']);
+    Route::post('signature-requests/{id}/sign', [\App\Http\Controllers\Asesi\SignatureRequestController::class, 'sign']);
 
     // PDF Generate
     Route::get('apl01/{registration}/pdf', [PdfApl01Controller::class, 'show']);

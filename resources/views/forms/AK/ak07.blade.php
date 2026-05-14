@@ -66,8 +66,8 @@
             display: inline-block;
             content: '';
             position: absolute;
-            left: 3px;
-            top: 0px;
+            left: 2px;
+            top: -1px;
             width: 3px;
             height: 6px;
             border: solid black;
@@ -296,7 +296,7 @@
 
                 {{-- Kolom Checkbox --}}
                 <td style="text-align:center; vertical-align:middle;" colspan="1">
-                    <span style="font-size: 14pt;">{!! $item['is_checked'] ? '☑' : '☐' !!}</span>
+                    <span class="{{ $item['is_checked'] ? 'cb-checked' : 'cb' }}"></span>
                 </td>
 
                 {{-- Kolom Label Dinamis --}}
@@ -350,7 +350,7 @@
                         @foreach($item['note'] as $note)
                             <div class="cb-item">
                                 {{-- Logika centang di dalam keterangan --}}
-                                <span style="font-size: 13pt;">{!! ($note['is_checked'] ?? false) ? '☑' : '☐' !!}</span>
+                                <span class="{{ ($note['is_checked'] ?? false) ? 'cb-checked' : 'cb' }}"></span>
                                 {!! $note['title'] !!}
                             </div>
                         @endforeach

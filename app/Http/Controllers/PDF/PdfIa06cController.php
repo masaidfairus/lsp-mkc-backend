@@ -129,7 +129,7 @@ class PdfIa06cController extends Controller
         return $pdf->stream($filename);
     }
 
-    private function getUserSignature($userId, $modelId = null, $role = null)
+    public function getUserSignature($userId, $modelId = null, $role = null)
     {
         if (!$userId) return ['signature' => null, 'qr_code' => null];
 

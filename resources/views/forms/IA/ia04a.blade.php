@@ -618,7 +618,7 @@
                 Tanda Tangan Asesor<br><br>
                 <div class="sig-block">
                     @if($asesor_qr_code ?? null)
-                        <img src="{{ $asesor_qr_code }}" class="sig-image" style="width: 70px; height: 70px;">
+                        <img src="{{ $asesor_qr_code }}" class="sig-image" style="width: 50px; height: 50px;">
                     @elseif($asesor_signature ?? null)
                         <img src="{{ $asesor_signature }}" class="sig-image" style="max-height: 70px;">
                     @endif
