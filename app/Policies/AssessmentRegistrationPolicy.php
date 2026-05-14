@@ -15,6 +15,7 @@ class AssessmentRegistrationPolicy
      */
     public function viewAny(User $user): bool
     {
+        if ($user->hasRole(['superadmin', 'admin'])) return true;
         return $user->can('view_any_assessment::registration');
     }
 
@@ -23,6 +24,7 @@ class AssessmentRegistrationPolicy
      */
     public function view(User $user, AssessmentRegistration $assessmentRegistration): bool
     {
+        if ($user->hasRole(['superadmin', 'admin'])) return true;
         return $user->can('view_assessment::registration');
     }
 
@@ -31,6 +33,7 @@ class AssessmentRegistrationPolicy
      */
     public function create(User $user): bool
     {
+        if ($user->hasRole(['superadmin', 'admin'])) return true;
         return $user->can('create_assessment::registration');
     }
 
@@ -39,6 +42,7 @@ class AssessmentRegistrationPolicy
      */
     public function update(User $user, AssessmentRegistration $assessmentRegistration): bool
     {
+        if ($user->hasRole(['superadmin', 'admin'])) return true;
         return $user->can('update_assessment::registration');
     }
 

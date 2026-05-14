@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
+use Illuminate\Database\Eloquent\Builder;
 
 class FrIa01Resource extends Resource
 {
@@ -26,6 +27,20 @@ class FrIa01Resource extends Resource
     protected static ?string $modelLabel = 'FR.IA.01';
     protected static ?string $pluralModelLabel = 'FR.IA.01';
     protected static ?int $navigationSort = 1;
+    
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()
+            ->where('document_type', 'FR.IA.01');
+        
+        if (auth()->user()->hasRole('asesor')) {
+            $query->whereHas('registration', function ($q) {
+                $q->where('assessor_id', auth()->id());
+            });
+        }
+        
+        return $query;
+    }
 
     public static function form(Form $form): Form
     {
@@ -163,6 +178,10 @@ class FrIa01Resource extends Resource
                 $set('main_data.header.tanggal', now()->format('d-m-Y'));
             }
 
+            if ($reg->assessor_id) {
+                self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.asesor');
+            }
+
             // Populate real Elemen + KUK if empty
             $existingSections = $get ? (array) $get('main_data.sections') : [];
             if (($isUpdate || empty($existingSections) || empty(array_filter(array_column($existingSections, 'work_group')))) && $reg->scheme) {
@@ -201,14 +220,17 @@ class FrIa01Resource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn($query) => $query->where('document_type', 'FR.IA.01'))
             ->columns([
                 Tables\Columns\TextColumn::make('registration_id')->label('Registration ID')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('registration.candidate.name')->label('Asesi')->searchable(),
                 Tables\Columns\TextColumn::make('registration.scheme.name')->label('Skema')->searchable(),
                 Tables\Columns\TextColumn::make('created_at')->label('Dibuat')->dateTime()->sortable(),
             ])
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 

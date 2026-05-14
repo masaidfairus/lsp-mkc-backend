@@ -27,6 +27,8 @@ class AssessmentRegistration extends Model
         'apl02_qr_code',
         'apl02_signature_date',
         'certificate',
+        'is_apl02_continuable',
+        'apl02_approach',
     ];
 
     protected $casts = [
@@ -36,6 +38,7 @@ class AssessmentRegistration extends Model
         'certification_purpose' => CertificationPurpose::class,
         'assessed_at' => 'datetime',
         'apl02_signature_date' => 'datetime',
+        'is_apl02_continuable' => 'boolean',
     ];
 
     public function candidate()
@@ -148,7 +151,7 @@ class AssessmentRegistration extends Model
             } elseif ($model->status_apl02 === \App\Enums\Apl02Status::SUBMITTED) {
                 $model->status = \App\Enums\AssessmentStatus::APL02_SUBMITTED;
             } 
-            // Jika APL.02 belum dimulai, gunakan status APL.01
+            // Jika APL.02 belum ada tindakan, gunakan status APL.01
             else {
                 if ($model->status_apl01 === \App\Enums\Apl01Status::APPROVED) {
                     $model->status = \App\Enums\AssessmentStatus::APL01_APPROVED;
@@ -159,7 +162,61 @@ class AssessmentRegistration extends Model
                 } elseif ($model->status_apl01 === \App\Enums\Apl01Status::PENDING) {
                     $model->status = \App\Enums\AssessmentStatus::APL01_PENDING;
                 } else {
-                    $model->status = \App\Enums\AssessmentStatus::APL01_DRAFT;
+                    // Jika tidak ada yang cocok, biarkan status yang ada atau set ke draft jika baru
+                    if (!$model->exists && !$model->status) {
+                        $model->status = \App\Enums\AssessmentStatus::APL01_DRAFT;
+                    }
+                }
+            }
+        });
+
+        static::saved(function ($model) {
+            // 1. Bersihkan permintaan TTD Asesor yang lama jika asesor_id diganti atau dihapus
+            \App\Models\SignatureRequest::where('registration_id', $model->id)
+                ->where('role', 'Asesor')
+                ->when($model->assessor_id, fn($q) => $q->where('user_id', '!=', $model->assessor_id))
+                ->delete();
+
+            // Jika asesor tidak ada, stop
+            if (!$model->assessor_id) {
+                return;
+            }
+
+            // 2. Sinkronkan permintaan TTD secara bertahap
+            // APL.01: Butuh TTD jika status PENDING/PAID/APPROVED
+            // APL.02: Butuh TTD jika status SUBMITTED/APPROVED
+            $docs = [
+                'APL.01' => in_array($model->status_apl01, [\App\Enums\Apl01Status::PENDING, \App\Enums\Apl01Status::PAID, \App\Enums\Apl01Status::APPROVED]),
+                'APL.02' => in_array($model->status_apl02, [\App\Enums\Apl02Status::SUBMITTED, \App\Enums\Apl02Status::APPROVED]),
+            ];
+
+            foreach ($docs as $label => $shouldHaveRequest) {
+                if ($shouldHaveRequest) {
+                    $existing = \App\Models\SignatureRequest::where([
+                        'registration_id' => $model->id,
+                        'user_id' => $model->assessor_id,
+                        'document_label' => $label,
+                    ])->first();
+
+                    if (!$existing) {
+                        \App\Models\SignatureRequest::create([
+                            'registration_id' => $model->id,
+                            'user_id' => $model->assessor_id,
+                            'document_label' => $label,
+                            'status' => 'pending',
+                            'signable_type' => get_class($model),
+                            'signable_id' => $model->id,
+                            'role' => 'Asesor',
+                        ]);
+                    }
+                } else {
+                    // Jika status tidak memenuhi syarat, hapus request yang masih pending
+                    \App\Models\SignatureRequest::where([
+                        'registration_id' => $model->id,
+                        'user_id' => $model->assessor_id,
+                        'document_label' => $label,
+                        'status' => 'pending',
+                    ])->delete();
                 }
             }
         });

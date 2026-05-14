@@ -32,15 +32,13 @@ class RolePermissionSeeder extends Seeder
 
             // Superadmin gets everything (handled at the end)
 
-            // --- ADMIN LOGIC ---
             // 1. Hak akses read semua dokumen
             if (str_starts_with($name, 'view_') || str_starts_with($name, 'view_any_')) {
-                // Ignore shield, users, roles, etc. unless explicitly needed. But "semua dokumen" means all assessment docs.
-                if (preg_match('/(assessment_registration|assessment::registration|apl|ak|appeal|fr_ia|fr::ia|mapa|fr_va|fr::va|assessment_instrument|competency|scheme|signature::inbox)/', $name)) {
+                if (preg_match('/(assessment_registration|assessment::registration|apl|ak|appeal|ia|mapa|va|assessment_instrument|competency|scheme|signature::inbox|work_group|criterion|element)/', $name)) {
                     $adminPermissions->push($name);
                 }
             }
-            // 2. Hak akses update APL.01 (AssessmentRegistration)
+            // 2. Hak akses update APL.01 (AssessmentRegistration) untuk verifikasi admin
             if (str_contains($name, 'assessment_registration') && str_starts_with($name, 'update_')) {
                 $adminPermissions->push($name);
             }
@@ -66,8 +64,8 @@ class RolePermissionSeeder extends Seeder
                 $asesorPermissions->push($name);
             }
 
-            // Hak akses Insert & Update untuk semua dokumen selain APL.01, APL.02
-            if (str_starts_with($name, 'create_') || str_starts_with($name, 'update_')) {
+            // Hak akses Insert, Update, & Delete untuk semua dokumen selain APL.01, APL.02
+            if (str_starts_with($name, 'create_') || str_starts_with($name, 'update_') || str_starts_with($name, 'delete_') || str_starts_with($name, 'delete_any_')) {
                 if ($isAk || $isIa || $isMapa || $isVa || $isSigInbox) {
                     $asesorPermissions->push($name);
                 }

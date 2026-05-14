@@ -197,6 +197,10 @@ class FrIa11Resource extends Resource
                 $set('main_data.header.assessment_date', now()->format('d-m-Y'));
             }
 
+            if ($reg->assessor_id) {
+                self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.assessor');
+            }
+
             // Populate categories if empty
             $existingReviews = $get ? (array) $get('main_data.product_reviews') : [];
             if ($isUpdate || empty($existingReviews) || empty(array_filter(array_column($existingReviews, 'category_name')))) {

@@ -157,6 +157,25 @@
             transform: rotate(45deg);
         }
 
+        .checkmark-text {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            position: relative;
+        }
+
+        .checkmark-text::after {
+            content: '';
+            position: absolute;
+            left: 3px;
+            top: -1px;
+            width: 3px;
+            height: 7px;
+            border: solid black;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
         /* ── TTD ── */
         .ttd-table {
             width: 55%;
@@ -208,7 +227,7 @@
         <div class="form-title">FR.AK.02. REKAMAN ASESMEN KOMPETENSI</div>
 
         <div class="instruksi">
-            <strong>Instruksi:</strong> Beri tanda centang (√) pada kolom yang sesuai untuk setiap unit kompetensi
+            <strong>Instruksi:</strong> Beri tanda centang pada kolom yang sesuai untuk setiap unit kompetensi
             berdasarkan hasil asesmen.
         </div>
 
@@ -275,15 +294,15 @@
                     <tr class="unit-row">
                         <td style="text-align:center">{{ $index + 1 }}.</td>
                         <td class="col-unit">{{ $u['unit_title'] ?? '-' }}</td>
-                        <td class="td-center">{{ !empty($ev['observasi_demonstrasi']) ? '✓' : '' }}</td>
-                        <td class="td-center">{{ !empty($ev['portofolio']) ? '✓' : '' }}</td>
+                        <td class="td-center">{!! !empty($ev['observasi_demonstrasi']) ? '<span class="checkmark-text"></span>' : '' !!}</td>
+                        <td class="td-center">{!! !empty($ev['portofolio']) ? '<span class="checkmark-text"></span>' : '' !!}</td>
                         <td class="td-center">
-                            {{ (!empty($ev['pernyataan_pihak_ketiga']) || !empty($ev['pertanyaan_wawancara'])) ? '✓' : '' }}
+                            {!! (!empty($ev['pernyataan_pihak_ketiga']) || !empty($ev['pertanyaan_wawancara'])) ? '<span class="checkmark-text"></span>' : '' !!}
                         </td>
-                        <td class="td-center">{{ !empty($ev['pertanyaan_lisan']) ? '✓' : '' }}</td>
-                        <td class="td-center">{{ !empty($ev['pertanyaan_tertulis']) ? '✓' : '' }}</td>
-                        <td class="td-center">{{ !empty($ev['proyek_kerja']) ? '✓' : '' }}</td>
-                        <td class="td-center">{{ !empty($ev['lainnya']) ? '✓' : '' }}</td>
+                        <td class="td-center">{!! !empty($ev['pertanyaan_lisan']) ? '<span class="checkmark-text"></span>' : '' !!}</td>
+                        <td class="td-center">{!! !empty($ev['pertanyaan_tertulis']) ? '<span class="checkmark-text"></span>' : '' !!}</td>
+                        <td class="td-center">{!! !empty($ev['proyek_kerja']) ? '<span class="checkmark-text"></span>' : '' !!}</td>
+                        <td class="td-center">{!! !empty($ev['lainnya']) ? '<span class="checkmark-text"></span>' : '' !!}</td>
                     </tr>
                 @endforeach
 
@@ -350,7 +369,13 @@
             <tr>
                 <td
                     style="width: 55%; border-right: none; height: 60px; vertical-align: middle; padding: 10px; text-align: left;">
-                    Tanda tangan Asesi : {{ $asesi_name }}
+                    Tanda tangan Asesi :
+                    @if($asesi_qr_code)
+                        <img src="{{ $asesi_qr_code }}"
+                            style="width:50px; height:50px; vertical-align: middle; margin-left: 5px;">
+                    @else
+                        {{ $asesi_name }}
+                    @endif
                     <div style="font-size: 7.5pt; font-style: italic; color: #666; margin-top: 4px;">
                         (Tanda tangan digital tersemat via aplikasi mobile)
                     </div>

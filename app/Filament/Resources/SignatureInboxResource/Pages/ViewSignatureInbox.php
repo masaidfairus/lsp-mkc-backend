@@ -111,6 +111,34 @@ class ViewSignatureInbox extends EditRecord
             'signed_at' => now(),
         ]);
 
+        // AUTOMATICALLY CREATE ASESI SIGNATURE REQUEST
+        \Log::info("Signature signed by assessor: label={$req->document_label}, reg_id={$req->registration_id}");
+        
+        // Forms that need Asesi signature after Assessor signs
+        $needsAsesiSignature = ['AK.01', 'AK.02', 'AK.05', 'AK.06', 'IA.01', 'IA.02', 'IA.03', 'IA.05', 'IA.06', 'IA.07', 'IA.11', 'MAPA.01'];
+        if (in_array($req->document_label, $needsAsesiSignature)) {
+            $asesiId = $req->registration->user_id;
+            
+            $existingAsesiReq = \App\Models\SignatureRequest::where([
+                'registration_id' => $req->registration_id,
+                'user_id'         => $asesiId,
+                'document_label'  => $req->document_label,
+                'role'            => 'asesi',
+            ])->first();
+
+            if (!$existingAsesiReq) {
+                \App\Models\SignatureRequest::create([
+                    'registration_id' => $req->registration_id,
+                    'user_id'         => $asesiId,
+                    'document_label'  => $req->document_label,
+                    'status'          => 'pending',
+                    'signable_type'   => $req->signable_type,
+                    'signable_id'     => $req->signable_id,
+                    'role'            => 'asesi',
+                ]);
+            }
+        }
+
         Notification::make()->title("Tanda tangan untuk $doc berhasil disimpan")->success()->send();
         
         // Check if there are any other pending requests for this record

@@ -456,7 +456,7 @@
             <td style="text-align:center">:</td>
             <td>
                 @if($asesor_qr_code ?? null)
-                    <img src="{{ $asesor_qr_code }}" style="width: 70px; height: 70px;"><br>
+                    <img src="{{ $asesor_qr_code }}" style="width: 50px; height: 50px;"><br>
                 @elseif($asesor_signature ?? null)
                     <img src="{{ $asesor_signature }}" style="max-height: 80px;"><br>
                 @endif

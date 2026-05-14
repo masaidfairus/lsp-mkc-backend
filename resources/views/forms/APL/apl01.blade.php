@@ -600,6 +600,45 @@
         </tbody>
     </table>
 
+    {{-- 3.3 Dokumen Portfolio Asesi --}}
+    @php
+        $portfolio_documents = $portfolio_documents ?? [];
+    @endphp
+    @if(!empty($portfolio_documents))
+    <div style="font-size:9.5pt; font-weight:bold; margin: 10px 0 6px 0;">3.3 Dokumen Portfolio yang Telah Dikirimkan</div>
+    <table class="tbl-border">
+        <thead>
+            <tr>
+                <th rowspan="2" style="width:6%;">No.</th>
+                <th rowspan="2">Nama Dokumen</th>
+                <th colspan="2">Ada</th>
+                <th rowspan="2" style="width:12%;">Tidak Ada</th>
+            </tr>
+            <tr>
+                <th style="width:13%;">Diunggah</th>
+                <th style="width:13%;">Belum</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($portfolio_documents as $i => $doc)
+                <tr>
+                    <td class="center">{{ $i + 1 }}.</td>
+                    <td>{{ $doc['title'] }}</td>
+                    <td class="center">
+                        <span class="{{ $doc['is_uploaded'] ? 'checkbox-checked' : 'checkbox' }}"></span>
+                    </td>
+                    <td class="center">
+                        <span class="{{ !$doc['is_uploaded'] && $doc['exists'] ? 'checkbox-checked' : 'checkbox' }}"></span>
+                    </td>
+                    <td class="center">
+                        <span class="{{ !$doc['exists'] ? 'checkbox-checked' : 'checkbox' }}"></span>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif
+
     {{-- Tabel Rekomendasi + TTD --}}
     <table class="tbl-rekom">
         <tr>

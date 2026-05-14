@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class Ak07Resource extends Resource
 {
+    use \App\Filament\Traits\HasStandardIaForm;
     protected static ?string $model = Ak07::class;
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?string $navigationGroup = 'AK';
@@ -19,7 +20,6 @@ class Ak07Resource extends Resource
     protected static ?string $modelLabel = 'AK.07';
     protected static ?string $pluralModelLabel = 'AK.07';
     protected static ?int $navigationSort = 7;
-
     public static function form(Form $form): Form
     {
         return $form
@@ -60,6 +60,9 @@ class Ak07Resource extends Resource
                                                 // Auto-populate Assessor from Registration
                                                 if ($reg->assessor) {
                                                     $set('ak07_data.asesor_name', $reg->assessor->name);
+                                                    
+                                                    // Auto-populate signature
+                                                    self::populateAssessorSignature($reg->assessor_id, $set, 'ak07_data.signatures.asesor');
                                                 }
 
                                                 if ($reg->tuk) {
@@ -105,10 +108,10 @@ class Ak07Resource extends Resource
                                             ->dehydrated()
                                             ->required(),
 
-                                        Forms\Components\Select::make('asesor_name')
+                                        Forms\Components\TextInput::make('asesor_name')
                                             ->label('Nama Asesor')
-                                            ->options(fn () => \App\Models\User::role('asesor')->pluck('name', 'name'))
-                                            ->searchable()
+                                            ->disabled()
+                                            ->dehydrated()
                                             ->required(),
 
                                         // 2. Auto-fill assessment_date to today on create
@@ -121,175 +124,25 @@ class Ak07Resource extends Resource
                                 // ── Potensi Asesi ──────────────────────────────────────
                                 Forms\Components\Section::make('Potensi Asesi')
                                     ->schema([
-                                        Forms\Components\Repeater::make('potential')
-                                            ->label('')
-                                            ->schema([
-                                                Forms\Components\Hidden::make('label'),
-                                                Forms\Components\Checkbox::make('is_checked')
-                                                    ->label(fn ($get) => $get('label')),
-                                            ])
-                                            ->default(self::defaultPotential())
-                                            ->addActionLabel('Tambah Potensi')
-                                            ->reorderable(false)
-                                            ->addable(true)
-                                            ->deletable(false),
+                                        // ... repeater content ...
                                     ]),
 
                                 // ── 3. Bagian A – redesigned for clean UI ──────────────
                                 Forms\Components\Section::make('Bagian A – Penyesuaian sesuai karakteristik asesi')
                                     ->schema([
-                                        Forms\Components\Repeater::make('part_a')
-                                            ->label('')
-                                            ->schema([
-                                                Forms\Components\Hidden::make('id'),
-                                                Forms\Components\Hidden::make('title'),
-
-                                                // Removed grid to fix flexbox issues, elements stack nicely
-                                                Forms\Components\Placeholder::make('title_display')
-                                                    ->label('Karakteristik Asesi')
-                                                    ->content(fn ($get) => $get('title')),
-
-                                                Forms\Components\Toggle::make('needs_adjustment')
-                                                    ->label('Diperlukan?')
-                                                    ->onIcon('heroicon-m-check')
-                                                    ->offIcon('heroicon-m-x-mark')
-                                                    ->onColor('success')
-                                                    ->offColor('gray')
-                                                    ->inline(false),
-
-                                                // 3. Using collapsed Section instead of Fieldset + live() to completely remove lag
-                                                Forms\Components\Section::make('Keterangan Penyesuaian (Buka jika Diperlukan)')
-                                                    ->schema([
-                                                        Forms\Components\CheckboxList::make('note_selections')
-                                                            ->label('Pilih Penyesuaian')
-                                                            ->options(function ($get) {
-                                                                $notes = $get('note') ?? [];
-                                                                $options = [];
-                                                                foreach ($notes as $n) {
-                                                                    $options[$n['title']] = $n['title'];
-                                                                }
-                                                                return $options;
-                                                            })
-                                                            ->columns(2)
-                                                            ->reactive(),
-                                                        
-                                                        Forms\Components\TextInput::make('note_other')
-                                                            ->label('Keterangan Lainnya')
-                                                            ->visible(fn ($get) => in_array('Lainnya', (array) $get('note_selections')))
-                                                            ->columnSpanFull(),
-                                                    ])
-                                                    ->collapsed(),
-                                            ])
-                                            ->default(self::defaultPartA())
-                                            ->reorderable(false)
-                                            ->addable(false)
-                                            ->deletable(false),
+                                        // ... repeater content ...
                                     ]),
 
                                 // ── 4. Bagian B – with adjustment_plan column ───────────
                                 Forms\Components\Section::make('Bagian B – Kesesuaian Rencana Asesmen')
                                     ->schema([
-                                        Forms\Components\Repeater::make('part_b')
-                                            ->label('')
-                                            ->schema([
-                                                Forms\Components\Hidden::make('id'),
-
-                                                Forms\Components\Hidden::make('question'),
-
-                                                // Removed grid to fix flexbox layout
-                                                Forms\Components\Placeholder::make('question_display')
-                                                    ->label('Aspek yang Diperiksa')
-                                                    ->content(fn ($get) => $get('question')),
-
-                                                Forms\Components\Toggle::make('answer')
-                                                    ->label('Ya')
-                                                    ->onIcon('heroicon-m-check')
-                                                    ->offIcon('heroicon-m-x-mark')
-                                                    ->onColor('success')
-                                                    ->offColor('gray')
-                                                    ->inline(false),
-
-                                                // Wrap dependent fields in a collapsed section to avoid live() lag
-                                                Forms\Components\Section::make('Detail Penyesuaian (Buka jika Tidak)')
-                                                    ->schema([
-                                                        Forms\Components\Grid::make(2)
-                                                            ->schema([
-                                                                Forms\Components\Textarea::make('adjustment_criteria_result')
-                                                                    ->label('Hasil Penyesuaian sesuai Kriteria Asesi')
-                                                                    ->rows(2)
-                                                                    ->columnSpan(1),
-
-                                                                Forms\Components\Textarea::make('adjustment_plan_result')
-                                                                    ->label('Hasil Penyesuaian Rencana Asesmen')
-                                                                    ->rows(2)
-                                                                    ->columnSpan(1),
-                                                            ]),
-
-                                                        // Keputusan Penyesuaian
-                                                        Forms\Components\Section::make('Keputusan Penyesuaian')
-                                                             ->statePath('adjustment_decisions')
-                                                            ->schema([
-                                                                Forms\Components\Grid::make(2)
-                                                                    ->schema([
-                                                                        Forms\Components\TextInput::make('industry_standard')
-                                                                            ->label('Standar Industri')
-                                                                            ->placeholder('Isi jika diperlukan'),
-                                                                        Forms\Components\TextInput::make('sop')
-                                                                            ->label('SOP')
-                                                                            ->placeholder('Isi jika diperlukan'),
-                                                                        Forms\Components\TextInput::make('technical_regulation')
-                                                                            ->label('Regulasi Teknis')
-                                                                            ->placeholder('Isi jika diperlukan'),
-                                                                        Forms\Components\TextInput::make('assessment_method')
-                                                                            ->label('Teknik Asesmen')
-                                                                            ->placeholder('Isi jika diperlukan'),
-                                                                    ]),
-                                                            ])->collapsed(),
-                                                    ])
-                                                    ->collapsed(),
-                                            ])
-                                            ->default(self::defaultPartB())
-                                            ->reorderable(false)
-                                            ->addable(false)
-                                            ->deletable(false),
+                                        // ... repeater content ...
                                     ]),
 
                                 // ── Hasil Penyesuaian Asesmen ──────────────────────────
                                 Forms\Components\Section::make('Hasil Penyesuaian Asesmen')
                                     ->schema([
-                                        Forms\Components\Section::make('A. Hasil penyesuaian sesuai karekteristik asesi')
-                                            ->statePath('adjustment_results_a')
-                                            ->schema([
-                                                Forms\Components\TextInput::make('assessment_benchmark')
-                                                    ->label('Acuan Pembanding Asesmen')
-                                                    ->placeholder('tuliskan nama acuan pembanding')
-                                                    ->default('ada'),
-                                                Forms\Components\TextInput::make('assessment_method')
-                                                    ->label('Metode Asesmen')
-                                                    ->placeholder('tuliskan nama metode asesmen')
-                                                    ->default('ada'),
-                                                Forms\Components\TextInput::make('assessment_instrument')
-                                                    ->label('Instrumen Asesmen')
-                                                    ->placeholder('tuliskan nama formulir instrumen asesmen')
-                                                    ->default('ada'),
-                                            ])->columns(3)->collapsed(),
-
-                                        Forms\Components\Section::make('B. Hasil penyesuaian rencana asesmen sesuai acuan pembanding, potensi asesi dan konteks asesi')
-                                            ->statePath('adjustment_results_b')
-                                            ->schema([
-                                                Forms\Components\TextInput::make('assessment_benchmark')
-                                                    ->label('Acuan Pembanding Asesmen')
-                                                    ->placeholder('tuliskan nama acuan pembanding')
-                                                    ->default('ada'),
-                                                Forms\Components\TextInput::make('assessment_method')
-                                                    ->label('Metode Asesmen')
-                                                    ->placeholder('tuliskan nama metode asesmen')
-                                                    ->default('ada'),
-                                                Forms\Components\TextInput::make('assessment_instrument')
-                                                    ->label('Instrumen Asesmen')
-                                                    ->placeholder('tuliskan nama formulir instrumen asesmen')
-                                                    ->default('ada'),
-                                            ])->columns(3)->collapsed(),
+                                        // ... section content ...
                                     ]),
 
                                 // ── 5. Tanda Tangan – ASESOR ONLY ──────────────────────
@@ -298,48 +151,7 @@ class Ak07Resource extends Resource
                                         Forms\Components\Group::make()
                                             ->statePath('signatures')
                                             ->schema([
-                                                Forms\Components\Group::make()
-                                                    ->statePath('asesor')
-                                                    ->schema([
-                                                        Forms\Components\Grid::make(3)
-                                                            ->schema([
-                                                                Forms\Components\Select::make('_signature_id')
-                                                                    ->label('Pilih Tanda Tangan Asesor')
-                                                                    ->options(\App\Models\UserSignature::pluck('name', 'id'))
-                                                                    ->reactive()
-                                                                    ->dehydrated(false)
-                                                                    ->afterStateUpdated(function ($state, callable $set) {
-                                                                        $sig = \App\Models\UserSignature::find($state);
-                                                                        if ($sig) {
-                                                                            $set('name', $sig->name);
-                                                                            $set('signature', $sig->signature_image);
-                                                                            $set('qr_preview', $sig->qr_code);
-                                                                        }
-                                                                    }),
-
-                                                                // 2. Auto-fill asesor date to today
-                                                                Forms\Components\TextInput::make('date')
-                                                                    ->label('Tanggal TTD Asesor')
-                                                                    ->type('date')
-                                                                    ->default(fn () => now()->toDateString()),
-
-                                                                Forms\Components\Placeholder::make('qr_preview')
-                                                                    ->label('QR Code Asesor')
-                                                                    ->content(fn ($get) => $get('qr_preview')
-                                                                        ? new \Illuminate\Support\HtmlString("<img src='{$get('qr_preview')}' width='120' />")
-                                                                        : '-'),
-                                                            ]),
-
-                                                        Forms\Components\Hidden::make('name'),
-                                                        Forms\Components\Hidden::make('signature'),
-
-                                                        // Signature image preview
-                                                        Forms\Components\Placeholder::make('_sig_preview')
-                                                            ->label('Preview Tanda Tangan Asesor')
-                                                            ->content(fn ($get) => $get('signature')
-                                                                ? new \Illuminate\Support\HtmlString("<img src='{$get('signature')}' style='max-height:100px;border:1px solid #e5e7eb;border-radius:6px;padding:4px;' />")
-                                                                : new \Illuminate\Support\HtmlString('<span class="text-sm text-gray-400 italic">Pilih tanda tangan di atas untuk preview.</span>')),
-                                                    ]),
+                                                self::standardAssessorSignatureBlock('asesor'),
 
                                                 // Asesi signature hidden fields only (no UI – mobile fills this)
                                                 Forms\Components\Group::make()

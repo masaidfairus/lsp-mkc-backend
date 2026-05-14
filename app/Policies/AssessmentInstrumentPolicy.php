@@ -15,6 +15,9 @@ class AssessmentInstrumentPolicy
      */
     public function viewAny(User $user): bool
     {
+        if ($user->hasRole('admin') || $user->hasRole('superadmin')) {
+            return true;
+        }
         return $user->can('view_any_fr::ia11');
     }
 
@@ -23,6 +26,9 @@ class AssessmentInstrumentPolicy
      */
     public function view(User $user, AssessmentInstrument $assessmentInstrument): bool
     {
+        if ($user->hasRole('admin') || $user->hasRole('superadmin')) {
+            return true;
+        }
         return $user->can('view_fr::ia11');
     }
 

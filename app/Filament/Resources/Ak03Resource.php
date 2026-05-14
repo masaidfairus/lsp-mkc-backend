@@ -62,6 +62,9 @@ class Ak03Resource extends Resource
 
                                         if ($reg->assessor) {
                                             $set('main_data.header.assessor_name', $reg->assessor->name);
+                                            
+                                            // Auto-populate assessor signature info
+                                            self::populateAssessorSignature($reg->assessor_id, $set, 'signatures.assessor');
                                         }
                                     }),
                             ]),

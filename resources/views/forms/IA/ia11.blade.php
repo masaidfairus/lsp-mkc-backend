@@ -330,7 +330,7 @@
         <td>
             <div class="sig-block">
                 @if($asesor_qr_code)
-                    <img src="{{ $asesor_qr_code }}" class="sig-image" style="width:60px;height:60px;">
+                    <img src="{{ $asesor_qr_code }}" class="sig-image" style="width:50px;height:50px;">
                 @elseif($asesor_signature)
                     <img src="{{ $asesor_signature }}" class="sig-image" style="max-height:65px;">
                 @endif

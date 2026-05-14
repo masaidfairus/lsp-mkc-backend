@@ -281,7 +281,7 @@
         <td style="text-align:center">:</td>
         <td>
             @if($asesor_qr_code)
-                <img src="{{ $asesor_qr_code }}" style="width:60px;height:60px;"><br>
+                <img src="{{ $asesor_qr_code }}" style="width:50px;height:50px;"><br>
             @elseif($asesor_signature)
                 <img src="{{ $asesor_signature }}" style="max-height:65px;"><br>
             @endif

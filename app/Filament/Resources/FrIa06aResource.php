@@ -134,6 +134,10 @@ class FrIa06aResource extends Resource
             if ($get && !$get('main_data.header.assessment_date')) {
                 $set('main_data.header.assessment_date', now()->format('Y-m-d'));
             }
+
+            if ($reg->assessor_id) {
+                self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.assessor');
+            }
         }
     }
 

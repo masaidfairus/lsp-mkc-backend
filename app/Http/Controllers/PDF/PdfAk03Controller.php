@@ -56,11 +56,12 @@ class PdfAk03Controller extends Controller
             'tuk' => $registration->tuk ?? 'Sewaktu/Tempat Kerja/Mandiri',
             'asesi_name' => strtoupper($candidate?->name ?? '-'),
             'asesor_name' => $assessor?->name ?? '-',
-            'assessment_date' => $assessmentDate,
+            'assessment_date_start' => $this->convertDateToLocalTime($ak03Data['header']['assessment_date_start'] ?? now()->format('Y-m-d')),
+            'assessment_date_end'   => $this->convertDateToLocalTime($ak03Data['header']['assessment_date_end'] ?? now()->format('Y-m-d')),
             'feedback_items' => $ak03Data['feedback_items'] ?? [],
             'asesor_reg' => $signatureData['reg_number'],
             'asesor_qr_code' => $signatureData['qr_code'],
-            'notes' => $ak03Data['notes'] ?? '',
+            'notes' => $ak03Data['additional_footer']['other_comments'] ?? '',
             'signatures' => $ak03Data['signatures'] ?? [],
         ];
 

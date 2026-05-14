@@ -24,6 +24,16 @@ class Ak04Resource extends Resource
     protected static ?string $pluralModelLabel = 'AK.04';
     protected static ?int $navigationSort = 4;
 
+    public static function canEdit($record): bool
+    {
+        return auth()->user()->hasRole(['admin', 'superadmin']);
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()->hasRole(['admin', 'superadmin']);
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -191,8 +201,10 @@ class Ak04Resource extends Resource
                 Tables\Actions\EditAction::make()
                     ->label('Verifikasi')
                     ->icon('heroicon-o-check-badge')
-                    ->color('primary'),
-                Tables\Actions\DeleteAction::make(),
+                    ->color('primary')
+                    ->visible(fn() => auth()->user()->hasRole(['admin', 'superadmin'])),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn() => auth()->user()->hasRole(['admin', 'superadmin'])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

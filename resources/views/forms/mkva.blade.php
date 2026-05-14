@@ -13,7 +13,7 @@
         }
 
         body {
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             font-size: 9pt;
             color: #000;
             padding: 4rem;
@@ -41,6 +41,27 @@
         /* Logo + Judul */
         .header-top {
             margin-bottom: 8px;
+        }
+        .checkbox {
+            display: inline-block;
+            width: 11px;
+            height: 11px;
+            border: 1px solid #000;
+            position: relative;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+
+        .checkbox-checked::after {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: -1px;
+            width: 3px;
+            height: 7px;
+            border: solid black;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
         }
         .logo-bnsp {
             font-weight: bold;
@@ -88,7 +109,7 @@
             display: inline-block;
             vertical-align: middle;
             margin-right: 4px;
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             font-size: 11pt;
             color: #000;
         }
@@ -321,9 +342,9 @@
             <td>Periode</td>
             <td style="text-align:center">:</td>
             <td colspan="4">
-                <span class="checkbox">{!! in_array('before_assessment', $periode ?? []) ? '&#9745;' : '&#9744;' !!}</span> SEBELUM ASESMEN &nbsp;
-                <span class="checkbox">{!! in_array('during_assessment', $periode ?? []) ? '&#9745;' : '&#9744;' !!}</span> PADA SAAT ASESMEN &nbsp;
-                <span class="checkbox">{!! in_array('after_assessment', $periode ?? []) ? '&#9745;' : '&#9744;' !!}</span> SETELAH ASESMEN
+                <span class="checkbox {!! in_array('before_assessment', $periode ?? []) ? 'checkbox-checked' : '' !!}"></span> SEBELUM ASESMEN &nbsp;
+                <span class="checkbox {!! in_array('during_assessment', $periode ?? []) ? 'checkbox-checked' : '' !!}"></span> PADA SAAT ASESMEN &nbsp;
+                <span class="checkbox {!! in_array('after_assessment', $periode ?? []) ? 'checkbox-checked' : '' !!}"></span> SETELAH ASESMEN
             </td>
         </tr>
         <tr>
@@ -351,22 +372,27 @@
             </tr>
         </thead>
         <tbody>
-            @php $maxRows = max(count($tujuan_fokus), count($konteks_validasi), count($pendekatan_validasi)); @endphp
-            @for ($i = 0; $i < $maxRows; $i++)
+            @for($i=0; $i<max(count($tujuan_fokus), count($konteks_validasi), count($pendekatan_validasi)); $i++)
             <tr class="item-row">
                 <td>
                     @if(isset($tujuan_fokus[$i]))
-                    <span class="checkbox">{!! !empty($tujuan_fokus[$i]['is_checked']) ? '&#9745;' : '&#9744;' !!}</span>{{ $tujuan_fokus[$i]['label'] }}
+                    <div class="cb-item">
+                        <span class="checkbox {!! !empty($tujuan_fokus[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $tujuan_fokus[$i]['label'] }}
+                    </div>
                     @endif
                 </td>
                 <td>
                     @if(isset($konteks_validasi[$i]))
-                    <span class="checkbox">{!! !empty($konteks_validasi[$i]['is_checked']) ? '&#9745;' : '&#9744;' !!}</span>{{ $konteks_validasi[$i]['label'] }}
+                    <div class="cb-item">
+                        <span class="checkbox {!! !empty($konteks_validasi[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $konteks_validasi[$i]['label'] }}
+                    </div>
                     @endif
                 </td>
                 <td>
                     @if(isset($pendekatan_validasi[$i]))
-                    <span class="checkbox">{!! !empty($pendekatan_validasi[$i]['is_checked']) ? '&#9745;' : '&#9744;' !!}</span>{{ $pendekatan_validasi[$i]['label'] }}
+                    <div class="cb-item">
+                        <span class="checkbox {!! !empty($pendekatan_validasi[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $pendekatan_validasi[$i]['label'] }}
+                    </div>
                     @endif
                 </td>
             </tr>
@@ -389,7 +415,7 @@
         <tbody>
             @foreach ($orang_relevan as $index => $o)
             <tr class="data-row">
-                <td><span class="checkbox">{!! !empty($o['is_checked']) ? '&#9745;' : '&#9744;' !!}</span>{{ $o['label'] }}</td>
+                <td><span class="checkbox {!! !empty($o['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $o['label'] }}</td>
                 @if($index === 0)
                 <td rowspan="{{ count($orang_relevan) }}" style="vertical-align:top; text-align:left; padding: 5px 10px;">
                     {!! nl2br(e($o['nama'])) !!}
@@ -418,17 +444,20 @@
             </tr>
         </thead>
         <tbody>
-            @php $maxAcuan = max(count($acuan_pembanding), count($dokumen_terkait)); @endphp
-            @for ($i = 0; $i < $maxAcuan; $i++)
+            @for($i=0; $i<max(count($acuan_pembanding), count($dokumen_terkait)); $i++)
             <tr class="item-row">
                 <td>
                     @if(isset($acuan_pembanding[$i]))
-                    <span class="checkbox">{!! !empty($acuan_pembanding[$i]['is_checked']) ? '&#9745;' : '&#9744;' !!}</span>{{ $acuan_pembanding[$i]['label'] }}
+                    <div class="cb-item">
+                        <span class="checkbox {!! !empty($acuan_pembanding[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $acuan_pembanding[$i]['label'] }}
+                    </div>
                     @endif
                 </td>
                 <td>
                     @if(isset($dokumen_terkait[$i]))
-                    <span class="checkbox">{!! !empty($dokumen_terkait[$i]['is_checked']) ? '&#9745;' : '&#9744;' !!}</span>{{ $dokumen_terkait[$i]['label'] }}
+                    <div class="cb-item">
+                        <span class="checkbox {!! !empty($dokumen_terkait[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $dokumen_terkait[$i]['label'] }}
+                    </div>
                     @endif
                 </td>
             </tr>
@@ -448,7 +477,7 @@
                     $selectedKomunikasi = array_column($komunikasi, 'label');
                 @endphp
                 @foreach ($allKomunikasi as $opt)
-                <span class="checkbox">{!! in_array($opt, $selectedKomunikasi) ? '&#9745;' : '&#9744;' !!}</span>{{ $opt }}<br>
+                <span class="checkbox {!! in_array($opt, $selectedKomunikasi) ? 'checkbox-checked' : '' !!}"></span>{{ $opt }}<br>
                 @endforeach
             </td>
         </tr>
@@ -480,14 +509,14 @@
             <tr class="data-row">
                 <td class="col-no">{{ $a['no'] }}.</td>
                 <td class="col-aspek" style="text-align:left">{{ $a['label'] }}</td>
-                <td><span class="checkbox">{!! !empty($a['v']) ? '&#9745;' : '&#9744;' !!}</span></td>
-                <td><span class="checkbox">{!! !empty($a['a']) ? '&#9745;' : '&#9744;' !!}</span></td>
-                <td><span class="checkbox">{!! !empty($a['t']) ? '&#9745;' : '&#9744;' !!}</span></td>
-                <td><span class="checkbox">{!! !empty($a['m']) ? '&#9745;' : '&#9744;' !!}</span></td>
-                <td><span class="checkbox">{!! !empty($a['pv']) ? '&#9745;' : '&#9744;' !!}</span></td>
-                <td><span class="checkbox">{!! !empty($a['pr']) ? '&#9745;' : '&#9744;' !!}</span></td>
-                <td><span class="checkbox">{!! !empty($a['pf']) ? '&#9745;' : '&#9744;' !!}</span></td>
-                <td><span class="checkbox">{!! !empty($a['pa']) ? '&#9745;' : '&#9744;' !!}</span></td>
+                <td><span class="checkbox {!! !empty($a['v']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['a']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['t']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['m']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['pv']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['pr']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['pf']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['pa']) ? 'checkbox-checked' : '' !!}"></span></td>
             </tr>
             @endforeach
         </tbody>
@@ -562,7 +591,7 @@
                 <div style="font-weight:bold; margin-bottom:10px;">{{ $assessor->name ?? '' }}</div>
                 <div class="sig-box" style="display: flex; align-items: center; justify-content: center; height: 100px;">
                     @if($assessor_qr_code)
-                        <img src="{{ $assessor_qr_code }}" style="width:70px; height:70px;">
+                        <img src="{{ $assessor_qr_code }}" style="width:50px; height:50px;">
                         <div style="margin-left: 10px; font-size: 8pt; text-align: left;">
                             Telah divalidasi pada:<br>
                             {{ $assessor_date }}
@@ -576,7 +605,7 @@
                 <div style="font-weight:bold; margin-bottom:10px;">{{ $validator->name ?? '' }}</div>
                 <div class="sig-box" style="display: flex; align-items: center; justify-content: center; height: 100px;">
                     @if($validator_qr_code)
-                        <img src="{{ $validator_qr_code }}" style="width:70px; height:70px;">
+                        <img src="{{ $validator_qr_code }}" style="width:50px; height:50px;">
                         <div style="margin-left: 10px; font-size: 8pt; text-align: left;">
                             Telah divalidasi pada:<br>
                             {{ $validator_date }}

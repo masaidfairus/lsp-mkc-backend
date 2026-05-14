@@ -88,18 +88,34 @@ class AssessmentRegistrationResource extends Resource
                                     ->hidden(fn() => auth()->user()->hasRole('asesor')),
 
                                 Forms\Components\Section::make('Validasi Evaluasi Mandiri (APL.02)')
-                                    ->hidden(fn() => auth()->user()->hasRole('admin'))
                                     ->schema([
                                         Forms\Components\Placeholder::make('apl02_warning')
                                             ->label('')
                                             ->content(new \Illuminate\Support\HtmlString('<div style="color: #b45309; background-color: #fffbeb; padding: 12px; border-radius: 8px; border: 1px solid #fde68a;">Asesi belum mengisi Form Asesmen Mandiri (APL.02). Status tidak dapat diubah.</div>'))
                                             ->visible(fn($record) => !$record || $record->selfAssessments->isEmpty())
+                                            ->hidden(fn() => auth()->user()->hasRole('asesor'))
                                             ->columnSpanFull(),
                                         Forms\Components\Select::make('status_apl02')
                                             ->options(Apl02Status::class)
                                             ->label('Status APL.02')
-                                            ->required()
+                                            ->required(fn() => !auth()->user()->hasRole(['admin', 'superadmin']))
                                             ->visible(fn($record) => $record && $record->status_apl02 !== null),
+
+                                        Forms\Components\Grid::make(2)
+                                            ->schema([
+                                                Forms\Components\Radio::make('is_apl02_continuable')
+                                                    ->label('Asesmen dapat dilanjutkan?')
+                                                    ->options([
+                                                        true => 'Dapat dilanjutkan',
+                                                        false => 'Tidak dapat dilanjutkan',
+                                                    ])
+                                                    ->inline()
+                                                    ->required(fn() => !auth()->user()->hasRole(['admin', 'superadmin'])),
+                                                Forms\Components\TextInput::make('apl02_approach')
+                                                    ->label('Melalui Pendekatan')
+                                                    ->placeholder('Contoh: Asesmen Mandiri / Verifikasi Portofolio')
+                                                    ->required(fn() => !auth()->user()->hasRole(['admin', 'superadmin'])),
+                                            ])->visible(fn($record) => $record && $record->status_apl02 !== null),
                                     ])->columns(1),
 
                                 Forms\Components\Section::make('Penerbitan Sertifikat')
@@ -116,7 +132,6 @@ class AssessmentRegistrationResource extends Resource
                             ]),
 
                         Forms\Components\Tabs\Tab::make('APL.01')
-                            ->hidden(fn() => auth()->user()->hasRole('asesor'))
                             ->schema([
                                 Forms\Components\Grid::make(3)->schema([
                                     Forms\Components\TextInput::make('apl_candidate_name')
@@ -234,7 +249,6 @@ class AssessmentRegistrationResource extends Resource
 
                         Forms\Components\Tabs\Tab::make('APL.02')
                             ->icon('heroicon-o-check-badge')
-                            ->hidden(fn() => auth()->user()->hasRole('admin'))
                             ->schema([
                                 Forms\Components\ViewField::make('apl02_detail')
                                     ->view('filament.forms.components.apl02-summary')
@@ -550,10 +564,12 @@ class AssessmentRegistrationResource extends Resource
                     ->native(false),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
                     ->label('Verifikasi')
                     ->icon('heroicon-o-check-badge')
                     ->color('primary'),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

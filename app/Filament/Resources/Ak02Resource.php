@@ -11,10 +11,13 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Filament\Traits\HasStandardIaForm;
 use Illuminate\Support\HtmlString;
+use Illuminate\Database\Eloquent\Builder;
 
 class Ak02Resource extends Resource
 {
+    use HasStandardIaForm;
     protected static ?string $model = Ak02::class;
     protected static ?string $navigationIcon = 'heroicon-o-document-check';
     protected static ?string $navigationGroup = 'AK';
@@ -22,6 +25,19 @@ class Ak02Resource extends Resource
     protected static ?string $modelLabel = 'AK.02';
     protected static ?string $pluralModelLabel = 'AK.02';
     protected static ?int $navigationSort = 2;
+    
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        
+        if (auth()->user()->hasRole('asesor')) {
+            $query->whereHas('registration', function ($q) {
+                $q->where('assessor_id', auth()->id());
+            });
+        }
+        
+        return $query;
+    }
 
     public static function form(Form $form): Form
     {
@@ -62,6 +78,11 @@ class Ak02Resource extends Resource
 
                                         if ($reg->assessor) {
                                             $set('main_data.header.assessor_name', $reg->assessor->name);
+                                        }
+
+                                        // Auto-populate assessor signature from registration's assigned assessor
+                                        if ($reg->assessor_id) {
+                                            self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.assessor');
                                         }
 
                                         // Auto-populate competency units from scheme
@@ -219,61 +240,8 @@ class Ak02Resource extends Resource
                                 // ── Tanda Tangan ──────────────────────────────
                                 Forms\Components\Section::make('Tanda Tangan')
                                     ->schema([
-                                        Forms\Components\Grid::make(2)
-                                            ->schema([
-
-                                                // Asesi signature (read-only, filled by mobile)
-                                                Forms\Components\Section::make('Tanda Tangan Asesi')
-                                                    ->statePath('signatures.assessee')
-                                                    ->schema([
-                                                        Forms\Components\Placeholder::make('_info')
-                                                            ->label('')
-                                                            ->content(new HtmlString('<span class="text-sm text-gray-400 italic">Tanda tangan asesi diisi melalui aplikasi mobile.</span>')),
-                                                        Forms\Components\Hidden::make('name'),
-                                                        Forms\Components\Hidden::make('date'),
-                                                        Forms\Components\Hidden::make('signature'),
-                                                    ]),
-
-                                                // Asesor signature
-                                                Forms\Components\Section::make('Tanda Tangan Asesor')
-                                                    ->statePath('signatures.assessor')
-                                                    ->schema([
-                                                        Forms\Components\Grid::make(2)
-                                                            ->schema([
-                                                                Forms\Components\Select::make('_signature_id')
-                                                                    ->label('Pilih Tanda Tangan Asesor')
-                                                                    ->options(UserSignature::pluck('name', 'id'))
-                                                                    ->reactive()
-                                                                    ->dehydrated(false)
-                                                                    ->afterStateUpdated(function ($state, callable $set) {
-                                                                        $sig = UserSignature::find($state);
-                                                                        if ($sig) {
-                                                                            $set('name', $sig->name);
-                                                                            $set('reg_number', $sig->reg_number ?? '');
-                                                                            $set('signature', $sig->signature_image);
-                                                                            $set('qr_preview', $sig->qr_code);
-                                                                        }
-                                                                    }),
-                                                                Forms\Components\TextInput::make('date')
-                                                                    ->label('Tanggal TTD')
-                                                                    ->type('date')
-                                                                    ->default(fn () => now()->toDateString()),
-                                                            ]),
-                                                        Forms\Components\Hidden::make('name'),
-                                                        Forms\Components\Hidden::make('reg_number'),
-                                                        Forms\Components\Hidden::make('signature'),
-                                                        Forms\Components\Placeholder::make('qr_preview')
-                                                            ->label('QR Code Asesor')
-                                                            ->content(fn ($get) => $get('qr_preview')
-                                                                ? new HtmlString("<img src='{$get('qr_preview')}' width='100' />")
-                                                                : '-'),
-                                                        Forms\Components\Placeholder::make('_sig_preview')
-                                                            ->label('Preview Tanda Tangan')
-                                                            ->content(fn ($get) => $get('signature')
-                                                                ? new HtmlString("<img src='{$get('signature')}' style='max-height:90px;border:1px solid #e5e7eb;border-radius:6px;padding:4px;' />")
-                                                                : new HtmlString('<span class="text-sm text-gray-400 italic">Pilih tanda tangan untuk preview.</span>')),
-                                                    ]),
-                                            ]),
+                                        self::standardAsesiDisclaimer(),
+                                        self::standardAssessorSignatureBlock('main_data.signatures.assessor'),
                                     ]),
 
                                 // ── Lampiran (statis) ─────────────────────────
@@ -319,6 +287,7 @@ class Ak02Resource extends Resource
             ])
             ->filters([])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

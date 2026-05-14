@@ -52,7 +52,8 @@ class SelfAssessmentRelationManager extends RelationManager
                                         true => 'success',
                                         false => 'danger',
                                     ])
-                                    ->required(),
+                                    ->required()
+                                    ->disabled(fn() => auth()->user()->hasRole('admin')),
                             ]),
                     ])
                     ->columns(1),
@@ -100,7 +101,10 @@ class SelfAssessmentRelationManager extends RelationManager
                 Tables\Actions\EditAction::make()
                     ->label('Verifikasi')
                     ->modalHeading('Mengubah Asesmen Mandiri')
-                    ->modalSubmitActionLabel('Simpan Asesmen'),
+                    ->modalSubmitActionLabel('Simpan Asesmen')
+                    ->visible(fn() => !auth()->user()->hasRole('admin')),
+                Tables\Actions\ViewAction::make()
+                    ->visible(fn() => auth()->user()->hasRole('admin')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

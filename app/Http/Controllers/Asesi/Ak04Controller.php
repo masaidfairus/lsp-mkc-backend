@@ -123,4 +123,31 @@ class Ak04Controller extends Controller
             'Data AK.04 berhasil disimpan'
         );
     }
+
+    /**
+     * Asesi membatalkan pengajuan AK.04 yang masih pending.
+     */
+    public function destroy(AssessmentRegistration $registration)
+    {
+        if ($registration->user_id !== request()->user()->id) {
+            return $this->errorResponse('E1005', 403);
+        }
+
+        $appeal = Appeal::where('registration_id', $registration->id)->first();
+
+        if (!$appeal) {
+            return response()->json(['message' => 'Data AK.04 tidak ditemukan'], 404);
+        }
+
+        // Hanya boleh dibatalkan jika masih PENDING (belum diverifikasi admin)
+        if ($appeal->status !== \App\Enums\AppealStatus::PENDING) {
+            return response()->json([
+                'message' => 'AK.04 yang sudah diverifikasi tidak dapat dibatalkan'
+            ], 403);
+        }
+
+        $appeal->delete();
+
+        return response()->json(['message' => 'AK.04 berhasil dibatalkan']);
+    }
 }

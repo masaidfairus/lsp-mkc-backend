@@ -183,6 +183,10 @@ class FrIa07Resource extends Resource
                 $set('main_data.header.assessment_date', now()->format('d-m-Y'));
             }
 
+            if ($reg->assessor_id) {
+                self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.assessor');
+            }
+
             // Only repopulate work_group_mapping if empty or user changed registration
             $existingGroups = $get ? (array) $get('main_data.work_group_mapping') : [];
             if (($isUpdate || empty($existingGroups) || empty(array_filter(array_column($existingGroups, 'group_name')))) && $reg->scheme) {

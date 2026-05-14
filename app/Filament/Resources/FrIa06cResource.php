@@ -175,6 +175,10 @@ class FrIa06cResource extends Resource
                 $set('main_data.header.time', now()->format('H:i'));
             }
 
+            if ($reg->assessor_id) {
+                self::populateAssessorSignature($reg->assessor_id, $set, 'main_data.signatures.assessor');
+            }
+
             $units = self::getSchemeUnitsForDropdown($reg->scheme_id);
             $set('unachieved_units', $units);
         }
