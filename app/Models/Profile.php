@@ -14,17 +14,16 @@ class Profile extends Model
         'address',
         'home_postal_code',
         'phone_number',
-        'education_qualifications',
+        'education_id',
         'company_name',
         'company_postal_code',
+        'company_fax',
+        'company_email',
         'job_title',
         'company_address',
         'company_contact',
         'asesi_type',
         'institution_name',
-        'place_of_birth',
-        'home_postal_code',
-        'company_postal_code'
     ];
 
     protected $casts = [
@@ -34,5 +33,10 @@ class Profile extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function education()
+    {
+        return $this->belongsTo(MasterEducation::class, 'education_id');
     }
 }

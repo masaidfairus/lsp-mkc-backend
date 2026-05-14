@@ -1,0 +1,73 @@
+{
+    "fr_ia_04b_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_number": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri",
+            "structured_activity_title": "",
+            "assessor_name": "",
+            "assessee_name": "",
+            "date": ""
+        },
+        "assessment_aspects": [
+            // LOOPING 1: Berdasarkan baris pada tabel Aspek Penilaian
+            {
+                "no": 1,
+                "presentation_scope": "",
+                "questions": [
+                    // LOOPING 2: Daftar pertanyaan dalam satu aspek
+                    "1. ...........",
+                    "2. ..........."
+                ],
+                "competency_standard_compliance": [
+                    // LOOPING 3: Daftar kesesuaian unit/elemen/KUK
+                    "1. ...........",
+                    "2. ..........."
+                ],
+                "achievement": {
+                    "is_yes": false,
+                    "is_no": false
+                }
+            }
+        ],
+        "assessor_recommendation": {
+            "is_competent": false,
+            "is_not_yet_competent": false
+        },
+        "signatures": {
+            "assessee": {
+                "name": "",
+                "date_signed": "",
+                "signature_url": ""
+            },
+            "assessor": {
+                "name": "",
+                "reg_number": "",
+                "date_signed": "",
+                "signature_url": ""
+            }
+        },
+        "document_control": {
+            "compilers": [
+                // LOOPING 4: Daftar penyusun dokumen
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "date_signed": "",
+                    "signature_url": ""
+                }
+            ],
+            "validators": [
+                // LOOPING 5: Daftar validator dokumen
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "date_signed": "",
+                    "signature_url": ""
+                }
+            ]
+        }
+    }
+}

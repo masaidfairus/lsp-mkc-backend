@@ -1,0 +1,81 @@
+{
+    "frak03_data": {
+        "header": {
+            "certification_scheme": "JENJANG IV BIDANG KEWIRAUSAHAAN INDUSTRI", // [cite: 2]
+            "scheme_code": "09-10/SSO/MKC.SKM.010/XI/2023", // [cite: 2]
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri", // [cite: 2]
+            "assessor_name": "Anita Mediana", // [cite: 2]
+            "assessee_name": "Gaetsa Zahira Shofa", // [cite: 2]
+            "assessment_date_start": "7 Februari 2026", // [cite: 2]
+            "assessment_date_end": "7 Februari 2026" // [cite: 2]
+        },
+
+        "feedback_items": [
+            // LOOPING UTAMA: Looping baris tabel Komponen Umpan Balik
+            {
+                "component": "Saya mendapatkan penjelasan yang cukup memadai mengenai proses asesmen/uji kompetensi", //
+                "result_yes": null, // Input dinamis (boolean): true jika "Ya" dicentang
+                "result_no": null, // Input dinamis (boolean): true jika "Tidak" dicentang
+                "assessee_note": "" // Input dinamis (teks): Catatan/Komentar Asesi
+            },
+            {
+                "component": "Saya diberikan kesempatan untuk mempelajari standar kompetensi yang akan diujikan dan menilai diri sendiri terhadap pencapaiannya", //
+                "result_yes": null,
+                "result_no": null,
+                "assessee_note": ""
+            },
+            {
+                "component": "Asesor memberikan kesempatan untuk mendiskusikan/menegosiasikan metoda, instrumen dan sumber asesmen serta jadwal asesmen", //
+                "result_yes": null,
+                "result_no": null,
+                "assessee_note": ""
+            },
+            {
+                "component": "Asesor berusaha menggali seluruh bukti pendukung yang sesuai dengan latar belakang pelatihan dan pengalaman yang saya miliki", //
+                "result_yes": null,
+                "result_no": null,
+                "assessee_note": ""
+            },
+            {
+                "component": "Saya sepenuhnya diberikan kesempatan untuk mendemonstrasikan kompetensi yang saya miliki selama asesmen", //
+                "result_yes": null,
+                "result_no": null,
+                "assessee_note": ""
+            },
+            {
+                "component": "Saya mendapatkan penjelasan yang memadai mengenai keputusan asesmen", //
+                "result_yes": null,
+                "result_no": null,
+                "assessee_note": ""
+            },
+            {
+                "component": "Asesor memberikan umpan balik yang mendukung setelah asesmen serta tindak lanjutnya", //
+                "result_yes": null,
+                "result_no": null,
+                "assessee_note": ""
+            },
+            {
+                "component": "Asesor bersama saya mempelajari semua dokumen asesmen serta menandatanganinya", //
+                "result_yes": null,
+                "result_no": null,
+                "assessee_note": ""
+            },
+            {
+                "component": "Saya mendapatkan jaminan kerahasiaan hasil asesmen serta penjelasan penanganan dokumen asesmen", //
+                "result_yes": null,
+                "result_no": null,
+                "assessee_note": ""
+            },
+            {
+                "component": "Asesor menggunakan keterampilan komunikasi yang efektif selama asesmen", //
+                "result_yes": null,
+                "result_no": null,
+                "assessee_note": ""
+            }
+        ],
+
+        "additional_footer": {
+            "other_comments": "" //  Input dinamis (teks): Catatan/komentar lainnya (apabila ada)
+        }
+    }
+}

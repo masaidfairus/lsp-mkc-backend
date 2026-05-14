@@ -44,6 +44,7 @@ return [
     'E4001' => 'Method tidak diizinkan',
     'E4002' => 'Payload tidak valid',
     'E4003' => 'Endpoint tidak ditemukan',
+    'E4004' => 'Data tidak ditemukan',
 
     'E5001' => 'Kesalahan database',
     'E5002' => 'Gagal mengirim email',

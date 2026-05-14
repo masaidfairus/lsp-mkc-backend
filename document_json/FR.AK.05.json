@@ -1,0 +1,43 @@
+{
+  "frak05_data": {
+    "header": {
+      "certification_scheme": "JENJANG IV BIDANG KEWIRAUSAHAAN INDUSTRI", 
+      "scheme_code": "09-10/SSO/MKC.SKM.010/XI/2023", 
+      "tuk": "Sewaktu/Tempat Kerja/Mandiri", 
+      "assessor_name": "Anita Mediana", 
+      "assessment_date": "7 Februari 2026" 
+    },
+
+    "assessment_results": [ // LOOPING UTAMA: Looping baris tabel untuk daftar Asesi
+      {
+        "no": 1, 
+        "assessee_name": "Gaetsa Zahira Shofa", 
+        "recommendation": "K", // "K" untuk Kompeten, "BK" untuk Belum Kompeten 
+        "description": "" // Keterangan (Kode/Judul Unit jika BK) [cite: 17, 18]
+      },
+      {
+        "no": 2, 
+        "assessee_name": "",
+        "recommendation": null,
+        "description": ""
+      }
+      // Tambahkan baris asesi lainnya di sini sesuai kebutuhan
+    ],
+
+    "evaluation_section": {
+      "positive_negative_aspects": "", // Aspek Negatif dan Positif dalam Asesmen [cite: 19]
+      "rejection_records": "", // Pencatatan Penolakan Hasil Asesmen [cite: 19]
+      "improvement_suggestions": "" // Saran Perbaikan (Asesor/Personil Terkait) [cite: 19]
+    },
+
+    "assessor_footer": {
+      "notes": "", // Catatan umum di bagian bawah
+      "assessor_details": {
+        "name": "Anita Mediana H",
+        "reg_number": "MET.000.016605.2019",
+        "signature": "data:image/png;base64,...",
+        "date": "07 Februari 2026"
+      }
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+    "frak06_data": {
+        "header": {
+            "certification_scheme": "JENJANG IV BIDANG KEWIRAUSAHAAN INDUSTRI",
+            "scheme_code": "09-10/SSO/MKC.SKM.010/XI/2023",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri",
+            "assessor_name": "Anita Mediana",
+            "assessment_date": "07 Februari 2026"
+        },
+
+        "assessment_principles_review": {
+            "items": [
+                // LOOPING 1: Looping baris tabel Prosedur Asesmen
+                {
+                    "aspect_name": "Rencana asesmen",
+                    "validitas": false, // Input dinamis (boolean)
+                    "reliabel": false, // Input dinamis (boolean)
+                    "fleksibel": false, // Input dinamis (boolean)
+                    "adil": false // Input dinamis (boolean)
+                },
+                {
+                    "aspect_name": "Persiapan asesmen",
+                    "validitas": false,
+                    "reliabel": false,
+                    "fleksibel": false,
+                    "adil": false
+                },
+                {
+                    "aspect_name": "Implementasi asesmen",
+                    "validitas": false,
+                    "reliabel": false,
+                    "fleksibel": false,
+                    "adil": false
+                },
+                {
+                    "aspect_name": "Keputusan asesmen",
+                    "validitas": false,
+                    "reliabel": false,
+                    "fleksibel": null, // Dibuat null karena di form fisiknya diblok hitam (tidak dinilai)
+                    "adil": false
+                },
+                {
+                    "aspect_name": "Umpan balik asesmen",
+                    "validitas": false,
+                    "reliabel": false,
+                    "fleksibel": null, // Dibuat null karena di form fisiknya diblok hitam (tidak dinilai)
+                    "adil": false
+                }
+            ],
+            "recommendation_notes": "" // Input dinamis (teks): Rekomendasi untuk peningkatan
+        },
+
+        "competency_dimensions_review": {
+            "items": [
+                // LOOPING 2: Looping baris tabel Pemenuhan Dimensi Kompetensi
+                {
+                    "aspect_name": "Konsistensi keputusan asesmen (Bukti dari berbagai asesmen diperiksa untuk konsistensi dimensi kompetensi)",
+                    "task_skills": "", // Input dinamis (checkbox boolean ATAU input text kode formulir)
+                    "task_management_skills": "",
+                    "contingency_management_skills": "",
+                    "job_role_environment_skills": "",
+                    "transfer_skills": ""
+                }
+                // Jika ada penambahan aspek tinjauan dimensi kompetensi lainnya, akan ter-looping di sini
+            ],
+            "recommendation_notes": "" // Input dinamis (teks): Rekomendasi untuk peningkatan
+        },
+
+        "assessor_footer": {
+            "lead_assessor_name": "Anita Mediana",
+            "date": "07 Februari 2026",
+            "signature": "data:image/png;base64,...",
+            "comment": "" // Input dinamis (teks): Komentar asesor
+        }
+    }
+}

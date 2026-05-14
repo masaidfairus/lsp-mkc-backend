@@ -155,46 +155,40 @@
 {{-- JUDUL --}}
 <div class="judul">FR.IA.02. &nbsp;&nbsp; TPD – TUGAS PRAKTIK DEMONSTRASI</div>
 
-{{-- HEADER INFO --}}
-<table class="tbl">
-    <colgroup>
-        <col style="width:28%;">
-        <col style="width:14%;">
-        <col style="width:3%;">
-        <col style="width:55%;">
-    </colgroup>
-    <tr>
-        <td rowspan="2" style="vertical-align:middle;" colspan="3">Skema Sertifikasi<br>(KKNI/Okupasi/Klaster)</td>
-        <td>Judul</td>
-        <td style="text-align:center;">:</td>
-        <td style="font-weight:bold;" colspan="4">{{ $nama_skema }}</td>
-    </tr>
-    <tr>
-        <td>Nomor</td>
-        <td style="text-align:center;">:</td>
-        <td style="font-weight:bold;" colspan="4">{{ $kode_skema }}</td>
-    </tr>
-    <tr>
-        <td colspan="4">TUK</td>
-        <td style="text-align:center;">:</td>
-        <td colspan="4">{{ $tuk }}</td>
-    </tr>
-    <tr>
-        <td colspan="4">Nama Asesor</td>
-        <td style="text-align:center;">:</td>
-        <td colspan="4">{{ $nama_asesor }}</td>
-    </tr>
-    <tr>
-        <td colspan="4">Nama Asesi</td>
-        <td style="text-align:center;">:</td>
-        <td colspan="4">{{ $nama_asesi }}</td>
-    </tr>
-    <tr>
-        <td colspan="4">Tanggal</td>
-        <td style="text-align:center;">:</td>
-        <td colspan="4">{{ $tanggal }}</td>
-    </tr>
-</table>
+<!-- Header -->
+    <table class="tbl">
+        <colgroup>
+            <col style="width:28%;">
+            <col style="width:14%;">
+            <col style="width:3%;">
+            <col style="width:55%;">
+        </colgroup>
+        <tr>
+            <td rowspan="2" style="vertical-align:middle;" colspan="2">Skema Sertifikasi<br>(KKNI/Okupasi/Klaster)</td>
+            <td>Judul :</td>
+            <td style="font-weight:bold;" colspan="5">{{ $nama_skema }}</td>
+        </tr>
+        <tr>
+            <td>Nomor :</td>
+            <td style="font-weight:bold;" colspan="5">{{ $kode_skema }}</td>
+        </tr>
+        <tr>
+            <td colspan="3">TUK :</td>
+            <td colspan="5">{{ $tuk }}</td>
+        </tr>
+        <tr>
+            <td colspan="3">Nama Asesor :</td>
+            <td colspan="5">{{ $nama_asesor }}</td>
+        </tr>
+        <tr>
+            <td colspan="3">Nama Asesi :</td>
+            <td colspan="5">{{ $nama_asesi }}</td>
+        </tr>
+        <tr>
+            <td colspan="3">Tanggal :</td>
+            <td colspan="5">{{ $tanggal }}</td>
+        </tr>
+    </table>
 
 {{-- A. PETUNJUK --}}
 <div class="section-title">A. &nbsp; Petunjuk</div>
@@ -241,8 +235,9 @@
     </table>
 
     {{-- Skenario --}}
-    <div class="field-line" style="margin-bottom:80px;">
-        Skenario Tugas <span style="text-decoration:underline;">Praktik</span> Demonstrasi &nbsp;&nbsp; :
+    <div class="field-line" style="margin-bottom:10px;">
+        Skenario Tugas <span style="text-decoration:underline;">Praktik</span> Demonstrasi &nbsp;&nbsp; : <br><br>
+        {!! nl2br(e($kp['scenario'])) !!}
     </div>
 
     {{-- Perlengkapan --}}
@@ -262,7 +257,7 @@
 
     {{-- Waktu --}}
     <div class="field-line" style="margin-bottom:80px;">
-        Waktu &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :
+        Waktu &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : {{ $kp['waktu'] }}
     </div>
 
 @endforeach
@@ -282,12 +277,19 @@
     <tr>
         <td colspan="2">Nama</td>
         <td style="text-align:center;">:</td>
-        <td colspan="4">{{ $nama_asesi }}</td>
+        <td colspan="4">{{ $asesi_name }}</td>
     </tr>
     <tr>
         <td class="ttd-space" colspan="2">Tanda tangan dan Tanggal</td>
         <td style="text-align:center;">:</td>
-        <td colspan="4"></td>
+        <td colspan="4">
+            @if(isset($asesi_signature) && $asesi_signature)
+                <img src="{{ $asesi_signature }}" style="max-height: 40px; vertical-align: middle;">
+            @endif
+            @if(isset($asesi_date) && $asesi_date)
+                <br><span style="font-size: 8pt;">{{ $asesi_date }}</span>
+            @endif
+        </td>
     </tr>
     <tr>
         <td colspan="7" class="header-cell">ASESOR :</td>
@@ -295,17 +297,26 @@
     <tr>
         <td colspan="2">Nama</td>
         <td style="text-align:center;">:</td>
-        <td colspan="4">{{ $nama_asesor }}</td>
+        <td colspan="4">{{ $asesor_name }}</td>
     </tr>
     <tr>
         <td colspan="2">No. Reg</td>
         <td style="text-align:center;">:</td>
-        <td colspan="4"></td>
+        <td colspan="4">{{ $asesor_reg }}</td>
     </tr>
     <tr>
         <td class="ttd-space" colspan="2">Tanda tangan dan Tanggal</td>
         <td style="text-align:center;">:</td>
-        <td colspan="4"></td>
+        <td colspan="4">
+            @if(isset($asesor_qr_code) && $asesor_qr_code)
+                <img src="{{ $asesor_qr_code }}" style="width: 45px; height: 45px; vertical-align: middle;">
+            @elseif(isset($asesor_signature) && $asesor_signature)
+                <img src="{{ $asesor_signature }}" style="max-height: 40px; vertical-align: middle;">
+            @endif
+            @if(isset($asesor_date) && $asesor_date)
+                <br><span style="font-size: 8pt;">{{ $asesor_date }}</span>
+            @endif
+        </td>
     </tr>
 </table>
 
@@ -325,32 +336,40 @@
         <th colspan="2">NOMOR MET</th>
         <th colspan="2">TANDA TANGAN DAN TANGGAL</th>
     </tr>
-    <tr>
-        <td colspan="2" rowspan="2" style="vertical-align:middle; font-weight:bold;">PENYUSUN</td>
-        <td colspan="1">1</td>
-        <td colspan="2">{{ $penyusun[0]['nama'] ?? '' }}</td>
-        <td colspan="2">{{ $penyusun[0]['nomor_met'] ?? '' }}</td>
-        <td colspan="2" class="ttd-space"></td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td colspan="2">{{ $penyusun[1]['nama'] ?? '' }}</td>
-        <td colspan="2">{{ $penyusun[1]['nomor_met'] ?? '' }}</td>
-        <td colspan="2" class="ttd-space"></td>
-    </tr>
-    <tr>
-        <td colspan="2" rowspan="2" style="vertical-align:middle; font-weight:bold;">VALIDATOR</td>
-        <td>1</td>
-        <td colspan="2">{{ $validator[0]['nama'] ?? '' }}</td>
-        <td colspan="2">{{ $validator[0]['nomor_met'] ?? '' }}</td>
-        <td colspan="2" class="ttd-space"></td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td colspan="2">{{ $validator[1]['nama'] ?? '' }}</td>
-        <td colspan="2">{{ $validator[1]['nomor_met'] ?? '' }}</td>
-        <td colspan="2" class="ttd-space"></td>
-    </tr>
+    @foreach(['Penyusun' => $compilers ?? $penyusun ?? [], 'Validator' => $validators ?? $validator ?? []] as $status => $items)
+        @php 
+            $items = (array)$items;
+            $count = max(2, count($items)); 
+        @endphp
+        @for($i = 0; $i < $count; $i++)
+            @php
+                $item = $items[$i] ?? [];
+                $name = $item['name'] ?? $item['nama'] ?? '';
+                $reg = $item['reg_number'] ?? $item['nomor_met'] ?? '';
+                $qr = $item['qr_code'] ?? null;
+                $sig = $item['signature'] ?? null;
+                $date = $item['date'] ?? '';
+            @endphp
+            <tr>
+                @if($i === 0)
+                    <td colspan="2" rowspan="{{ $count }}" style="vertical-align:middle; font-weight:bold; text-transform:uppercase;">{{ $status }}</td>
+                @endif
+                <td colspan="1">{{ $i + 1 }}</td>
+                <td colspan="2">{{ $name }}</td>
+                <td colspan="2">{{ $reg }}</td>
+                <td colspan="2" class="ttd-space" style="text-align:center; vertical-align:middle;">
+                    @if($qr)
+                        <img src="{{ $qr }}" style="width:45px;height:45px;vertical-align:middle;">
+                    @elseif($sig)
+                        <img src="{{ $sig }}" style="max-height:40px;vertical-align:middle;">
+                    @endif
+                    @if($date)
+                        <br><span style="font-size:8pt;">{{ $date }}</span>
+                    @endif
+                </td>
+            </tr>
+        @endfor
+    @endforeach
 </table>
 
 </body>

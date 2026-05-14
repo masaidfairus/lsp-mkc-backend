@@ -3,46 +3,59 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserSignatureResource\Pages;
-use App\Filament\Resources\UserSignatureResource\RelationManagers;
 use App\Models\UserSignature;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserSignatureResource extends Resource
 {
-    protected static ?string $model = \App\Models\UserSignature::class;
+    protected static ?string $model = UserSignature::class;
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
     protected static ?string $navigationGroup = 'Mastering Data';
-    protected static ?string $navigationLabel = 'Signature Library';
+    protected static ?string $navigationLabel = 'Daftar Tanda Tangan';
+    protected static ?string $modelLabel = 'Tanda Tangan Lama (Library)';
+    protected static ?string $pluralModelLabel = 'Tanda Tangan Lama (Library)';
+
+    protected static bool $shouldRegisterNavigation = true;
+
+    public static function getCreateButtonLabel(): string
+    {
+        return 'Buat Tanda Tangan';
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Create Your Signature')
+                Forms\Components\Section::make('Buat Tanda Tangan Anda')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Name/Identifier')
+                        Forms\Components\Select::make('name')
+                            ->label('Nama / Identifier')
+                            ->options(\App\Models\User::pluck('name', 'name'))
+                            ->searchable()
                             ->required()
-                            ->placeholder('e.g. Budi Signature 1'),
-                        
+                            ->placeholder('Pilih nama pengguna'),
+
                         Forms\Components\ViewField::make('signature_image')
                             ->view('filament.forms.components.signature-pad')
+                            ->label('Gambar Tanda Tangan')
                             ->columnSpanFull()
                             ->required(),
 
-                        Forms\Components\Hidden::make('signature_shape'),
-                        
+                        Forms\Components\Hidden::make('signature_shape')
+                            ->live()
+                            ->dehydrated(true),
+
                         Forms\Components\Grid::make(1)
                             ->schema([
                                 Forms\Components\Placeholder::make('qr_preview')
-                                    ->label('QR Code Preview')
-                                    ->content(fn ($record) => $record && $record->qr_code ? new \Illuminate\Support\HtmlString("<img src='{$record->qr_code}' width='200' />") : 'QR will be generated after saving.'),
+                                    ->label('Pratinjau QR Code')
+                                    ->content(fn ($record) => $record && $record->qr_code 
+                                        ? new \Illuminate\Support\HtmlString("<img src='{$record->qr_code}' width='200' />") 
+                                        : 'QR Code akan dibuat setelah disimpan.'),
                             ])->visible(fn ($record) => $record !== null),
                     ]),
             ]);
@@ -53,24 +66,26 @@ class UserSignatureResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('signature_image')
-                    ->label('Signature'),
+                    ->label('Tanda Tangan'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Dibuat Pada')
+                    ->dateTime('d M Y H:i')
                     ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()->label('Edit'),
+                Tables\Actions\DeleteAction::make()->label('Hapus'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus Terpilih'),
                 ]),
             ]);
     }

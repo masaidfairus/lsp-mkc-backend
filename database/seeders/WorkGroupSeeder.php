@@ -22,7 +22,7 @@ class WorkGroupSeeder extends Seeder
         $definitions = [
             '09-10/SSO/MKC.SKM.001/XI/2023' => [
                 [
-                    'name' => 'Kelompok Pekerjaan 1. Administrasi Usaha dan Perizinan',
+                    'name' => 'Administrasi Usaha dan Perizinan',
                     'units' => [
                         'Melakukan analisis harga pulang pokok',
                         'Menghitung biaya investasi',
@@ -30,7 +30,7 @@ class WorkGroupSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 2. Administrasi dan Pembukuan Keuangan',
+                    'name' => 'Administrasi dan Pembukuan Keuangan',
                     'units' => [
                         'Melakukan pembukuan keuangan untuk setiap transaksi',
                         'Melakukan pengaturan penyimpanan bahan baku, bahan pembantu, produk antara dan produk akhir',
@@ -44,14 +44,14 @@ class WorkGroupSeeder extends Seeder
 
             '09-10/SSO/MKC.SKM.002/XI/2023' => [
                 [
-                    'name' => 'Kelompok Pekerjaan 1. Mengelola Proses Penjualan dan Promosi Produk',
+                    'name' => 'Mengelola Proses Penjualan dan Promosi Produk',
                     'units' => [
                         'Melakukan promosi produk',
                         'Menjalin hubungan dengan pelanggan',
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 2. Menjalin Hubungan dengan Konsumen',
+                    'name' => 'Menjalin Hubungan dengan Konsumen',
                     'units' => [
                         'Melaksanakan Komunikasi Efektif',
                         'Melakukan Komunikasi melalui Telepon',
@@ -59,7 +59,7 @@ class WorkGroupSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 3. Menerapkan Pelayanan Prima',
+                    'name' => 'Menerapkan Pelayanan Prima',
                     'units' => [
                         'Memproses Keluhan Pelanggan',
                         'Mengembangkan Pengetahuan Produk (Barang/Jasa)',
@@ -69,7 +69,7 @@ class WorkGroupSeeder extends Seeder
 
             '09-10/SSO/MKC.SKM.003/XI/2023' => [
                 [
-                    'name' => 'Kelompok Pekerjaan 1. Survei Pasar dan Membangun Strategi Pemasaran Online',
+                    'name' => 'Survei Pasar dan Membangun Strategi Pemasaran Online',
                     'units' => [
                         'Melakukan promosi produk',
                         'Mengidentifikasi Elemen Pemasaran Organisasi',
@@ -77,7 +77,7 @@ class WorkGroupSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 2. Menggunakan Media Digital Sosial dan Aplikasi Daring (Online Tools)',
+                    'name' => 'Menggunakan Media Digital Sosial dan Aplikasi Daring (Online Tools)',
                     'units' => [
                         'Menggunakan Media Sosial dan Aplikasi Daring (Online Tools)',
                         'Melaksanakan Kegiatan Analisis di Media Sosial dan Media Bisnis Digital',
@@ -87,7 +87,7 @@ class WorkGroupSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 3. Melaksanakan Promosi dan Mengelola Pelanggan',
+                    'name' => 'Melaksanakan Promosi dan Mengelola Pelanggan',
                     'units' => [
                         'Melayani Kebutuhan Informasi Bagi Pelanggan',
                         'Menggunakan Penelusur Situs Web (Web Browser)',
@@ -98,14 +98,14 @@ class WorkGroupSeeder extends Seeder
 
             '09-10/SSO/MKC.SKM.004/XI/2023' => [
                 [
-                    'name' => 'Kelompok Pekerjaan 1. Membangun Hubungan dan Kepercayaan',
+                    'name' => 'Membangun Hubungan dan Kepercayaan',
                     'units' => [
                         'Melaksanakan Komunikasi Efektif',
                         'Mengembangkan Pola Komunikasi Efektif kepada Pemangku Kepentingan',
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 2. Analisis Perencanaan Kebutuhan Kelembagaan dan Fasilitasi Akses Usaha',
+                    'name' => 'Analisis Perencanaan Kebutuhan Kelembagaan dan Fasilitasi Akses Usaha',
                     'units' => [
                         'Melakukan pengawasan jalannya proses produksi',
                         'Menentukan jumlah dan keahlian tenaga kerja yang dibutuhkan',
@@ -115,7 +115,7 @@ class WorkGroupSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 3. Administrasi dan Pelaporan',
+                    'name' => 'Administrasi dan Pelaporan',
                     'units' => [
                         'Melakukan pengurusan perijinan usaha industri',
                         'Membuat Laporan Tertulis',
@@ -125,20 +125,20 @@ class WorkGroupSeeder extends Seeder
 
             '09-10/SSO/MKC.SKM.005/XI/2023' => [
                 [
-                    'name' => 'Kelompok Pekerjaan 1. Mengembangkan Keterampilan Penjualan Pribadi',
+                    'name' => 'Mengembangkan Keterampilan Penjualan Pribadi',
                     'units' => [
                         'Melaksanakan Komunikasi Efektif',
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 2. Melakukan Pembinaan dan Motivasi Tim Penjualan',
+                    'name' => 'Melakukan Pembinaan dan Motivasi Tim Penjualan',
                     'units' => [
                         'Mengembangkan Keterampilan dan Kerjasama Anggota Tim Penjual',
                         'Memberikan Bimbingan dan Peningkatan Kualitas Hidup',
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 3. Memaksimalkan Target Pencapaian Penjualan',
+                    'name' => 'Memaksimalkan Target Pencapaian Penjualan',
                     'units' => [
                         'Mengelola Stres Dalam Dinamika Tim Penjualan',
                         'Memimpin Program Transformasi dalam Penjualan dan Layanan',
@@ -148,7 +148,7 @@ class WorkGroupSeeder extends Seeder
 
             '09-010/SSO/MKC.SKM.006/XI/2023' => [
                 [
-                    'name' => 'Kelompok Pekerjaan 1. Analisis Awal dan Merencanakan Kebutuhan yang Akan Diusahakan',
+                    'name' => 'Analisis Awal dan Merencanakan Kebutuhan yang Akan Diusahakan',
                     'units' => [
                         'Melakukan Pendampingan Pengurusan Legalitas Kelembagaan dan Usaha',
                         'Melakukan Pendampingan Pembuatan Profil Perusahaan (Company Profile)',
@@ -156,7 +156,7 @@ class WorkGroupSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 2. Melakukan Pendampingan, Fasilitasi Akses, dan Jejaring',
+                    'name' => 'Melakukan Pendampingan, Fasilitasi Akses, dan Jejaring',
                     'units' => [
                         'Menghitung biaya investasi',
                         'Menentukan Jenis Produk Yang Akan Diusahakan',
@@ -167,7 +167,7 @@ class WorkGroupSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 3. Membangun Kerjasama Tim',
+                    'name' => 'Membangun Kerjasama Tim',
                     'units' => [
                         'Mengembangkan Kerjasama Tim dan Individu',
                     ],
@@ -176,14 +176,14 @@ class WorkGroupSeeder extends Seeder
 
             '09-10/SSO/MKC.SKM.007/XI/2023' => [
                 [
-                    'name' => 'Kelompok Pekerjaan 1. Persiapan dan Perencanaan Penjualan (Sales Activity)',
+                    'name' => 'Persiapan dan Perencanaan Penjualan (Sales Activity)',
                     'units' => [
                         'Mencapai Target Penjualan',
                         'Mengembangkan Pengetahuan Produk (Barang/Jasa)',
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 2. Mengelola Proses Penjualan',
+                    'name' => 'Mengelola Proses Penjualan',
                     'units' => [
                         'Melaksanakan Keterampilan Penjualan',
                         'Mengembangkan Cara Berfikir Kritis dan Kreatif',
@@ -192,7 +192,7 @@ class WorkGroupSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 3. Menangani Keberatan (Handling Objection)',
+                    'name' => 'Menangani Keberatan (Handling Objection)',
                     'units' => [
                         'Menyusun Rencana Aktifitas Penjualan',
                     ],
@@ -201,21 +201,21 @@ class WorkGroupSeeder extends Seeder
 
             '09-10/SSO/MKC.SKM.008/XI/2023' => [
                 [
-                    'name' => 'Kelompok Pekerjaan 1. Membangun Hubungan Baik dengan Setiap Pemangku Kepentingan (Stakeholder)',
+                    'name' => 'Membangun Hubungan Baik dengan Setiap Pemangku Kepentingan (Stakeholder)',
                     'units' => [
                         'Melaksanakan Komunikasi Efektif',
                         'Mengidentifikasi Elemen Pemasaran Organisasi',
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 2. Strategi Pemasaran dan Branding',
+                    'name' => 'Strategi Pemasaran dan Branding',
                     'units' => [
                         'Menggunakan Media Sosial dan Aplikasi Daring (Online Tools)',
                         'Melaksanakan Penulisan Bisnis (Business Writing)',
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 3. Membangun Merek secara Digital',
+                    'name' => 'Membangun Merek secara Digital',
                     'units' => [
                         'Melaksanakan Event Sebagai Bagian dari Komunikasi Merek',
                         'Mempersiapkan Konten Digital',
@@ -225,7 +225,7 @@ class WorkGroupSeeder extends Seeder
 
             '09-10/SSO/MKC.SKM.009/XI/2023' => [
                 [
-                    'name' => 'Kelompok Pekerjaan 1. Melakukan Analisis Bisnis dan Menerapkan Strategi Pemasaran',
+                    'name' => 'Melakukan Analisis Bisnis dan Menerapkan Strategi Pemasaran',
                     'units' => [
                         'Melaksanakan Analisis Lingkungan Bisnis',
                         'Mengembangkan dan Menerapkan Strategi Bisnis',
@@ -234,7 +234,7 @@ class WorkGroupSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 2. Mengembangkan dan Mengelola Program Loyalitas Pelanggan',
+                    'name' => 'Mengembangkan dan Mengelola Program Loyalitas Pelanggan',
                     'units' => [
                         'Mengelola Program Loyalitas Pelanggan',
                     ],
@@ -243,7 +243,7 @@ class WorkGroupSeeder extends Seeder
 
             '09-10/SSO/MKC.SKM.010/XI/2023' => [
                 [
-                    'name' => 'Kelompok Pekerjaan 1. Menentukan Jenis Produk yang Akan Diusahakan',
+                    'name' => 'Menentukan Jenis Produk yang Akan Diusahakan',
                     'units' => [
                         'Melaksanakan survey pasar atas suatu produk',
                         'Melakukan studi proses produksi suatu produk',
@@ -253,7 +253,7 @@ class WorkGroupSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 2. Melakukan Pengadaan Sarana dan Bahan Baku serta Bahan Pembantu',
+                    'name' => 'Melakukan Pengadaan Sarana dan Bahan Baku serta Bahan Pembantu',
                     'units' => [
                         'Melakukan pengadaan mesin dan peralatan yang dibutuhkan',
                         'Melakukan pengadaan bahan baku dan bahan Pembantu',
@@ -262,7 +262,7 @@ class WorkGroupSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'Kelompok Pekerjaan 3. Memasarkan Produk',
+                    'name' => 'Memasarkan Produk',
                     'units' => [
                         'Melakukan promosi produk',
                         'Melakukan survey atas pedagang eceran suatu Produk',
@@ -283,7 +283,7 @@ class WorkGroupSeeder extends Seeder
     {
         $scheme = DB::table('schemes')->where('code', $schemeCode)->first();
 
-        if (! $scheme) {
+        if (!$scheme) {
             throw new RuntimeException("Skema dengan kode {$schemeCode} tidak ditemukan.");
         }
 
@@ -312,7 +312,7 @@ class WorkGroupSeeder extends Seeder
             foreach ($group['units'] as $unitTitle) {
                 $normalizedTitle = $this->normalizeText($unitTitle);
 
-                if (! array_key_exists($normalizedTitle, $unitsByTitle)) {
+                if (!array_key_exists($normalizedTitle, $unitsByTitle)) {
                     throw new RuntimeException(
                         "Unit '{$unitTitle}' tidak ditemukan pada skema '{$scheme->name}' ({$schemeCode})."
                     );
@@ -332,7 +332,7 @@ class WorkGroupSeeder extends Seeder
                 ]);
         }
 
-        $unassignedUnits = $units->filter(fn ($unit) => ! in_array($unit->id, $assignedIds, true));
+        $unassignedUnits = $units->filter(fn($unit) => !in_array($unit->id, $assignedIds, true));
 
         if ($unassignedUnits->isNotEmpty()) {
             $titles = $unassignedUnits->pluck('unit_title')->implode(', ');

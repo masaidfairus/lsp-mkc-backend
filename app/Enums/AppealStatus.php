@@ -1,13 +1,13 @@
 <?php
-
+ 
 namespace App\Enums;
-
+ 
 enum AppealStatus: string
 {
     case PENDING = 'pending';
     case APPROVED = 'approved';
     case REJECTED = 'rejected';
-
+ 
     public function getLabel(): ?string
     {
         return match ($this) {
@@ -15,5 +15,10 @@ enum AppealStatus: string
             self::APPROVED => 'Approved',
             self::REJECTED => 'Rejected',
         };
+    }
+
+    public function isApproved(): bool
+    {
+        return $this === self::APPROVED;
     }
 }

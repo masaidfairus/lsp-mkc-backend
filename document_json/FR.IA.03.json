@@ -1,0 +1,81 @@
+{
+    "fr_ia_03_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_number": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri",
+            "assessor_name": "",
+            "assessee_name": "",
+            "date": ""
+        },
+        "work_groups": [
+            // LOOPING 1: Berdasarkan Kelompok Pekerjaan
+            {
+                "group_label": "Kelompok Pekerjaan 1",
+                "group_name": "Menerapkan pengetahuan tentang desain",
+                "units": [
+                    // LOOPING 2: Daftar Unit Kompetensi dalam kelompok ini
+                    {
+                        "no": 1,
+                        "unit_code": "M.74100.001.02",
+                        "unit_title": "Mengaplikasikan Prinsip Dasar Desain"
+                    },
+                    {
+                        "no": 2,
+                        "unit_code": "M.74100.002.02",
+                        "unit_title": "Menerapkan Prinsip Dasar Komunikasi"
+                    },
+                    {
+                        "no": 3,
+                        "unit_code": "M.74100.003.02",
+                        "unit_title": "Menerapkan Pengetahuan Dasar Desain"
+                    }
+                ],
+                "observation_questions": [
+                    // LOOPING 3: Daftar Pertanyaan Pendukung
+                    {
+                        "no": 1,
+                        "question": "",
+                        "response": "",
+                        "achievement": {
+                            "is_yes": false,
+                            "is_no": false
+                        }
+                    },
+                    {
+                        "no": 2,
+                        "question": "",
+                        "response": "",
+                        "achievement": {
+                            "is_yes": false,
+                            "is_no": false
+                        }
+                    },
+                    {
+                        "no": 3,
+                        "question": "",
+                        "response": "",
+                        "achievement": {
+                            "is_yes": false,
+                            "is_no": false
+                        }
+                    }
+                ]
+            }
+        ],
+        "assessee_feedback": "",
+        "signatures": {
+            "assessee": {
+                "name": "",
+                "date": "",
+                "signature_url": ""
+            },
+            "assessor": {
+                "name": "",
+                "reg_no": "",
+                "date": "",
+                "signature_url": ""
+            }
+        }
+    }
+}

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class AssessmentPlanning extends Model
 {
@@ -14,6 +15,9 @@ class AssessmentPlanning extends Model
         'ak07_data',
         'version',
         'confirmed_at',
+        'ak01_asesi_signature',
+        'ak01_asesi_qr_code',
+        'ak01_asesi_signature_date',
     ];
 
     protected $casts = [
@@ -27,5 +31,10 @@ class AssessmentPlanning extends Model
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class);
+    }
+
+    public function signatureRequests(): MorphMany
+    {
+        return $this->morphMany(SignatureRequest::class, 'signable');
     }
 }

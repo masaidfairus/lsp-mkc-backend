@@ -12,13 +12,17 @@ return new class extends Migration {
     {
         Schema::create('assessment_plannings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('registration_id')->constrained('assessment_registrations')->cascadeOnDelete();
+            $table->foreignId('registration_id')->unique()->constrained('assessment_registrations')->cascadeOnDelete();
             $table->json('mapa01_data')->nullable();
             $table->json('mapa02_data')->nullable();
             $table->json('ak01_data')->nullable();
             $table->json('ak07_data')->nullable();
+            $table->json('methods')->nullable();
             $table->string('version')->default('1.0');
             $table->timestamp('confirmed_at')->nullable();
+            $table->string('ak01_asesi_signature')->nullable();
+            $table->text('ak01_asesi_qr_code')->nullable();
+            $table->timestamp('ak01_asesi_signature_date')->nullable();
             $table->timestamps();
         });
     }

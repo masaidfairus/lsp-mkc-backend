@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Asesi;
 
 use App\Http\Controllers\Controller;
-use App\Enums\Apl01Status;
-use App\Enums\Apl02Status;
+use App\Enums\AssessmentStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Apl02Portfolio;
 use App\Models\AssessmentRegistration;
@@ -16,6 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class Apl02Controller extends Controller
 {
@@ -27,16 +27,12 @@ class Apl02Controller extends Controller
             return $this->errorResponse('E1005', 403);
         }
 
-        if ($registration->status_apl01 !== Apl01Status::APPROVED) {
+        if (!$registration->status->isApl01Complete()) {
             return $this->errorResponse('E2009', 403);
         }
 
-        if ($registration->asesi_type === 'pribadi') {
-            $payment = $registration->payments()->first();
-            if (!$payment || $payment->status !== PaymentStatus::PAID) {
-                return $this->errorResponse('E2010', 403);
-            }
-        }
+        // Payment is considered settled if APL.01 is approved.
+
 
         $scheme = $registration->scheme->load([
             'competencyUnits.competencyElements.performanceCriteria'
@@ -96,10 +92,14 @@ class Apl02Controller extends Controller
         $validated = $request->validate([
             'is_declared' => ['required', 'accepted'],
             'portfolio_ids' => ['nullable', 'array'],
-            'portfolio_ids.*' => ['integer', 'exists:file_profiles,id'],
+            'portfolio_ids.*' => [
+                'integer',
+                Rule::exists('file_profiles', 'id')->where('user_id', $request->user()->id)
+            ],
             'answers' => ['required', 'array', 'min:1'],
             'answers.*.element_id' => ['required', 'integer'],
             'answers.*.is_competent' => ['required', 'boolean'],
+            'signature' => ['nullable', 'image', 'max:1024'],
         ]);
 
         $mandatoryIds = $registration->scheme->portfolios
@@ -142,13 +142,22 @@ class Apl02Controller extends Controller
         }
 
         DB::transaction(function () use ($validated, $registration) {
-            Apl02Portfolio::where('registration_id', $registration->id)->delete();
-            foreach ($validated['portfolio_ids'] ?? [] as $fileProfileId) {
-                Apl02Portfolio::create([
-                    'registration_id' => $registration->id,
-                    'file_profile_id' => $fileProfileId,
-                    'is_active' => true,
-                ]);
+            $newFileProfileIds = $validated['portfolio_ids'] ?? [];
+
+            Apl02Portfolio::where('registration_id', $registration->id)
+                ->whereNotIn('file_profile_id', $newFileProfileIds)
+                ->update(['is_active' => false]);
+
+            foreach ($newFileProfileIds as $fileProfileId) {
+                Apl02Portfolio::updateOrCreate(
+                    [
+                        'registration_id' => $registration->id,
+                        'file_profile_id' => $fileProfileId,
+                    ],
+                    [
+                        'is_active' => true,
+                    ]
+                );
             }
 
             $rows = array_map(fn($answer) => [
@@ -165,7 +174,34 @@ class Apl02Controller extends Controller
                 ['is_competent', 'updated_at']
             );
 
-            $registration->update(['status_apl02' => Apl02Status::SUBMITTED, 'assessed_at' => Carbon::now()]);
+            // ── Signature Processing ──────────────────────────────────
+            $updateData = [
+                'status_apl02' => \App\Enums\Apl02Status::SUBMITTED,
+                'assessed_at' => \Carbon\Carbon::now()
+            ];
+
+            if (request()->hasFile('signature')) {
+                $sig = request()->file('signature');
+                $user = auth()->user();
+                $sigName = "sig_user_{$user->id}_apl02_" . uniqid() . "." . $sig->getClientOriginalExtension();
+                $sigPath = $sig->storeAs("signatures", $sigName, 'local');
+
+                // 1. Update Profile Signature
+                $user->userSignature()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    ['name' => $user->name, 'signature_image' => $sigPath]
+                );
+
+                // 2. Build QR Code for APL.02
+                $qrText = route('signature.verify', ['id' => $registration->id, 'type' => 'apl02']);
+                $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->generate($qrText));
+
+                $updateData['apl02_signature'] = $sigPath;
+                $updateData['apl02_qr_code'] = $qrBase64;
+                $updateData['apl02_signature_date'] = now();
+            }
+
+            $registration->update($updateData);
         });
 
         return $this->successResponse(

@@ -1,0 +1,301 @@
+{
+    "mapa01_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_code": "SUK-SKS-REV1-L007",
+            "assessment_date": "15-04-2026"
+        },
+        "section_1_approach": {
+            "1_1_assessment_approach": [
+                {
+                    "label": "Asesi",
+                    "options": [
+                        {
+                            "title": "Hasil pelatihan dan / atau pendidikan, dimana Kurikulum dan fasilitas praktek mampu telusur terhadap standar kompetensi",
+                            "is_checked": true
+                        },
+                        {
+                            "title": "Hasil pelatihan dan / atau pendidikan, dimana kurikulum belum berbasis kompetensi.",
+                            "is_checked": false
+                        },
+                        {
+                            "title": "Pekerja berpengalaman, dimana berasal dari industri/tempat kerja yang dalam operasionalnya mampu telusur dengan standar kompetensi",
+                            "is_checked": false
+                        },
+                        {
+                            "title": "Pekerja berpengalaman, dimana berasal dari industri/tempat kerja yang dalam operasionalnya belum berbasis kompetensi.",
+                            "is_checked": false
+                        },
+                        {
+                            "title": "Pelatihan / belajar mandiri atau otodidak.",
+                            "is_checked": false
+                        }
+                    ]
+                },
+                {
+                    "label": "Tujuan Asesmen",
+                    "options": [
+                        { "title": "Sertifikasi", "is_checked": true },
+                        {
+                            "title": "Pengakuan Kompetensi Terkini (PKT)",
+                            "is_checked": false
+                        },
+                        {
+                            "title": "Rekognisi Pembelajaran Lampau (RPL)",
+                            "is_checked": false
+                        }
+                    ]
+                },
+                {
+                    "label": "Konteks Asesmen:",
+                    "details": [
+                        {
+                            "aspect": "Lingkungan",
+                            "value": [
+                                {
+                                    "name": "Tempat kerja nyata",
+                                    "is_checked": true
+                                },
+                                {
+                                    "name": "Tempat kerja",
+                                    "is_checked": false
+                                },
+                                {
+                                    "name": "Simulasi",
+                                    "is_checked": false
+                                }
+                            ]
+                        },
+                        {
+                            "aspect": "Peluang untuk mengumpulkan bukti dalam sejumlah situasi",
+                            "value": [
+                                { "name": "Tersedia", "is_checked": true },
+                                { "name": "Terbatas", "is_checked": false }
+                            ]
+                        },
+                        {
+                            "aspect": "Hubungan antara standar kompetensi dan:",
+                            "value": [
+                                {
+                                    "name": "Bukti untuk mendukung asesmen",
+                                    "is_checked": true
+                                },
+                                {
+                                    "name": "Aktivitas kerja di tempat kerja Asesi",
+                                    "is_checked": false
+                                },
+                                {
+                                    "name": "Kegiatan Pembelajaran",
+                                    "is_checked": false
+                                }
+                            ]
+                        },
+                        {
+                            "aspect": "Siapa yang melakukan asesmen / RPL",
+                            "value": [
+                                {
+                                    "name": "Lembaga Sertifaikasi",
+                                    "is_checked": true
+                                },
+                                {
+                                    "name": "Organisasi Pelatihan",
+                                    "is_checked": false
+                                },
+                                {
+                                    "name": "Asesor Perusahaan",
+                                    "is_checked": false
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "label": "Konfirmasi dengan orang yang relevan",
+                    "options": [
+                        {
+                            "title": "Manajer sertifikasi LSP",
+                            "is_checked": true
+                        },
+                        {
+                            "title": "Master Asesor / Master Trainer / Lead Asesor Kompetensi",
+                            "is_checked": false
+                        },
+                        {
+                            "title": "Manajer Pelatihan Lembaga Training terakreditasi / Lembaga Training terdaftar",
+                            "is_checked": false
+                        },
+                        {
+                            "title": "Manajer atau supervisor ditempat kerja",
+                            "is_checked": false
+                        }
+                    ]
+                }
+            ],
+            "1_2_benchmark_standards": [
+                {
+                    "label": "Standar Kompetensi:",
+                    "is_checked": true,
+                    "note": "SKKNI KEPMENAKER RI NO 53 TAHUN 2014"
+                },
+                {
+                    "label": "Kriteria asesmen dari kurikulum pelatihan:",
+                    "is_checked": false,
+                    "note": ""
+                },
+                {
+                    "label": "Spesifikasi kinerja suatu perusahaan atau industri:",
+                    "is_checked": true,
+                    "note": ""
+                },
+                {
+                    "label": "Spesifikasi Produk:",
+                    "is_checked": true,
+                    "note": ""
+                },
+                {
+                    "label": "Pedoman khusus:",
+                    "is_checked": true,
+                    "note": ""
+                }
+            ]
+        },
+        "section_2_assessment_plan": [
+            {
+                "work_group": "Menerapkan Pengetahuan Desain", // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                "competency_units": [
+                    {
+                        "unit_code": "M.74100.001.02", // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                        "unit_title": "Mengaplikasikan Prinsip Dasar Desain", // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                        "evidence": "Hasil Verifikasi Portofolio dan Hasil Tanya Jawab tentang Melaksanakan survey pasar atas suatu produk", // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                        "evidence_type": {
+                            "langsung": true,
+                            "tidak_langsung": false,
+                            "tambahan": true
+                        },
+                        "assessment_methods": [
+                            {
+                                "method": "Observasi Langsung",
+                                "answer": "DPT"
+                            },
+                            {
+                                "method": "Kegiatan Terstruktur",
+                                "answer": null
+                            },
+                            {
+                                "method": "Tanya Jawab",
+                                "answer": "DIT"
+                            },
+                            {
+                                "method": "Verifikasi Portfolio",
+                                "answer": null
+                            },
+                            {
+                                "method": "Reviu Produk",
+                                "answer": null
+                            },
+                            {
+                                "method": "Verifikasi Pihak Ketiga",
+                                "answer": null
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "section_3_contextualization": [
+            {
+                "no": "3.1",
+                "content": [
+                    { "type": "a. Karakteristik Kandidat:", "answer": "" },
+                    {
+                        "type": "b. Kebutuhan kontekstualisasi terkait tempat kerja:",
+                        "answer": ""
+                    }
+                ]
+            },
+            {
+                "no": "3.2",
+                "content": [
+                    {
+                        "type": "Saran yang diberikan oleh paket pelatihan atau pengembang pelatihan",
+                        "answer": ""
+                    }
+                ]
+            },
+            {
+                "no": "3.3",
+                "content": [
+                    {
+                        "type": "Penyesuaian perangkat asesmen terkait kebutuhan kontekstualisasi",
+                        "answer": ""
+                    }
+                ]
+            },
+            {
+                "no": "3.4",
+                "content": [
+                    {
+                        "type": "Peluang untuk kegiatan asesmen terintegrasi dan mencatat setiap perubahan yang diperlukan untuk alat asesmen",
+                        "answer": ""
+                    }
+                ]
+            }
+        ],
+        "section_4_relevant_confirmation": [
+            {
+                "party": "Manajer Sertifikasi LSP",
+                "name": "Budi Santoso, ST.",
+                "date": "14-04-2026",
+                "signature": "data:image/png;base64,..."
+            },
+            {
+                "party": "Master Asesor / Master Trainer / Lead Asesor Kompetensi",
+                "name": "Budi Santoso, ST.",
+                "date": "14-04-2026",
+                "signature": "data:image/png;base64,..."
+            },
+            {
+                "party": "Manajer pelatihan Lembaga Training terakreditasi / Lembaga Training terdaftar",
+                "name": "Budi Santoso, ST.",
+                "date": "14-04-2026",
+                "signature": "data:image/png;base64,..."
+            },
+            {
+                "party": "Manajer atau supervisor ditempat kerja",
+                "name": "Budi Santoso, ST.",
+                "date": "14-04-2026",
+                "signature": "data:image/png;base64,..."
+            }
+        ],
+        "signatures": {
+            "compiler": [
+                {
+                    "name": "Budi Santoso, ST.",
+                    "met_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                },
+                {
+                    "name": "Budi Santoso, ST.",
+                    "met_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                }
+            ],
+            "validator": [
+                {
+                    "name": "Budi Santoso, ST.",
+                    "met_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                },
+                {
+                    "name": "Budi Santoso, ST.",
+                    "met_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                }
+            ]
+        }
+    }
+}

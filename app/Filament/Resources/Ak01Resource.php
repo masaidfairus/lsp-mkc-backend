@@ -1,9 +1,7 @@
 <?php
-
 namespace App\Filament\Resources;
-
 use App\Filament\Resources\Ak01Resource\Pages;
-use App\Filament\Resources\Ak01Resource\RelationManagers;
+use App\Filament\Traits\HasStandardIaForm;
 use App\Models\Ak01;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -11,16 +9,30 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class Ak01Resource extends Resource
 {
+    use HasStandardIaForm;
     protected static ?string $model = Ak01::class;
     protected static ?string $navigationIcon = 'heroicon-o-document-check';
     protected static ?string $navigationGroup = 'AK';
     protected static ?string $navigationLabel = 'AK.01';
     protected static ?string $modelLabel = 'AK.01';
     protected static ?string $pluralModelLabel = 'AK.01';
+    protected static ?int $navigationSort = 1;
+    
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        
+        if (auth()->user()->hasRole('asesor')) {
+            $query->whereHas('registration', function ($q) {
+                $q->where('assessor_id', auth()->id());
+            });
+        }
+        
+        return $query;
+    }
 
     public static function form(Form $form): Form
     {
@@ -31,23 +43,46 @@ class Ak01Resource extends Resource
                         Forms\Components\Grid::make(3)
                             ->schema([
                                 Forms\Components\Select::make('registration_id')
-                                    ->relationship('registration', 'id')
-                                    ->label('ID Pendaftaran')
+                                    ->label('Nama Asesi (ID Pendaftaran)')
+                                    ->options(function () {
+                                        $registrations = \App\Models\AssessmentRegistration::with(['candidate', 'scheme'])->get();
+                                        $occurrences   = [];
+                                        return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
+                                            $key          = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
+                                            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
+                                            $candidate    = $reg->candidate?->name ?? 'Unknown';
+                                            $scheme       = $reg->scheme?->name ?? 'Tanpa Skema';
+                                            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
+                                        });
+                                    })
                                     ->required()
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
                                     ->afterStateUpdated(function ($state, callable $set) {
                                         if ($state) {
-                                            $reg = \App\Models\AssessmentRegistration::with('scheme')->find($state);
-                                            if ($reg && $reg->scheme) {
-                                                $set('ak01_data.certification_scheme.name', $reg->scheme->name);
-                                                $set('ak01_data.certification_scheme.code', $reg->scheme->code);
+                                            $reg = \App\Models\AssessmentRegistration::with(['scheme', 'candidate', 'assessor'])->find($state);
+                                            if ($reg) {
+                                                if ($reg->scheme) {
+                                                    $set('ak01_data.certification_scheme.name', $reg->scheme->name);
+                                                    $set('ak01_data.certification_scheme.code', $reg->scheme->code);
+                                                }
+                                                $set('ak01_data.asesi_name', $reg->candidate?->name ?? '');
+
+                                                if ($reg->tuk) {
+                                                    $set('ak01_data.tuk', $reg->tuk);
+                                                }
+                                                if ($reg->assessor) {
+                                                    $set('ak01_data.asesor_name', $reg->assessor->name);
+                                                    
+                                                    // Auto-populate assessor signature info
+                                                    self::populateAssessorSignature($reg->assessor_id, $set, 'signatures.asesor');
+                                                }
                                             }
                                         }
                                     }),
                             ]),
-                        
+
                         Forms\Components\Group::make()
                             ->statePath('ak01_data')
                             ->schema([
@@ -68,102 +103,52 @@ class Ak01Resource extends Resource
 
                                 Forms\Components\Grid::make(3)
                                     ->schema([
-                                        Forms\Components\Select::make('tuk')
+                                        Forms\Components\TextInput::make('tuk')
                                             ->label('TUK')
-                                            ->options([
-                                                'Sewaktu' => 'Sewaktu',
-                                                'Tempat Kerja' => 'Tempat Kerja',
-                                                'Mandiri' => 'Mandiri',
-                                            ])
-                                            ->required(),
-                                        Forms\Components\TextInput::make('asesor_name')
+                                            ->disabled()
+                                            ->dehydrated(),
+
+                                        Forms\Components\Select::make('asesor_name')
                                             ->label('Nama Asesor')
+                                            ->disabled()
+                                            ->searchable()
                                             ->required(),
+
                                         Forms\Components\TextInput::make('asesi_name')
                                             ->label('Nama Asesi')
+                                            ->disabled()
+                                            ->dehydrated()
                                             ->required(),
                                     ]),
 
                                 Forms\Components\Section::make('Bukti yang akan dikumpulkan')
                                     ->schema([
-                                        Forms\Components\Repeater::make('evidence_methods')
+                                        Forms\Components\CheckboxList::make('evidence_selections')
                                             ->label('Metode Bukti')
-                                            ->schema([
-                                                Forms\Components\Grid::make(4)
-                                                    ->schema([
-                                                        Forms\Components\TextInput::make('label')
-                                                            ->label('Metode/Bukti')
-                                                            ->required()
-                                                            ->columnSpan(3),
-                                                        Forms\Components\Checkbox::make('answer')
-                                                            ->label('Ya?')
-                                                            ->columnSpan(1),
-                                                    ]),
+                                            ->options([
+                                                'Hasil Verifikasi Portofolio' => 'Hasil Verifikasi Portofolio',
+                                                'Hasil Reviu Produk' => 'Hasil Reviu Produk',
+                                                'Hasil Observasi Langsung' => 'Hasil Observasi Langsung',
+                                                'Hasil Kegiatan Terstruktur' => 'Hasil Kegiatan Terstruktur',
+                                                'Hasil Tanya Jawab' => 'Hasil Tanya Jawab',
+                                                'Other' => 'Lainnya:',
                                             ])
-                                            // ->columns(1) // mobile-style list
-                                            ->default([
-                                                ['label' => 'Hasil Verifikasi Portofolio', 'answer' => false],
-                                                ['label' => 'Hasil Reviu Produk', 'answer' => false],
-                                                ['label' => 'Hasil Observasi Langsung', 'answer' => false],
-                                                ['label' => 'Hasil Kegiatan Terstruktur', 'answer' => false],
-                                                ['label' => 'Hasil Tanya Jawab', 'answer' => false],
-                                            ])
-                                            ->addActionLabel('Tambah Bukti Lainnya')
-                                            ->reorderable(true)
-                                            ->addable(true)
-                                            ->deletable(true),
-                                    ]),
+                                            ->required()
+                                            ->columns(2)
+                                            ->reactive(),
+                                        
+                                        Forms\Components\TextInput::make('evidence_other')
+                                            ->label('Bukti Lainnya')
+                                            ->placeholder('Sebutkan...')
+                                            ->visible(fn ($get) => in_array('Other', (array) $get('evidence_selections')))
+                                            ->columnSpanFull(),
 
-                                Forms\Components\Section::make('Pelaksanaan asesmen disepakati pada')
-                                    ->statePath('agreement_time')
-                                    ->schema([
-                                        Forms\Components\DatePicker::make('date')
-                                            ->label('Hari/ Tanggal')
-                                            ->default(now())
+                                        Forms\Components\DateTimePicker::make('assessment_schedule')
+                                            ->label('Hari/Tanggal/Waktu Asesmen')
                                             ->required(),
-                                        Forms\Components\TimePicker::make('time')
-                                            ->label('Waktu')
-                                            ->default(now())
-                                            ->required(),
-                                        Forms\Components\TextInput::make('tuk')
-                                            ->label('TUK (Lokasi)')
-                                            ->required(),
-                                    ])->columns(3),
-
-                                Forms\Components\Grid::make(2)
-                                    ->statePath('signatures')
-                                    ->schema([
-                                        Forms\Components\Section::make('Asesor')
-                                            ->statePath('asesor')
-                                            ->schema([
-                                                Forms\Components\Select::make('signature_id')
-                                                    ->label('Pilih Tanda Tangan Asesor')
-                                                    ->options(\App\Models\UserSignature::pluck('name', 'id'))
-                                                    ->reactive()
-                                                    ->afterStateUpdated(function ($state, callable $set) {
-                                                        $sig = \App\Models\UserSignature::find($state);
-                                                        if ($sig) {
-                                                            $set('name', $sig->name);
-                                                            $set('signature', $sig->signature_image);
-                                                            $set('qr_preview', $sig->qr_code);
-                                                        }
-                                                    }),
-                                                Forms\Components\TextInput::make('name')
-                                                    ->label('Nama Asesor')
-                                                    ->disabled()
-                                                    ->dehydrated(),
-                                                Forms\Components\DatePicker::make('date')
-                                                    ->label('Tanggal')
-                                                    ->default(now()),
-                                                Forms\Components\Hidden::make('signature'),
-                                                Forms\Components\Placeholder::make('sig_preview')
-                                                    ->label('Preview Signature')
-                                                    ->content(fn ($get) => $get('signature') ? new \Illuminate\Support\HtmlString("<img src='{$get('signature')}' width='150' class='border' />") : ''),
-                                                Forms\Components\Placeholder::make('qr_preview')
-                                                    ->label('QR Code')
-                                                    ->content(fn ($get) => $get('qr_preview') ? new \Illuminate\Support\HtmlString("<img src='{$get('qr_preview')}' width='100' />") : ''),
-                                            ]),
                                     ]),
+                                self::standardAsesiDisclaimer(),
+                                self::standardAssessorSignatureBlock('signatures.asesor'),
                             ]),
                     ]),
             ]);
@@ -172,6 +157,7 @@ class Ak01Resource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('ak01_data'))
             ->columns([
                 Tables\Columns\TextColumn::make('registration_id')
                     ->label('Registration ID')
@@ -193,10 +179,9 @@ class Ak01Resource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

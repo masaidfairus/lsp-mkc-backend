@@ -60,6 +60,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Profile::class);
     }
 
+    public function userSignature()
+    {
+        return $this->hasOne(UserSignature::class);
+    }
+
     public function asesiPassword()
     {
         return $this->hasOne(AsesiPassword::class, 'user_id', 'id');
@@ -78,16 +83,6 @@ class User extends Authenticatable implements MustVerifyEmail
     public function assignments()
     {
         return $this->hasMany(AssessmentRegistration::class, 'assessor_id', 'id');
-    }
-
-    public function mainAssessorValidations()
-    {
-        return $this->hasMany(PeerValidation::class, 'main_assessor_id', 'id');
-    }
-
-    public function peerAssessorValidations()
-    {
-        return $this->hasMany(PeerValidation::class, 'peer_assessor_id', 'id');
     }
 
     public function userFile()

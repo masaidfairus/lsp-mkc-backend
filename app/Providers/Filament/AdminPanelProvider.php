@@ -27,18 +27,29 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->font('Outfit')
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->spa()
+            ->databaseNotifications()
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
             ])
             ->navigationGroups([
                 'Admin',
                 'Mastering Data',
+                'Permintaan TTD',
                 'Dokumen',
+                'Pendaftaran',
                 'APL',
                 'AK',
+                'MAPA',
+                'IA',
+                'IA (A)',
+                'IA (B)',
+                'IA (C)',
+                'MKVA',
                 'Filament Shield',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

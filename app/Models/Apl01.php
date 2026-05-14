@@ -25,4 +25,12 @@ class Apl01 extends AssessmentRegistration
                     ->orHas('administrativeProof');
             });
     }
+
+    public function portfolioFiles()
+    {
+        return $this->hasMany(FileProfile::class, 'user_id', 'user_id')
+            ->whereHas('documentList.portfolioScheme', function ($query) {
+                $query->where('scheme_id', $this->scheme_id);
+            });
+    }
 }

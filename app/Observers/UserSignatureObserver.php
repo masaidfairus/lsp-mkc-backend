@@ -6,24 +6,20 @@ use App\Models\UserSignature;
 
 class UserSignatureObserver
 {
-    public function saving(UserSignature $userSignature): void
+    public function saved(UserSignature $userSignature): void
     {
-        if ($userSignature->isDirty(['signature_image', 'signature_shape', 'name'])) {
-            $data = [
-                'n' => $userSignature->name,
-                'd' => now()->toDateTimeString(),
-                's' => base64_encode(gzcompress($userSignature->signature_shape ?? '')),
-            ];
-
-            $qrContent = json_encode($data);
+        if ($userSignature->wasChanged(['signature_image', 'signature_shape', 'name']) || $userSignature->wasRecentlyCreated) {
             
-            // Generate QR as base64 image
+            // Generate QR content with ID
+            $qrContent = route('signature.verify', ['id' => $userSignature->id]);
+
             $qrImage = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')
                 ->size(300)
                 ->margin(1)
                 ->generate($qrContent);
-            
+
             $userSignature->qr_code = 'data:image/svg+xml;base64,' . base64_encode($qrImage);
+            $userSignature->saveQuietly();
         }
     }
 

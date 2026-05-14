@@ -8,6 +8,10 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        @page {
+            margin: 1.5cm 1.5cm 2cm 1.5cm;
+        }
+
         body {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 9pt;
@@ -15,9 +19,49 @@
             padding: 4rem;
         }
 
+        footer {
+            position: fixed;
+            bottom: -0.8cm;
+            left: 0;
+            right: 0;
+            height: 0.8cm;
+            font-size: 7pt;
+            color: #555;
+        }
+        .footer-line {
+            height: 4px;
+            background-color: #e8742a;
+            width: 100%;
+            margin-bottom: 2px;
+        }
+        .pagenum:before {
+            content: counter(page);
+        }
+
         /* Logo + Judul */
         .header-top {
             margin-bottom: 8px;
+        }
+        .checkbox {
+            display: inline-block;
+            width: 11px;
+            height: 11px;
+            border: 1px solid #000;
+            position: relative;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+
+        .checkbox-checked::after {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: -1px;
+            width: 3px;
+            height: 7px;
+            border: solid black;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
         }
         .logo-bnsp {
             font-weight: bold;
@@ -62,13 +106,35 @@
 
         /* Checkbox */
         .checkbox {
-            width: 10px;
-            height: 10px;
-            border: 1px solid #000;
             display: inline-block;
             vertical-align: middle;
             margin-right: 4px;
-            flex-shrink: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11pt;
+            color: #000;
+        }
+
+        /* ── Signature Table ── */
+        .sig-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .sig-table td {
+            width: 50%;
+            border: 1px solid #000;
+            padding: 10px;
+            vertical-align: top;
+        }
+        .sig-box {
+            height: 70px;
+            border-bottom: 1px dotted #000;
+            margin: 10px 0;
+            position: relative;
+        }
+        .sig-label {
+            font-size: 8pt;
+            margin-bottom: 5px;
         }
 
         /* ── Tabel Tujuan/Konteks/Pendekatan ── */
@@ -182,22 +248,26 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 14px;
+            table-layout: fixed;
         }
         .temuan-table th, .temuan-table td {
             border: 1px solid #000;
             padding: 5px 7px;
             font-size: 8.5pt;
             vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: normal;
         }
         .temuan-table th {
             background-color: #d9d9d9;
             font-weight: bold;
             text-align: center;
         }
-        .temuan-table .col-no    { width: 6%; text-align: center; }
+        .temuan-table .col-no    { width: 30px; text-align: center; }
         .temuan-table .col-temuan{ width: 47%; }
-        .temuan-table .col-rekom { width: 47%; }
-        .temuan-table .data-row td { height: 55px; vertical-align: top; }
+        .temuan-table .col-rekom { width: auto; }
+        .temuan-table .data-row td { height: auto; min-height: 55px; vertical-align: top; }
 
         /* ── Rencana Implementasi ── */
         .impl-table {
@@ -222,17 +292,26 @@
         .impl-table .col-pj    { width: 34%; }
         .impl-table .data-row td { height: 65px; vertical-align: top; }
 
-        /* Orange bottom bar */
-        .orange-bar {
-            height: 8px;
-            background-color: #e8742a;
-            margin-top: 16px;
-        }
+
 
         .page-break { page-break-before: always; }
     </style>
 </head>
 <body>
+    <footer>
+        <div class="footer-line"></div>
+        <table style="width: 100%; border:none; margin-top:5px">
+            <tr>
+                <td style="border:none; text-align:left; font-size:7pt">
+                    Badan Nasional Sertifikasi Profesi<br>
+                    Jl. MT. Haryono Kavling 52, Jakarta, Indonesia
+                </td>
+                <td style="border:none; text-align:right; font-size:7pt">
+                    Halaman <span class="pagenum"></span>
+                </td>
+            </tr>
+        </table>
+    </footer>
 
     {{-- LOGO + JUDUL --}}
     <div class="header-top">
@@ -263,9 +342,9 @@
             <td>Periode</td>
             <td style="text-align:center">:</td>
             <td colspan="4">
-                <span class="checkbox"></span> SEBELUM ASESMEN &nbsp;
-                <span class="checkbox"></span> PADA SAAT ASESMEN &nbsp;
-                <span class="checkbox"></span> SETELAH ASESMEN
+                <span class="checkbox {!! in_array('before_assessment', $periode ?? []) ? 'checkbox-checked' : '' !!}"></span> SEBELUM ASESMEN &nbsp;
+                <span class="checkbox {!! in_array('during_assessment', $periode ?? []) ? 'checkbox-checked' : '' !!}"></span> PADA SAAT ASESMEN &nbsp;
+                <span class="checkbox {!! in_array('after_assessment', $periode ?? []) ? 'checkbox-checked' : '' !!}"></span> SETELAH ASESMEN
             </td>
         </tr>
         <tr>
@@ -293,22 +372,27 @@
             </tr>
         </thead>
         <tbody>
-            @php $maxRows = max(count($tujuan_fokus), count($konteks_validasi), count($pendekatan_validasi)); @endphp
-            @for ($i = 0; $i < $maxRows; $i++)
+            @for($i=0; $i<max(count($tujuan_fokus), count($konteks_validasi), count($pendekatan_validasi)); $i++)
             <tr class="item-row">
                 <td>
                     @if(isset($tujuan_fokus[$i]))
-                    <span class="checkbox"></span>{{ $tujuan_fokus[$i]['label'] }}
+                    <div class="cb-item">
+                        <span class="checkbox {!! !empty($tujuan_fokus[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $tujuan_fokus[$i]['label'] }}
+                    </div>
                     @endif
                 </td>
                 <td>
                     @if(isset($konteks_validasi[$i]))
-                    <span class="checkbox"></span>{{ $konteks_validasi[$i]['label'] }}
+                    <div class="cb-item">
+                        <span class="checkbox {!! !empty($konteks_validasi[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $konteks_validasi[$i]['label'] }}
+                    </div>
                     @endif
                 </td>
                 <td>
                     @if(isset($pendekatan_validasi[$i]))
-                    <span class="checkbox"></span>{{ $pendekatan_validasi[$i]['label'] }}
+                    <div class="cb-item">
+                        <span class="checkbox {!! !empty($pendekatan_validasi[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $pendekatan_validasi[$i]['label'] }}
+                    </div>
                     @endif
                 </td>
             </tr>
@@ -329,17 +413,21 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($orang_relevan as $o)
+            @foreach ($orang_relevan as $index => $o)
             <tr class="data-row">
-                <td><span class="checkbox"></span>{{ $o['label'] }}</td>
-                <td>{{ $o['nama'] }}</td>
-                <td>{{ $o['hasil'] }}</td>
+                <td><span class="checkbox {!! !empty($o['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $o['label'] }}</td>
+                @if($index === 0)
+                <td rowspan="{{ count($orang_relevan) }}" style="vertical-align:top; text-align:left; padding: 5px 10px;">
+                    {!! nl2br(e($o['nama'])) !!}
+                </td>
+                <td rowspan="{{ count($orang_relevan) }}" style="vertical-align:top; padding:10px">{!! nl2br(e($o['hasil'])) !!}</td>
+                @endif
             </tr>
             @endforeach
         </tbody>
     </table>
 
-    <div class="orange-bar"></div>
+
 
     {{-- PAGE 2 --}}
     <div class="page-break"></div>
@@ -356,17 +444,20 @@
             </tr>
         </thead>
         <tbody>
-            @php $maxAcuan = max(count($acuan_pembanding), count($dokumen_terkait)); @endphp
-            @for ($i = 0; $i < $maxAcuan; $i++)
+            @for($i=0; $i<max(count($acuan_pembanding), count($dokumen_terkait)); $i++)
             <tr class="item-row">
                 <td>
                     @if(isset($acuan_pembanding[$i]))
-                    <span class="checkbox"></span>{{ $acuan_pembanding[$i]['label'] }}
+                    <div class="cb-item">
+                        <span class="checkbox {!! !empty($acuan_pembanding[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $acuan_pembanding[$i]['label'] }}
+                    </div>
                     @endif
                 </td>
                 <td>
                     @if(isset($dokumen_terkait[$i]))
-                    <span class="checkbox"></span>{{ $dokumen_terkait[$i]['label'] }}
+                    <div class="cb-item">
+                        <span class="checkbox {!! !empty($dokumen_terkait[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $dokumen_terkait[$i]['label'] }}
+                    </div>
                     @endif
                 </td>
             </tr>
@@ -381,8 +472,12 @@
         <tr>
             <td class="col-label">Keterampilan komunikasi yang digunakan dalam kegiatan validasi :</td>
             <td class="col-opts">
-                @foreach ($komunikasi as $k)
-                <span class="checkbox"></span>{{ $k['label'] }}<br>
+                @php 
+                    $allKomunikasi = ['PRO AKTIF', 'ACTIVE LISTENING', 'Empati'];
+                    $selectedKomunikasi = array_column($komunikasi, 'label');
+                @endphp
+                @foreach ($allKomunikasi as $opt)
+                <span class="checkbox {!! in_array($opt, $selectedKomunikasi) ? 'checkbox-checked' : '' !!}"></span>{{ $opt }}<br>
                 @endforeach
             </td>
         </tr>
@@ -414,14 +509,14 @@
             <tr class="data-row">
                 <td class="col-no">{{ $a['no'] }}.</td>
                 <td class="col-aspek" style="text-align:left">{{ $a['label'] }}</td>
-                <td><span class="checkbox"></span></td>
-                <td><span class="checkbox"></span></td>
-                <td><span class="checkbox"></span></td>
-                <td><span class="checkbox"></span></td>
-                <td><span class="checkbox"></span></td>
-                <td><span class="checkbox"></span></td>
-                <td><span class="checkbox"></span></td>
-                <td><span class="checkbox"></span></td>
+                <td><span class="checkbox {!! !empty($a['v']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['a']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['t']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['m']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['pv']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['pr']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['pf']) ? 'checkbox-checked' : '' !!}"></span></td>
+                <td><span class="checkbox {!! !empty($a['pa']) ? 'checkbox-checked' : '' !!}"></span></td>
             </tr>
             @endforeach
         </tbody>
@@ -435,22 +530,22 @@
         <thead>
             <tr>
                 <th class="col-no"></th>
-                <th class="col-temuan">Temuan Validasi :</th>
-                <th class="col-rekom">Rekomendasi untuk meningkatkan Praktek Asesmen</th>
+                <th colspan="8" class="col-temuan">Temuan Validasi :</th>
+                <th colspan="8" class="col-rekom">Rekomendasi untuk meningkatkan Praktek Asesmen</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($temuan_rekomendasi as $t)
             <tr class="data-row">
                 <td class="col-no" style="vertical-align:top; padding-top:6px">{{ $t['no'] }}.</td>
-                <td>{{ $t['temuan'] }}</td>
-                <td>{{ $t['rekomendasi'] }}</td>
+                <td colspan="8">{{ $t['temuan'] }}</td>
+                <td colspan="8">{{ $t['rekomendasi'] }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
 
-    <div class="orange-bar"></div>
+
 
     {{-- PAGE 3 --}}
     <div class="page-break"></div>
@@ -486,7 +581,41 @@
         </tbody>
     </table>
 
-    <div class="orange-bar"></div>
+
+
+    {{-- Signature Section --}}
+    <table class="sig-table">
+        <tr>
+            <td>
+                <div class="sig-label">Asesor Kompetensi:</div>
+                <div style="font-weight:bold; margin-bottom:10px;">{{ $assessor->name ?? '' }}</div>
+                <div class="sig-box" style="display: flex; align-items: center; justify-content: center; height: 100px;">
+                    @if($assessor_qr_code)
+                        <img src="{{ $assessor_qr_code }}" style="width:50px; height:50px;">
+                        <div style="margin-left: 10px; font-size: 8pt; text-align: left;">
+                            Telah divalidasi pada:<br>
+                            {{ $assessor_date }}
+                        </div>
+                    @endif
+                </div>
+                <div class="sig-label">Tanda Tangan / Tanggal</div>
+            </td>
+            <td>
+                <div class="sig-label">Validator:</div>
+                <div style="font-weight:bold; margin-bottom:10px;">{{ $validator->name ?? '' }}</div>
+                <div class="sig-box" style="display: flex; align-items: center; justify-content: center; height: 100px;">
+                    @if($validator_qr_code)
+                        <img src="{{ $validator_qr_code }}" style="width:50px; height:50px;">
+                        <div style="margin-left: 10px; font-size: 8pt; text-align: left;">
+                            Telah divalidasi pada:<br>
+                            {{ $validator_date }}
+                        </div>
+                    @endif
+                </div>
+                <div class="sig-label">Tanda Tangan / Tanggal</div>
+            </td>
+        </tr>
+    </table>
 
 </body>
 </html>

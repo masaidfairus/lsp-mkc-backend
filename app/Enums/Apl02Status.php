@@ -1,17 +1,17 @@
 <?php
-
+ 
 namespace App\Enums;
-
+ 
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
-
+ 
 enum Apl02Status: string implements HasLabel, HasColor
 {
     case NOT_STARTED = 'not_started';
     case SUBMITTED = 'submitted';
     case APPROVED = 'approved';
     case REJECTED = 'rejected';
-
+ 
     public function getLabel(): ?string
     {
         return match ($this) {
@@ -21,7 +21,7 @@ enum Apl02Status: string implements HasLabel, HasColor
             self::REJECTED => 'Tidak Diterima',
         };
     }
-
+ 
     public function getColor(): string|array|null
     {
         return match ($this) {
@@ -32,4 +32,8 @@ enum Apl02Status: string implements HasLabel, HasColor
         };
     }
 
+    public function isApproved(): bool
+    {
+        return $this === self::APPROVED;
+    }
 }

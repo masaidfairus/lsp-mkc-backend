@@ -26,26 +26,7 @@
             margin-bottom: 8px;
         }
 
-        /* Header table */
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 4px;
-        }
-        .header-table td {
-            border: 1px solid #000;
-            padding: 4px 6px;
-            font-size: 9.5pt;
-            vertical-align: middle;
-        }
-        .header-table .val {
-            font-weight: bold;
-        }
-
-        .note-small {
-            font-size: 8.5pt;
-            margin-bottom: 10px;
-        }
+       5b
 
         /* Panduan */
         .panduan-box {
@@ -82,6 +63,7 @@
         .unit-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
             margin-bottom: 8px;
         }
         .unit-table th, .unit-table td {
@@ -89,6 +71,7 @@
             padding: 4px 6px;
             font-size: 9.5pt;
             vertical-align: middle;
+            word-wrap: break-word;
         }
         .unit-table th {
             font-weight: bold;
@@ -100,12 +83,14 @@
         .pertanyaan-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
         .pertanyaan-table th, .pertanyaan-table td {
             border: 1px solid #000;
             padding: 4px 6px;
             font-size: 9.5pt;
             vertical-align: top;
+            word-wrap: break-word;
         }
         .pertanyaan-table th {
             font-weight: bold;
@@ -140,6 +125,7 @@
         .ttd-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
             margin-bottom: 16px;
         }
         .ttd-table td {
@@ -147,6 +133,7 @@
             padding: 4px 6px;
             font-size: 9.5pt;
             vertical-align: top;
+            word-wrap: break-word;
         }
         .ttd-table .section-header td {
             font-weight: bold;
@@ -163,50 +150,178 @@
             border-top: 1px solid #ccc;
             padding-top: 5px;
         }
+
+               .judul { font-size: 10pt; font-weight: bold; margin-bottom: 8px; }
+
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin-bottom: 8px;
+        }
+        .tbl td {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            vertical-align: middle;
+            word-wrap: break-word;
+            font-size: 9pt;
+            line-height: 1.4;
+        }
+
+        .tbl-kp {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin-bottom: 10px;
+            font-size: 9pt;
+        }
+        .tbl-kp th {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            background: #e0e0e0;
+            font-weight: bold;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .tbl-kp td {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            vertical-align: middle;
+            word-wrap: break-word;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 9pt;
+            margin: 10px 0 6px 0;
+        }
+
+        .petunjuk-list {
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+        .petunjuk-list li {
+            margin-bottom: 3px;
+            font-size: 9pt;
+            line-height: 1.4;
+        }
+
+        .field-line {
+            font-size: 9pt;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .field-space {
+            display: inline-block;
+            min-width: 200px;
+            border-bottom: 1px solid #000;
+            margin-left: 6px;
+            vertical-align: bottom;
+        }
+
+        .perlengkapan-list {
+            padding-left: 22px;
+            margin: 3px 0 8px 0;
+        }
+        .perlengkapan-list li {
+            font-size: 9pt;
+            margin-bottom: 2px;
+        }
+
+        /* Footer TTD */
+        .tbl-ttd {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 9pt;
+            margin-bottom: 14px;
+        }
+        .tbl-ttd td {
+            border: 1px solid #000;
+            padding: 5px 8px;
+            vertical-align: top;
+        }
+        .tbl-ttd .header-cell {
+            font-weight: bold;
+            background: #f0f0f0;
+        }
+        .tbl-ttd .ttd-space { height: 35px; }
+
+        /* Penyusun validator */
+        .tbl-pv {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 9pt;
+        }
+        .tbl-pv th {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            background: #e0e0e0;
+            font-weight: bold;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .tbl-pv td {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            vertical-align: middle;
+            text-align: center;
+        }
+        .tbl-pv td.ttd-space { height: 40px; }
     </style>
 </head>
 <body>
+
+@php
+    $nama_skema         = $nama_skema ?? '';
+    $kode_skema         = $kode_skema ?? '';
+    $tuk                = $tuk ?? 'Sewaktu/Tempat Kerja/Mandiri';
+    $nama_asesor        = $nama_asesor ?? '';
+    $nama_asesi         = $nama_asesi ?? '';
+    $tanggal            = $tanggal ?? '';
+    $kelompok_pekerjaan = $kelompok_pekerjaan ?? [];
+    $penyusun           = $penyusun ?? [['nama'=>'','nomor_met'=>''],['nama'=>'','nomor_met'=>'']];
+    $validator          = $validator ?? [['nama'=>'','nomor_met'=>''],['nama'=>'','nomor_met'=>'']];
+@endphp
+
 <div class="page">
 
     {{-- JUDUL --}}
     <div class="form-title">FR.IA.03. PERTANYAAN UNTUK MENDUKUNG OBSERVASI</div>
 
     {{-- HEADER --}}
-    <table class="header-table">
+    <table class="tbl">
+        <colgroup>
+            <col style="width:28%;">
+            <col style="width:14%;">
+            <col style="width:3%;">
+            <col style="width:55%;">
+        </colgroup>
         <tr>
-            <td style="width:28%" rowspan="2">Skema Sertifikasi<br>(KKNI/Okupasi/Klaster)</td>
-            <td style="width:10%">Judul</td>
-            <td style="width:3%; text-align:center">:</td>
-            <td class="val">{{ $judul }}</td>
+            <td rowspan="2" style="vertical-align:middle;" colspan="2">Skema Sertifikasi<br>(KKNI/Okupasi/Klaster)</td>
+            <td>Judul :</td>
+            <td style="font-weight:bold;" colspan="5">{{ $judul }}</td>
         </tr>
         <tr>
-            <td>Nomor</td>
-            <td style="text-align:center">:</td>
-            <td class="val">{{ $nomor }}</td>
+            <td>Nomor :</td>
+            <td style="font-weight:bold;" colspan="5">{{ $nomor }}</td>
         </tr>
         <tr>
-            <td>TUK</td>
-            <td></td>
-            <td style="text-align:center">:</td>
-            <td>{{ $tuk }}</td>
+            <td colspan="3">TUK :</td>
+            <td colspan="5">{{ $tuk }}</td>
         </tr>
         <tr>
-            <td>Nama Asesor</td>
-            <td></td>
-            <td style="text-align:center">:</td>
-            <td>{{ $nama_asesor }}</td>
+            <td colspan="3">Nama Asesor :</td>
+            <td colspan="5">{{ $nama_asesor }}</td>
         </tr>
         <tr>
-            <td>Nama Asesi</td>
-            <td></td>
-            <td style="text-align:center">:</td>
-            <td>{{ $nama_asesi }}</td>
+            <td colspan="3">Nama Asesi :</td>
+            <td colspan="5">{{ $nama_asesi }}</td>
         </tr>
         <tr>
-            <td>Tanggal</td>
-            <td></td>
-            <td style="text-align:center">:</td>
-            <td>{{ $tanggal }}</td>
+            <td colspan="3">Tanggal :</td>
+            <td colspan="5">{{ $tanggal }}</td>
         </tr>
     </table>
     {{-- PANDUAN --}}
@@ -249,7 +364,7 @@
                         {{ $kp['nama'] }}
                     </td>
                     @endif
-                    <td style="text-align:center">{{ $unit['no'] }}.</td>
+                    <td style="text-align:center">{{ !empty($unit['no']) ? $unit['no'] : ($i + 1) }}.</td>
                     <td>{{ $unit['kode'] }}</td>
                     <td>{{ $unit['judul'] }}</td>
                 </tr>
@@ -273,7 +388,7 @@
             <tbody>
                 @foreach ($kp['pertanyaan'] as $p)
                 <tr>
-                    <td class="col-no" style="padding-top:6px">{{ $p['no'] }}.</td>
+                    <td class="col-no" style="padding-top:6px">{{ !empty($p['no']) ? $p['no'] : ($loop->iteration) }}.</td>
                     <td class="col-pertanyaan" style="padding:6px">{{ $p['pertanyaan'] }}</td>
                     <td class="col-ya"></td>
                     <td class="col-tdk"></td>
@@ -284,10 +399,10 @@
                         <div class="tanggapan-area">{{ $p['tanggapan'] ?? '' }}</div>
                     </td>
                     <td style="text-align:center; vertical-align:middle">
-                        <span class="checkbox"></span>
+                        <span style="font-size: 13pt;">{!! ($p['is_yes'] ?? false) ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>' !!}</span>
                     </td>
                     <td style="text-align:center; vertical-align:middle">
-                        <span class="checkbox"></span>
+                        <span style="font-size: 13pt;">{!! ($p['is_no'] ?? false) ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>' !!}</span>
                     </td>
                 </tr>
                 @endforeach
@@ -316,7 +431,12 @@
         <tr class="ttd-row">
             <td>Tanda tangan<br>dan Tanggal</td>
             <td style="text-align:center">:</td>
-            <td>{{ $asesi_ttd_tanggal }}</td>
+            <td>
+                @if($asesi_signature ?? null)
+                    <img src="{{ $asesi_signature }}" style="max-height: 80px;"><br>
+                @endif
+                {{ $asesi_ttd_tanggal }}
+            </td>
         </tr>
         <tr class="section-header">
             <td colspan="3"><strong>Asesor :</strong></td>
@@ -334,7 +454,14 @@
         <tr class="ttd-row">
             <td>Tanda tangan<br>dan Tanggal</td>
             <td style="text-align:center">:</td>
-            <td>{{ $asesor_ttd_tanggal }}</td>
+            <td>
+                @if($asesor_qr_code ?? null)
+                    <img src="{{ $asesor_qr_code }}" style="width: 50px; height: 50px;"><br>
+                @elseif($asesor_signature ?? null)
+                    <img src="{{ $asesor_signature }}" style="max-height: 80px;"><br>
+                @endif
+                {{ $asesor_ttd_tanggal }}
+            </td>
         </tr>
     </table>
 
