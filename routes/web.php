@@ -15,6 +15,9 @@ use App\Http\Controllers\PDF\PdfApl02Controller;
 use App\Http\Controllers\PDF\PdfMapa01Controller;
 use App\Http\Controllers\PDF\PdfMapa02Controller;
 
+Route::redirect('/', '/admin');
+Route::permanentRedirect('/', '/admin');
+
 Route::get('/test-activation', function () {
     return view('auth.activation');
 });
@@ -22,10 +25,6 @@ Route::get('/test-activation', function () {
 // Route::get('/active', function () {
 //     return view('auth.activation');
 // })->name('verif');
-
-// Route::get('/', function () {
-//     return view('welcome');
-// })->name('login');
 
 // Route::post('/login', [AuthController::class, 'login']);
 
