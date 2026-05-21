@@ -123,7 +123,7 @@ class PdfMapa02Controller extends Controller
         }
         // ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.mapa.mapa02', $data)
+        $pdf = Pdf::loadView('forms.MAPA.mapa02', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);
