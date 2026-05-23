@@ -17,8 +17,8 @@ class PdfApl01Controller extends Controller
         // ── Validasi status APL.01 (Menggunakan Enum baru) ───────────
         if (!$registration->status->isApl01Complete()) {
             return app(\App\Http\Controllers\PdfFallbackController::class)->show(
-                $registration, 
-                'Dokumen APL.01 Belum Siap', 
+                $registration,
+                'Dokumen APL.01 Belum Siap',
                 'Dokumen FR.APL.01 belum dapat dicetak karena status APL.01 masih dalam proses persetujuan oleh Admin.'
             );
         }
@@ -29,8 +29,8 @@ class PdfApl01Controller extends Controller
 
         if (!$signatureData['is_signed'] && !$isAuthorizedReviewer) {
             return app(\App\Http\Controllers\PdfFallbackController::class)->show(
-                $registration, 
-                'Dokumen APL.01 Belum Ditandatangani', 
+                $registration,
+                'Dokumen APL.01 Belum Ditandatangani',
                 'Dokumen FR.APL.01 belum dapat dicetak karena Asesor belum menandatangani dokumen ini di menu Inbox Tanda Tangan.'
             );
         }
@@ -38,7 +38,7 @@ class PdfApl01Controller extends Controller
         // ── Otorisasi ────────────────────────────────────────────────
         $user = $request->user();
         $isAuthorized = $this->isAuthorizedReviewer($user, $registration) || ($user && $user->id === $registration->user_id);
-        
+
         if (!$isAuthorized) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
@@ -141,7 +141,7 @@ class PdfApl01Controller extends Controller
         ];
 
 
-        $pdf = Pdf::loadView('forms.APL.apl01', $data)
+        $pdf = Pdf::loadView('forms.apl.apl01', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);

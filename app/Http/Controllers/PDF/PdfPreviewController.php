@@ -41,37 +41,37 @@
 //         ];
 
 //                 // --- Inject Signatures for Compilers & Validators ---
-        if (isset($data['compilers']) && is_array($data['compilers'])) {
-            foreach ($data['compilers'] as &$c) {
-                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
-                $c['signature'] = $sig['signature'];
-                $c['qr_code']   = $sig['qr_code'];
-            }
-        }
-        if (isset($data['penyusun']) && is_array($data['penyusun'])) {
-            foreach ($data['penyusun'] as &$c) {
-                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
-                $c['signature'] = $sig['signature'];
-                $c['qr_code']   = $sig['qr_code'];
-            }
-        }
-        if (isset($data['validators']) && is_array($data['validators'])) {
-            foreach ($data['validators'] as &$v) {
-                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
-                $v['signature'] = $sig['signature'];
-                $v['qr_code']   = $sig['qr_code'];
-            }
-        }
-        if (isset($data['validator']) && is_array($data['validator'])) {
-            foreach ($data['validator'] as &$v) {
-                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
-                $v['signature'] = $sig['signature'];
-                $v['qr_code']   = $sig['qr_code'];
-            }
-        }
-        // ----------------------------------------------------
+if (isset($data['compilers']) && is_array($data['compilers'])) {
+    foreach ($data['compilers'] as &$c) {
+        $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+        $c['signature'] = $sig['signature'];
+        $c['qr_code'] = $sig['qr_code'];
+    }
+}
+if (isset($data['penyusun']) && is_array($data['penyusun'])) {
+    foreach ($data['penyusun'] as &$c) {
+        $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+        $c['signature'] = $sig['signature'];
+        $c['qr_code'] = $sig['qr_code'];
+    }
+}
+if (isset($data['validators']) && is_array($data['validators'])) {
+    foreach ($data['validators'] as &$v) {
+        $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+        $v['signature'] = $sig['signature'];
+        $v['qr_code'] = $sig['qr_code'];
+    }
+}
+if (isset($data['validator']) && is_array($data['validator'])) {
+    foreach ($data['validator'] as &$v) {
+        $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+        $v['signature'] = $sig['signature'];
+        $v['qr_code'] = $sig['qr_code'];
+    }
+}
+// ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.APL.apl01', compact($data))
+$pdf = Pdf::loadView('forms.apl.apl01', compact($data))
 //             ->setPaper('a4', 'portrait');
 
 //         return $pdf->stream('apl01_preview.pdf');
@@ -110,37 +110,37 @@
 //         ];
 
 //                 // --- Inject Signatures for Compilers & Validators ---
-        if (isset($data['compilers']) && is_array($data['compilers'])) {
-            foreach ($data['compilers'] as &$c) {
-                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
-                $c['signature'] = $sig['signature'];
-                $c['qr_code']   = $sig['qr_code'];
-            }
-        }
-        if (isset($data['penyusun']) && is_array($data['penyusun'])) {
-            foreach ($data['penyusun'] as &$c) {
-                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
-                $c['signature'] = $sig['signature'];
-                $c['qr_code']   = $sig['qr_code'];
-            }
-        }
-        if (isset($data['validators']) && is_array($data['validators'])) {
-            foreach ($data['validators'] as &$v) {
-                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
-                $v['signature'] = $sig['signature'];
-                $v['qr_code']   = $sig['qr_code'];
-            }
-        }
-        if (isset($data['validator']) && is_array($data['validator'])) {
-            foreach ($data['validator'] as &$v) {
-                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
-                $v['signature'] = $sig['signature'];
-                $v['qr_code']   = $sig['qr_code'];
-            }
-        }
-        // ----------------------------------------------------
+if (isset($data['compilers']) && is_array($data['compilers'])) {
+    foreach ($data['compilers'] as &$c) {
+        $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+        $c['signature'] = $sig['signature'];
+        $c['qr_code'] = $sig['qr_code'];
+    }
+}
+if (isset($data['penyusun']) && is_array($data['penyusun'])) {
+    foreach ($data['penyusun'] as &$c) {
+        $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+        $c['signature'] = $sig['signature'];
+        $c['qr_code'] = $sig['qr_code'];
+    }
+}
+if (isset($data['validators']) && is_array($data['validators'])) {
+    foreach ($data['validators'] as &$v) {
+        $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+        $v['signature'] = $sig['signature'];
+        $v['qr_code'] = $sig['qr_code'];
+    }
+}
+if (isset($data['validator']) && is_array($data['validator'])) {
+    foreach ($data['validator'] as &$v) {
+        $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+        $v['signature'] = $sig['signature'];
+        $v['qr_code'] = $sig['qr_code'];
+    }
+}
+// ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.APL.apl01', $data)
+$pdf = Pdf::loadView('forms.apl.apl01', $data)
 //             ->setPaper('a4', 'portrait');
 
 //         return $pdf->download('APL01-' . $apl01->nama . '.pdf');

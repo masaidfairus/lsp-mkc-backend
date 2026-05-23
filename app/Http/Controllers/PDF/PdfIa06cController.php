@@ -15,7 +15,7 @@ class PdfIa06cController extends Controller
     {
         $user = $request->user();
         $isAuthorized = $this->isAuthorizedReviewer($user, $registration) || ($user && $user->id === $registration->user_id);
-        
+
         if (!$isAuthorized) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
@@ -31,20 +31,20 @@ class PdfIa06cController extends Controller
 
         $registration->load(['candidate', 'scheme', 'assessor']);
 
-        $asesiSig  = $this->getUserSignature($registration->candidate?->id ?? null);
+        $asesiSig = $this->getUserSignature($registration->candidate?->id ?? null);
         $asesorSig = $this->getUserSignature($registration->assessor?->id ?? null, $instrument?->id ?? ($record->id ?? null), 'Asesor');
 
         $mainData = $instrument->main_data ?? [];
-        $header   = $mainData['header'] ?? [];
+        $header = $mainData['header'] ?? [];
 
         $signatures = $mainData['signatures'] ?? [];
         $asesorSigData = $signatures['assessor'] ?? [];
 
         $asesorSignature = $asesorSigData['signature'] ?? $asesorSig['signature'] ?? null;
-        $asesorQrCode    = $asesorSigData['qr_code']   ?? $asesorSig['qr_code']   ?? null;
-        $asesorName      = $asesorSigData['name']       ?? $registration->assessor?->name ?? '';
-        $asesorReg       = $asesorSigData['reg_number'] ?? $registration->assessor?->registration_number ?? '';
-        $asesorDate      = $asesorSigData['date']       ?? $header['date'] ?? $header['tanggal'] ?? now()->format('d-m-Y');
+        $asesorQrCode = $asesorSigData['qr_code'] ?? $asesorSig['qr_code'] ?? null;
+        $asesorName = $asesorSigData['name'] ?? $registration->assessor?->name ?? '';
+        $asesorReg = $asesorSigData['reg_number'] ?? $registration->assessor?->registration_number ?? '';
+        $asesorDate = $asesorSigData['date'] ?? $header['date'] ?? $header['tanggal'] ?? now()->format('d-m-Y');
 
         $answerSheet = $mainData['answer_sheet'] ?? [];
         $jawabanData = [];
@@ -61,62 +61,62 @@ class PdfIa06cController extends Controller
         $feedback = $mainData['feedback_section'] ?? [];
 
         $data = [
-            'nama_skema'       => $header['certification_scheme'] ?? $header['scheme_name'] ?? $registration->scheme?->name ?? '-',
-            'kode_skema'       => $header['scheme_number'] ?? $header['scheme_code'] ?? $registration->scheme?->code ?? '-',
-            'tuk'              => $header['tuk'] ?? $registration->tuk ?? 'Sewaktu/Tempat Kerja/Mandiri',
-            'nama_asesor'      => $header['assessor_name'] ?? $asesorName,
-            'nama_asesi'       => $header['assessee_name'] ?? $header['asesi_name'] ?? $registration->candidate?->name ?? '-',
-            'tanggal'          => $header['date'] ?? $header['tanggal'] ?? now()->format('d-m-Y'),
-            'waktu'            => $header['time'] ?? '-',
-            
-            'asesi_signature'  => $asesiSig['signature'] ?? null,
-            'asesor_reg'       => $asesorReg,
+            'nama_skema' => $header['certification_scheme'] ?? $header['scheme_name'] ?? $registration->scheme?->name ?? '-',
+            'kode_skema' => $header['scheme_number'] ?? $header['scheme_code'] ?? $registration->scheme?->code ?? '-',
+            'tuk' => $header['tuk'] ?? $registration->tuk ?? 'Sewaktu/Tempat Kerja/Mandiri',
+            'nama_asesor' => $header['assessor_name'] ?? $asesorName,
+            'nama_asesi' => $header['assessee_name'] ?? $header['asesi_name'] ?? $registration->candidate?->name ?? '-',
+            'tanggal' => $header['date'] ?? $header['tanggal'] ?? now()->format('d-m-Y'),
+            'waktu' => $header['time'] ?? '-',
+
+            'asesi_signature' => $asesiSig['signature'] ?? null,
+            'asesor_reg' => $asesorReg,
             'asesor_signature' => $asesorSignature,
-            'asesor_qr_code'   => $asesorQrCode,
+            'asesor_qr_code' => $asesorQrCode,
 
-            'jawaban_data'     => $jawabanData,
-            'umpan_balik'      => $feedback['assessee_feedback'] ?? '',
-            'aspect_status'    => $feedback['knowledge_aspect_status'] ?? '',
-            'unachieved'       => $feedback['unachieved_details'] ?? '',
+            'jawaban_data' => $jawabanData,
+            'umpan_balik' => $feedback['assessee_feedback'] ?? '',
+            'aspect_status' => $feedback['knowledge_aspect_status'] ?? '',
+            'unachieved' => $feedback['unachieved_details'] ?? '',
 
-            'compilers'        => $mainData['document_control']['compilers'] ?? [],
-            'penyusun'         => $mainData['document_control']['compilers'] ?? [],
-            'validators'       => $mainData['document_control']['validators'] ?? [],
-            'validator'        => $mainData['document_control']['validators'] ?? [],
+            'compilers' => $mainData['document_control']['compilers'] ?? [],
+            'penyusun' => $mainData['document_control']['compilers'] ?? [],
+            'validators' => $mainData['document_control']['validators'] ?? [],
+            'validator' => $mainData['document_control']['validators'] ?? [],
         ];
 
-                // --- Inject Signatures for Compilers & Validators ---
+        // --- Inject Signatures for Compilers & Validators ---
         if (isset($data['compilers']) && is_array($data['compilers'])) {
             foreach ($data['compilers'] as &$c) {
                 $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
                 $c['signature'] = $sig['signature'];
-                $c['qr_code']   = $sig['qr_code'];
+                $c['qr_code'] = $sig['qr_code'];
             }
         }
         if (isset($data['penyusun']) && is_array($data['penyusun'])) {
             foreach ($data['penyusun'] as &$c) {
                 $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
                 $c['signature'] = $sig['signature'];
-                $c['qr_code']   = $sig['qr_code'];
+                $c['qr_code'] = $sig['qr_code'];
             }
         }
         if (isset($data['validators']) && is_array($data['validators'])) {
             foreach ($data['validators'] as &$v) {
                 $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
                 $v['signature'] = $sig['signature'];
-                $v['qr_code']   = $sig['qr_code'];
+                $v['qr_code'] = $sig['qr_code'];
             }
         }
         if (isset($data['validator']) && is_array($data['validator'])) {
             foreach ($data['validator'] as &$v) {
                 $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
                 $v['signature'] = $sig['signature'];
-                $v['qr_code']   = $sig['qr_code'];
+                $v['qr_code'] = $sig['qr_code'];
             }
         }
         // ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.IA.ia06c', $data)
+        $pdf = Pdf::loadView('forms.ia.ia06c', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true)
@@ -131,12 +131,15 @@ class PdfIa06cController extends Controller
 
     public function getUserSignature($userId, $modelId = null, $role = null)
     {
-        if (!$userId) return ['signature' => null, 'qr_code' => null];
+        if (!$userId)
+            return ['signature' => null, 'qr_code' => null];
 
         $query = \App\Models\SignatureRequest::where('user_id', $userId)->where('status', 'signed');
-        if ($modelId) $query->where('signable_id', $modelId);
-        if ($role) $query->where('role', $role);
-        
+        if ($modelId)
+            $query->where('signable_id', $modelId);
+        if ($role)
+            $query->where('role', $role);
+
         $req = $query->latest('signed_at')->first();
         if ($req) {
             return ['signature' => $req->raw_signature, 'qr_code' => $req->qr_code];

@@ -28,8 +28,8 @@ class PdfApl02Controller extends Controller
         // ── Validasi status APL.02 (Menggunakan Enum baru) ───────────
         if ($registration->status !== AssessmentStatus::APL02_SUBMITTED && !$registration->status->isApl02Complete()) {
             return app(\App\Http\Controllers\PdfFallbackController::class)->show(
-                $registration, 
-                'Dokumen APL.02 Belum Siap', 
+                $registration,
+                'Dokumen APL.02 Belum Siap',
                 'Dokumen FR.APL.02 belum dapat dicetak karena status APL.02 masih dalam proses pengisian atau belum disubmit oleh Asesi.'
             );
         }
@@ -49,8 +49,8 @@ class PdfApl02Controller extends Controller
 
         if (!$asesorSig['is_signed'] && !$isAuthorizedReviewer) {
             return app(\App\Http\Controllers\PdfFallbackController::class)->show(
-                $registration, 
-                'Dokumen APL.02 Belum Ditandatangani', 
+                $registration,
+                'Dokumen APL.02 Belum Ditandatangani',
                 'Dokumen FR.APL.02 belum dapat dicetak karena Asesor belum menandatangani dokumen ini di menu Inbox Tanda Tangan.'
             );
         }
@@ -74,7 +74,7 @@ class PdfApl02Controller extends Controller
 
 
 
-        $pdf = Pdf::loadView('forms.APL.apl02', $data)
+        $pdf = Pdf::loadView('forms.apl.apl02', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);
