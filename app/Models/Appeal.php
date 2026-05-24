@@ -21,16 +21,31 @@ class Appeal extends Model
         'ak04_data' => 'array'
     ];
  
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return mixed
+     */
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class);
     }
 
+    /**
+     * Is approved.
+     *
+     * @return bool
+     */
     public function isApproved(): bool
     {
         return $this->status === AppealStatus::APPROVED;
     }
  
+    /**
+     * Booted.
+     *
+     * @return mixed
+     */
     protected static function booted()
     {
         static::updated(function ($appeal) {

@@ -12,6 +12,11 @@ class CreateFrVa extends CreateRecord
     use HasFormTemplates;
     protected static string $resource = FrVaResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

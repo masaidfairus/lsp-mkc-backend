@@ -24,6 +24,12 @@ class Mapa02Resource extends Resource
     protected static ?string $modelLabel = 'MAPA.02';
     protected static ?string $pluralModelLabel = 'MAPA.02';
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
@@ -33,6 +39,7 @@ class Mapa02Resource extends Resource
                         // ── Header & Registration ──────────────────────────────────────
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
                                     ->options(function () {
@@ -95,14 +102,17 @@ class Mapa02Resource extends Resource
                                 Forms\Components\Section::make('Skema Sertifikasi (KKNI/Okupasi/Klaster)')
                                     ->statePath('header')
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('certification_scheme')
                                             ->label('Judul Skema')
                                             ->disabled()
                                             ->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('scheme_code')
                                             ->label('Nomor Skema')
                                             ->disabled()
                                             ->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('assessment_date')
                                             ->label('Tanggal Asesmen')
                                             ->disabled()
@@ -135,6 +145,7 @@ class Mapa02Resource extends Resource
                                                             ->columnSpan(1),
                                                     ]),
 
+                                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                                 Forms\Components\Section::make('Instrumen Asesmen & Potensi Asesi')
                                                     ->schema([
                                                         Forms\Components\Repeater::make('assessment_instruments')
@@ -184,6 +195,7 @@ class Mapa02Resource extends Resource
                                     ->schema([
                                         Forms\Components\Grid::make(2)
                                             ->schema([
+                                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                                 Forms\Components\Section::make('Penyusun Dokumen')
                                                     ->icon('heroicon-o-pencil-square')
                                                     ->schema([
@@ -200,6 +212,7 @@ class Mapa02Resource extends Resource
                                                             ->default([[], []]),
                                                     ])->columnSpan(1),
 
+                                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                                 Forms\Components\Section::make('Validator Dokumen')
                                                     ->icon('heroicon-o-shield-check')
                                                     ->schema([
@@ -223,21 +236,31 @@ class Mapa02Resource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query->whereNotNull('mapa02_data'))
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')
                     ->label('Registration ID')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Skema')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime()
@@ -256,6 +279,11 @@ class Mapa02Resource extends Resource
             ]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [
@@ -285,10 +313,17 @@ class Mapa02Resource extends Resource
         ];
     }
 
+    /**
+     * Assessor signature schema.
+     *
+     * @param  string  $label
+     * @return Forms\Components\Group
+     */
     private static function assessorSignatureSchema(string $label): Forms\Components\Group
     {
         return Forms\Components\Group::make()
             ->schema([
+                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                 Forms\Components\Select::make('user_id')
                     ->label($label)
                     ->options(User::role(strtolower($label))->pluck('name', 'id'))

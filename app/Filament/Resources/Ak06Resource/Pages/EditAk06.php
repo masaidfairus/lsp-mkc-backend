@@ -12,6 +12,11 @@ class EditAk06 extends EditRecord
     use HasFormTemplates;
     protected static string $resource = Ak06Resource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

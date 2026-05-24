@@ -27,14 +27,22 @@ class FrIa10Resource extends Resource
     protected static ?string $pluralModelLabel = 'FR.IA.10';
     protected static ?int $navigationSort = 10;
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('FR.IA.10 - VPK – Verifikasi Pihak Ketiga')
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
                                     ->options(function () {
@@ -70,29 +78,41 @@ class FrIa10Resource extends Resource
                             ->statePath('main_data')
                             ->schema([
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Header Dokumen')
                                     ->statePath('header')
                                     ->columns(3)
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('certification_scheme')->label('Skema Sertifikasi')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('scheme_number')->label('Nomor Skema')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('tuk')->label('TUK')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('assessor_name')->label('Nama Asesor')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('assessee_name')->label('Nama Asesi')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('date')->label('Tanggal')->disabled()->dehydrated(),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Kelompok Pekerjaan')
                                     ->schema([
                                         Forms\Components\Repeater::make('work_groups')
                                             ->label('')
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('group_name')->label('Kelompok Pekerjaan')->disabled()->dehydrated(),
                                                 Forms\Components\Repeater::make('units')
                                                     ->label('Unit Kompetensi')
                                                     ->schema([
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('no')->label('No')->disabled()->dehydrated()->numeric(),
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('unit_code')->label('Kode Unit')->disabled()->dehydrated(),
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('unit_title')->label('Judul Unit')->disabled()->dehydrated(),
                                                     ])
                                                     ->columns(3)
@@ -106,14 +126,19 @@ class FrIa10Resource extends Resource
                                             ->itemLabel(fn(array $state): ?string => $state['group_name'] ?? ''),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Identitas Pihak Ketiga')
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('third_party_details.name')->label('Nama Pengawas / Atasan / Orang Lain'),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('third_party_details.workplace')->label('Tempat Kerja'),
                                         Forms\Components\Textarea::make('third_party_details.address')->label('Alamat')->rows(2),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('third_party_details.phone')->label('Telepon'),
                                     ])->columns(2),
 
+                                 // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                  Forms\Components\Section::make('Verifikasi')
                                     ->schema([
                                         Forms\Components\Repeater::make('verification_questions')
@@ -134,14 +159,17 @@ class FrIa10Resource extends Resource
                                             ]),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Penilaian Naratif')
                                     ->schema([
                                         Forms\Components\Textarea::make('narrative_assessment.relationship_with_assessee')->label('Apa hubungan Anda dengan asesi?')->rows(2),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('narrative_assessment.work_duration')->label('Berapa lama Anda bekerja dengan asesi?'),
                                         Forms\Components\Textarea::make('narrative_assessment.proximity_in_assessed_area')->label('Seberapa dekat Anda bekerja dengan asesi di area yang dinilai?')->rows(2),
                                         Forms\Components\Textarea::make('narrative_assessment.technical_experience_qualification')->label('Apa pengalaman teknis dan/atau kualifikasi Anda di bidang yang dinilai?')->rows(3),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Kesimpulan Keseluruhan')
                                     ->schema([
                                         Forms\Components\Textarea::make('overall_conclusion.is_consistent_with_standards')
@@ -154,6 +182,7 @@ class FrIa10Resource extends Resource
                                 self::standardDocumentControlBlock('document_control'),
                             ]),
 
+                        // BAGIAN FORM: Grup bidang form berbingkai (Section)
                         Forms\Components\Section::make('Tanda Tangan')
                             ->schema([
                                 self::standardAsesiDisclaimer(),
@@ -163,6 +192,15 @@ class FrIa10Resource extends Resource
             ]);
     }
 
+    /**
+     * Populate ia10 data.
+     *
+     * @param  mixed  $state
+     * @param  callable  $set
+     * @param  callable  $get
+     * @param  bool  $isUpdate
+     * @return mixed
+     */
     protected static function populateIa10Data($state, callable $set, callable $get = null, bool $isUpdate = false)
     {
         $reg = AssessmentRegistration::with([
@@ -216,20 +254,35 @@ class FrIa10Resource extends Resource
         }
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn($query) => $query->where('document_type', 'FR.IA.10'))
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')->label('Registration ID')->sortable()->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.candidate.name')->label('Asesi')->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.scheme.name')->label('Skema')->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')->label('Dibuat')->dateTime()->sortable(),
             ])
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

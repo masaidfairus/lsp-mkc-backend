@@ -10,6 +10,11 @@ class EditDocumentList extends EditRecord
 {
     protected static string $resource = DocumentListResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

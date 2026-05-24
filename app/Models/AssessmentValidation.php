@@ -18,11 +18,21 @@ class AssessmentValidation extends Model
         'validation_data' => 'array',
     ];
 
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return mixed
+     */
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi scheme.
+     *
+     * @return mixed
+     */
     public function scheme()
     {
         // Many AssessmentValidations might not have a direct scheme_id, 
@@ -37,6 +47,11 @@ class AssessmentValidation extends Model
         );
     }
 
+    /**
+     * Mendapatkan relasi mainAssessor.
+     *
+     * @return mixed
+     */
     public function mainAssessor()
     {
         return $this->hasOneThrough(
@@ -49,6 +64,11 @@ class AssessmentValidation extends Model
         );
     }
 
+    /**
+     * Mendapatkan relasi peerAssessor.
+     *
+     * @return mixed
+     */
     public function peerAssessor()
     {
         // Peer assessor might be stored in validation_data.header.peer_assessor_id

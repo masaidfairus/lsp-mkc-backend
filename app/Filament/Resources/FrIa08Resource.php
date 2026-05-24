@@ -27,14 +27,22 @@ class FrIa08Resource extends Resource
     protected static ?string $pluralModelLabel = 'FR.IA.08';
     protected static ?int $navigationSort = 8;
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('FR.IA.08 - CVP - Ceklis Verifikasi Portofolio')
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
                                     ->options(function () {
@@ -70,23 +78,32 @@ class FrIa08Resource extends Resource
                             ->statePath('main_data')
                             ->schema([
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Header Dokumen')
                                     ->statePath('header')
                                     ->columns(3)
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('certification_scheme')->label('Skema Sertifikasi')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('scheme_number')->label('Nomor Skema')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('tuk')->label('TUK')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('assessor_name')->label('Nama Asesor')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('assessee_name')->label('Nama Asesi')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('date')->label('Tanggal')->disabled()->dehydrated(),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Verifikasi Bukti Portofolio')
                                     ->schema([
                                         Forms\Components\Repeater::make('portfolio_verification')
                                             ->label('')
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('no')
                                                     ->label('No')
                                                     ->numeric()
@@ -95,6 +112,7 @@ class FrIa08Resource extends Resource
                                                     ->default(fn (Forms\Get $get) => count($get('../portfolio_verification') ?? []) + 1),
                                                 Forms\Components\Textarea::make('portfolio_evidence_name')->label('Bukti Portofolio')->rows(2)->columnSpan(3),
 
+                                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                                 Forms\Components\Section::make('Aturan Bukti')
                                                     ->columns(4)
                                                     ->schema([
@@ -129,13 +147,16 @@ class FrIa08Resource extends Resource
                                             ->addActionLabel('Tambah Bukti Portofolio'),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Tindak Lanjut Verifikasi Bukti')
                                     ->schema([
                                         Forms\Components\Repeater::make('follow_up_verification')
                                             ->label('')
                                             ->schema([
                                                 Forms\Components\Checkbox::make('is_checked')->label('Cek'),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('unit_code')->label('Kode Unit')->disabled()->dehydrated(),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('element_no')->label('No. Elemen'),
                                                 Forms\Components\Textarea::make('interview_substance')->label('Materi/Substansi Wawancara')->rows(2)->columnSpan(3),
                                             ])
@@ -149,6 +170,7 @@ class FrIa08Resource extends Resource
                                     ->label('Bukti Tambahan Diperlukan')
                                     ->rows(3),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Rekomendasi Asesor')
                                     ->schema([
                                         Forms\Components\Radio::make('assessor_recommendation.is_competent')
@@ -160,9 +182,13 @@ class FrIa08Resource extends Resource
                                         Forms\Components\Group::make()
                                             ->visible(fn($get) => $get('assessor_recommendation.is_competent') === false)
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('assessor_recommendation.observation_details.work_group')->label('Kelompok Pekerjaan'),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('assessor_recommendation.observation_details.unit')->label('Unit'),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('assessor_recommendation.observation_details.element')->label('Elemen'),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('assessor_recommendation.observation_details.kuk')->label('KUK'),
                                             ])
                                             ->columns(2),
@@ -171,6 +197,7 @@ class FrIa08Resource extends Resource
                                 self::standardDocumentControlBlock('document_control'),
                             ]),
 
+                        // BAGIAN FORM: Grup bidang form berbingkai (Section)
                         Forms\Components\Section::make('Tanda Tangan')
                             ->schema([
                                 self::standardAsesiDisclaimer(),
@@ -180,6 +207,15 @@ class FrIa08Resource extends Resource
             ]);
     }
 
+    /**
+     * Populate ia08 data.
+     *
+     * @param  mixed  $state
+     * @param  callable  $set
+     * @param  callable  $get
+     * @param  bool  $isUpdate
+     * @return mixed
+     */
     protected static function populateIa08Data($state, callable $set, callable $get = null, bool $isUpdate = false)
     {
         $reg = AssessmentRegistration::with([
@@ -218,20 +254,35 @@ class FrIa08Resource extends Resource
         }
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn($query) => $query->where('document_type', 'FR.IA.08'))
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')->label('Registration ID')->sortable()->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.candidate.name')->label('Asesi')->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.scheme.name')->label('Skema')->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')->label('Dibuat')->dateTime()->sortable(),
             ])
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

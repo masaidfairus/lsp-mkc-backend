@@ -6,6 +6,12 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceService
 {
+  /**
+   * Menghasilkan number.
+   *
+   * @param  string  $type
+   * @return mixed
+   */
   public static function generateNumber(string $type = 'INV')
   {
     $prefix = date('Y/m');

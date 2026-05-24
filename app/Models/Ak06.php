@@ -6,12 +6,22 @@ class Ak06 extends AssessmentReport
 {
     protected $table = 'assessment_reports';
 
+    /**
+     * Mendapatkan relasi booted.
+     *
+     * @return void
+     */
     protected static function booted(): void
     {
         static::addGlobalScope('document_type', fn ($q) => $q->where('document_type', 'FR.AK.06'));
         static::creating(fn ($m) => $m->document_type = 'FR.AK.06');
     }
 
+    /**
+     * Mendapatkan relasi candidate.
+     *
+     * @return mixed
+     */
     public function candidate()
     {
         return $this->hasOneThrough(
@@ -24,6 +34,11 @@ class Ak06 extends AssessmentReport
         );
     }
 
+    /**
+     * Mendapatkan relasi scheme.
+     *
+     * @return mixed
+     */
     public function scheme()
     {
         return $this->hasOneThrough(

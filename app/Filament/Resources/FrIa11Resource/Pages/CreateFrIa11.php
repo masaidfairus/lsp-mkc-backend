@@ -13,12 +13,22 @@ class CreateFrIa11 extends CreateRecord
     use HasFormTemplates;
     use HasSignatureRequestSpawner;
 
+    /**
+     * Mengambil document label.
+     *
+     * @return string
+     */
     protected function getDocumentLabel(): string
     {
         return 'FR.IA.11';
     }
     protected static string $resource = FrIa11Resource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

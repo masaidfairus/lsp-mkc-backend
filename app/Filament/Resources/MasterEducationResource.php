@@ -23,30 +23,47 @@ class MasterEducationResource extends Resource
     protected static ?string $modelLabel = 'Kualifikasi Pendidikan';
     protected static ?string $pluralModelLabel = 'Kualifikasi Pendidikan';
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                 Forms\Components\TextInput::make('title')
                     ->label('Nama Kualifikasi Pendidikan')
                     ->required(),
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('id')
                     ->label('No'),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('title')
                     ->label('Nama Kualifikasi')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat pada:')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Diperbarui pada:')
                     ->dateTime()
@@ -66,6 +83,11 @@ class MasterEducationResource extends Resource
             ]);
     }
 
+    /**
+     * Mendapatkan relasi getRelations.
+     *
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -73,6 +95,11 @@ class MasterEducationResource extends Resource
         ];
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

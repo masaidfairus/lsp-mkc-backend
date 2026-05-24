@@ -15,6 +15,12 @@ class ViewSignatureInbox extends EditRecord
 
     protected ?string $heading = 'Tinjau & Tanda Tangani Dokumen';
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public function form(Form $form): Form
     {
         return $form
@@ -155,6 +161,12 @@ class ViewSignatureInbox extends EditRecord
         return redirect(request()->header('Referer'));
     }
 
+    /**
+     * Revert signature.
+     *
+     * @param  mixed  $requestId
+     * @return mixed
+     */
     public function revertSignature($requestId)
     {
         $req = SignatureRequest::where('id', $requestId)
@@ -176,6 +188,11 @@ class ViewSignatureInbox extends EditRecord
         return redirect(request()->header('Referer'));
     }
 
+    /**
+     * Mengambil form actions.
+     *
+     * @return array
+     */
     protected function getFormActions(): array
     {
         return []; // Sembunyikan tombol save default

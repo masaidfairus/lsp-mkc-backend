@@ -13,12 +13,22 @@ class EditFrIa07 extends EditRecord
     use HasFormTemplates;
     use HasSignatureRequestSpawner;
 
+    /**
+     * Mengambil document label.
+     *
+     * @return string
+     */
     protected function getDocumentLabel(): string
     {
         return 'FR.IA.07';
     }
     protected static string $resource = FrIa07Resource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

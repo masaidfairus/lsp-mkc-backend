@@ -21,6 +21,11 @@ class AssessmentInstrument extends Model
         'validation_data' => 'array',
     ];
 
+    /**
+     * Booted.
+     *
+     * @return void
+     */
     protected static function booted(): void
     {
         static::saved(function ($model) {
@@ -50,11 +55,21 @@ class AssessmentInstrument extends Model
         });
     }
 
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return mixed
+     */
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class, 'registration_id');
     }
 
+    /**
+     * Signature requests.
+     *
+     * @return MorphMany
+     */
     public function signatureRequests(): MorphMany
     {
         return $this->morphMany(SignatureRequest::class, 'signable');

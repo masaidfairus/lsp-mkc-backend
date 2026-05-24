@@ -24,12 +24,20 @@ class PerformanceCriterionResource extends Resource
     protected static ?string $pluralModelLabel = 'Kriteria Unjuk Kerja';
     protected static ?int $navigationSort = 4;
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('Data Kriteria Unjuk Kerja (KUK)')
                     ->schema([
+                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                         Forms\Components\Select::make('element_id')
                             ->relationship('element', 'title')
                             ->label('Elemen Kompetensi')
@@ -45,15 +53,23 @@ class PerformanceCriterionResource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('element.title')
                     ->label('Elemen')
                     ->searchable()
                     ->sortable()
                     ->wrap(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('description')
                     ->label('Deskripsi KUK')
                     ->searchable()
@@ -72,6 +88,11 @@ class PerformanceCriterionResource extends Resource
             ]);
     }
 
+    /**
+     * Mendapatkan relasi getRelations.
+     *
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -79,6 +100,11 @@ class PerformanceCriterionResource extends Resource
         ];
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

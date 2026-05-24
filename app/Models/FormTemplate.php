@@ -17,6 +17,11 @@ class FormTemplate extends Model
         'data' => 'array',
     ];
 
+    /**
+     * Mendapatkan relasi user.
+     *
+     * @return mixed
+     */
     public function user()
     {
         return $this->belongsTo(User::class);

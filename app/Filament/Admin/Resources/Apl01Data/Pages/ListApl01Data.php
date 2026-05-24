@@ -10,6 +10,11 @@ class ListApl01Data extends ListRecords
 {
     protected static string $resource = Apl01DataResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

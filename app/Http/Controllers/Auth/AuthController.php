@@ -17,6 +17,12 @@ use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
+    /**
+     * Is valid nik.
+     *
+     * @param  mixed  $nik
+     * @return mixed
+     */
     private function isValidNik($nik)
     {
         if (!preg_match('/^\d{16}$/', $nik)) {
@@ -36,11 +42,23 @@ class AuthController extends Controller
         return checkdate($month, $day, $year);
     }
 
+    /**
+     * Is valid passport.
+     *
+     * @param  mixed  $passport
+     * @return mixed
+     */
     private function isValidPassport($passport)
     {
         return preg_match('/^[A-Z0-9]{7,9}$/i', $passport);
     }
 
+    /**
+     * Melakukan pendaftaran (register).
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -108,6 +126,12 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Melakukan proses masuk (login).
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function login(Request $request)
     {
         $validated = $request->validate([
@@ -151,6 +175,12 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Melakukan proses keluar (logout).
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function logout(Request $request)
     {
         if (Auth::user()->role == 'admin' || Auth::user()->role == 'asesor') {
@@ -164,6 +194,12 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
+    /**
+     * Memverifikasi.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function verify(Request $request)
     {
         if (!$request->hasValidSignature()) {
@@ -182,6 +218,12 @@ class AuthController extends Controller
         return view('auth.activation');
     }
 
+    /**
+     * Resend.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function resend(Request $request)
     {
         $request->validate([
@@ -204,6 +246,12 @@ class AuthController extends Controller
         return $this->successResponse([], 'Link verifikasi telah dikirim ke email anda.');
     }
 
+    /**
+     * Memeriksa status.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function checkStatus(Request $request)
     {
         $user = $request->user();

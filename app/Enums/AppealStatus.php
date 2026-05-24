@@ -8,6 +8,11 @@ enum AppealStatus: string
     case APPROVED = 'approved';
     case REJECTED = 'rejected';
  
+    /**
+     * Mengambil label.
+     *
+     * @return ?string
+     */
     public function getLabel(): ?string
     {
         return match ($this) {
@@ -17,6 +22,11 @@ enum AppealStatus: string
         };
     }
 
+    /**
+     * Is approved.
+     *
+     * @return bool
+     */
     public function isApproved(): bool
     {
         return $this === self::APPROVED;

@@ -29,14 +29,22 @@ class FrIa05bResource extends Resource
     protected static ?string $pluralModelLabel = 'FR.IA.05b';
     protected static ?int $navigationSort = 2;
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('FR.IA.05B - LEMBAR KUNCI JAWABAN PERTANYAAN TERTULIS PILIHAN GANDA')
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
                                     ->options(function () {
@@ -71,12 +79,16 @@ class FrIa05bResource extends Resource
                         Forms\Components\Group::make()->statePath('main_data')
                             ->schema([
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Header Dokumen')
                                     ->statePath('header')
                                     ->columns(3)
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('certification_scheme')->label('Skema Sertifikasi')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('scheme_number')->label('Nomor Skema')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('tuk')->label('TUK')->disabled()->dehydrated(),
                                     ]),
 
@@ -86,6 +98,7 @@ class FrIa05bResource extends Resource
                                         Forms\Components\Repeater::make('work_groups')
                                             ->label('')
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('group_name')
                                                     ->label('Nama Kelompok Pekerjaan')
                                                     ->disabled()
@@ -95,8 +108,11 @@ class FrIa05bResource extends Resource
                                                 Forms\Components\Repeater::make('units')
                                                     ->label('Unit Kompetensi')
                                                     ->schema([
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('no')->label('No')->disabled()->dehydrated()->numeric(),
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('unit_code')->label('Kode Unit')->disabled()->dehydrated(),
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('unit_title')->label('Judul Unit')->disabled()->dehydrated()->columnSpan(2),
                                                         Forms\Components\Textarea::make('kuk')
                                                             ->label('Kriteria Unjuk Kerja (KUK)')
@@ -125,6 +141,7 @@ class FrIa05bResource extends Resource
                                         Forms\Components\Repeater::make('answer_keys')
                                             ->label('')
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('question_no')
                                                     ->label('No. Soal')
                                                     ->numeric()
@@ -133,6 +150,7 @@ class FrIa05bResource extends Resource
                                                     ->dehydrated()
                                                     ->default(fn (Forms\Get $get) => count($get('../answer_keys') ?? []) + 1),
 
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                                 Forms\Components\Select::make('key')
                                                     ->label('Kunci Jawaban')
                                                     ->options([
@@ -160,6 +178,7 @@ class FrIa05bResource extends Resource
                                 self::standardDocumentControlBlock('document_control'),
                             ]),
 
+                        // BAGIAN FORM: Grup bidang form berbingkai (Section)
                         Forms\Components\Section::make('Tanda Tangan')
                             ->schema([
                                 self::standardAsesiDisclaimer(),
@@ -169,6 +188,15 @@ class FrIa05bResource extends Resource
             ]);
     }
 
+    /**
+     * Populate ia05b data.
+     *
+     * @param  mixed  $state
+     * @param  callable  $set
+     * @param  callable  $get
+     * @param  bool  $isUpdate
+     * @return mixed
+     */
     protected static function populateIa05bData($state, callable $set, callable $get = null, bool $isUpdate = false)
     {
         $reg = AssessmentRegistration::with('scheme')->find($state);
@@ -230,13 +258,22 @@ class FrIa05bResource extends Resource
         return $result;
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn($query) => $query->where('document_type', 'FR.IA.05B'))
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')->label('ID')->sortable()->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.candidate.name')->label('Asesi'),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.scheme.name')->label('Skema'),
             ])
             ->actions([
@@ -246,6 +283,11 @@ class FrIa05bResource extends Resource
             ]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

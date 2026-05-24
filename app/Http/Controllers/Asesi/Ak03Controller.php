@@ -69,6 +69,11 @@ class Ak03Controller extends Controller
         );
     }
 
+    /**
+     * Default feedback items.
+     *
+     * @return array
+     */
     private function defaultFeedbackItems(): array
     {
         return [

@@ -16,6 +16,12 @@ use Illuminate\Support\Facades\Storage;
 
 class DocumentProfileController extends Controller
 {
+    /**
+     * Menampilkan daftar resource.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function index(Request $request)
     {
         $user = $request->user();
@@ -37,6 +43,13 @@ class DocumentProfileController extends Controller
         return $this->successResponse($files, 'Data dokumen berhasil ditampilkan.');
     }
 
+    /**
+     * Stream.
+     *
+     * @param  Request  $request
+     * @param  FileProfile  $document
+     * @return mixed
+     */
     public function stream(Request $request, FileProfile $document)
     {
         $user = $request->user();
@@ -57,12 +70,23 @@ class DocumentProfileController extends Controller
         return response($content)->header('Content-Type', $mimeType);
     }
 
+    /**
+     * Menampilkan document lists.
+     *
+     * @return mixed
+     */
     public function showDocumentLists()
     {
         $result = DocumentList::all();
         return $this->successResponse($result, 'Data portfolio berhasil ditampilkan');
     }
 
+    /**
+     * Menampilkan basic requirement by scheme id.
+     *
+     * @param  Scheme  $scheme
+     * @return mixed
+     */
     public function showBasicRequirementBySchemeId(Scheme $scheme)
     {
         $basic = DocumentList::forScheme($scheme->id, 'basicRequirementProof')->get();
@@ -70,6 +94,12 @@ class DocumentProfileController extends Controller
         return $this->successResponse($basic, "Data persyaratan untuk skema {$scheme->name} berhasil ditampilkan");
     }
 
+    /**
+     * Menampilkan portfolio by scheme id.
+     *
+     * @param  Scheme  $scheme
+     * @return mixed
+     */
     public function showPortfolioBySchemeId(Scheme $scheme)
     {
         $portfolio = DocumentList::forScheme($scheme->id, 'portfolioScheme')->get(); //
@@ -77,6 +107,12 @@ class DocumentProfileController extends Controller
         return $this->successResponse($portfolio, "Data persyaratan untuk skema {$scheme->name} berhasil ditampilkan");
     }
 
+    /**
+     * Menyimpan resource baru ke dalam penyimpanan.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -115,6 +151,13 @@ class DocumentProfileController extends Controller
         return $this->successResponse($result, 'Portfolio berhasil diupload');
     }
 
+    /**
+     * Memperbarui resource yang ditentukan di dalam penyimpanan.
+     *
+     * @param  Request  $request
+     * @param  FileProfile  $document
+     * @return mixed
+     */
     public function update(Request $request, FileProfile $document)
     {
         $validated = $request->validate([
@@ -144,6 +187,13 @@ class DocumentProfileController extends Controller
         );
     }
 
+    /**
+     * Menghapus resource yang ditentukan dari penyimpanan.
+     *
+     * @param  Request  $request
+     * @param  FileProfile  $document
+     * @return mixed
+     */
     public function destroy(Request $request, FileProfile $document)
     {
         if ($document->user_id !== $request->user()->id) {

@@ -10,6 +10,12 @@ use Illuminate\Http\Request;
 
 class Ak04Controller extends Controller
 {
+    /**
+     * Menampilkan detail dari resource yang ditentukan.
+     *
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function show(AssessmentRegistration $registration)
     {
         if ($registration->user_id !== request()->user()->id) {
@@ -51,6 +57,13 @@ class Ak04Controller extends Controller
         ]);
     }
 
+    /**
+     * Menyimpan resource baru ke dalam penyimpanan.
+     *
+     * @param  Request  $request
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function store(Request $request, AssessmentRegistration $registration)
     {
         if ($registration->user_id !== $request->user()->id) {

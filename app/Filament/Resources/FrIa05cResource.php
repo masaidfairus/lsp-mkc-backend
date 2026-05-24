@@ -29,14 +29,22 @@ class FrIa05cResource extends Resource
     protected static ?string $pluralModelLabel = 'FR.IA.05c';
     protected static ?int $navigationSort = 1;
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('FR.IA.05C - LEMBAR JAWABAN PERTANYAAN TERTULIS PILIHAN GANDA')
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
                                     ->options(function () {
@@ -71,30 +79,39 @@ class FrIa05cResource extends Resource
                         Forms\Components\Group::make()->statePath('main_data')
                             ->schema([
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Header Dokumen')
                                     ->statePath('header')
                                     ->columns(3)
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('certification_scheme')->label('Skema Sertifikasi')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('scheme_number')->label('Nomor Skema')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('tuk')->label('TUK')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('assessor_name')->label('Nama Asesor')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('assessee_name')->label('Nama Asesi')->disabled()->dehydrated(),
                                         Forms\Components\DatePicker::make('date')->label('Tanggal')->native(false),
                                         Forms\Components\TimePicker::make('time')->label('Waktu')->native(false),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Lembar Jawaban Pilihan Ganda')
                                     ->schema([
                                         Forms\Components\Repeater::make('answer_sheet')
                                             ->label('')
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('no')
                                                     ->label('No.')
                                                     ->numeric()
                                                     ->disabled()
                                                     ->dehydrated()
                                                     ->default(fn (Forms\Get $get) => count($get('../answer_sheet') ?? []) + 1),
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                                 Forms\Components\Select::make('answer')->label('Jawaban Asesi')
                                                     ->options(['A'=>'A','B'=>'B','C'=>'C','D'=>'D','E'=>'E'])
                                                     ->required(),
@@ -119,12 +136,14 @@ class FrIa05cResource extends Resource
                                             ->default(array_map(fn($i) => ['no' => $i, 'answer' => '', 'achievement' => ['is_yes' => null, 'is_no' => null]], range(1, 10))),
                                     ]),
 
+                                 // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                  Forms\Components\Section::make('Umpan Balik dan Catatan')
                                     ->schema([
                                         Forms\Components\Textarea::make('feedback_section.assessee_feedback')
                                             ->label('Umpan Balik untuk Asesi')
                                             ->rows(3),
 
+                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                         Forms\Components\Select::make('feedback_section.knowledge_aspect_status')
                                             ->label('Aspek Pengetahuan')
                                             ->options(['Tercapai' => 'Tercapai', 'Belum Tercapai' => 'Belum Tercapai']),
@@ -138,6 +157,7 @@ class FrIa05cResource extends Resource
                                 self::standardDocumentControlBlock('document_control'),
                             ]),
 
+                        // BAGIAN FORM: Grup bidang form berbingkai (Section)
                         Forms\Components\Section::make('Tanda Tangan')
                             ->schema([
                                 self::standardAsesiDisclaimer(),
@@ -147,6 +167,15 @@ class FrIa05cResource extends Resource
             ]);
     }
 
+    /**
+     * Populate ia05c data.
+     *
+     * @param  mixed  $state
+     * @param  callable  $set
+     * @param  callable  $get
+     * @param  bool  $isUpdate
+     * @return mixed
+     */
     protected static function populateIa05cData($state, callable $set, callable $get = null, bool $isUpdate = false)
     {
         $reg = AssessmentRegistration::with(['scheme', 'candidate', 'assessor'])->find($state);
@@ -173,6 +202,12 @@ class FrIa05cResource extends Resource
         }
     }
 
+    /**
+     * Mengambil scheme units for dropdown.
+     *
+     * @param  mixed  $schemeId
+     * @return array
+     */
     private static function getSchemeUnitsForDropdown($schemeId): array
     {
         if (!$schemeId) return [];
@@ -190,18 +225,32 @@ class FrIa05cResource extends Resource
         return $options;
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn($query) => $query->where('document_type', 'FR.IA.05C'))
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')->label('ID')->sortable()->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.candidate.name')->label('Asesi'),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.scheme.name')->label('Skema'),
             ])
             ->actions([Tables\Actions\EditAction::make()]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

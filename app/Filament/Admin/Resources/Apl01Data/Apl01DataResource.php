@@ -22,16 +22,33 @@ class Apl01DataResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'Apl01Data';
 
+    /**
+     * Form.
+     *
+     * @param  Schema  $schema
+     * @return Schema
+     */
     public static function form(Schema $schema): Schema
     {
         return Apl01DataForm::configure($schema);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return Apl01DataTable::configure($table);
     }
 
+    /**
+     * Mendapatkan relasi getRelations.
+     *
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -39,6 +56,11 @@ class Apl01DataResource extends Resource
         ];
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

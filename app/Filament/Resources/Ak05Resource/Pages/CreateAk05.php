@@ -12,6 +12,11 @@ class CreateAk05 extends CreateRecord
     use HasFormTemplates;
     protected static string $resource = Ak05Resource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

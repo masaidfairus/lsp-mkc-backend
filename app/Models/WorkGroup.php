@@ -11,11 +11,21 @@ class WorkGroup extends Model
         'name',
     ];
 
+    /**
+     * Mendapatkan relasi scheme.
+     *
+     * @return mixed
+     */
     public function scheme()
     {
         return $this->belongsTo(Scheme::class);
     }
 
+    /**
+     * Mendapatkan relasi competencyUnits.
+     *
+     * @return mixed
+     */
     public function competencyUnits()
     {
         return $this->hasMany(CompetencyUnit::class);

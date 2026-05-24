@@ -10,6 +10,11 @@ class ListAssessmentRegistrations extends ListRecords
 {
     protected static string $resource = AssessmentRegistrationResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

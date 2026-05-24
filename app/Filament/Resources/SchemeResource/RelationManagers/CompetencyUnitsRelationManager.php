@@ -14,14 +14,22 @@ class CompetencyUnitsRelationManager extends RelationManager
 {
     protected static string $relationship = 'competencyUnits';
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public function form(Form $form): Form
     {
         return $form
             ->schema([
+                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                 Forms\Components\TextInput::make('unit_code')
                     ->label('Kode Unit')
                     ->required()
                     ->maxLength(255),
+                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                 Forms\Components\TextInput::make('unit_title')
                     ->label('Judul Unit')
                     ->required()
@@ -29,14 +37,22 @@ class CompetencyUnitsRelationManager extends RelationManager
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('unit_title')
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('unit_code')
                     ->label('Kode')
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('unit_title')
                     ->label('Judul Unit')
                     ->searchable()

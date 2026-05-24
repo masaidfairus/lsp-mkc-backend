@@ -21,6 +21,11 @@ class Ak01Resource extends Resource
     protected static ?string $pluralModelLabel = 'AK.01';
     protected static ?int $navigationSort = 1;
     
+    /**
+     * Mengambil eloquent query.
+     *
+     * @return Builder
+     */
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
@@ -34,14 +39,22 @@ class Ak01Resource extends Resource
         return $query;
     }
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('Persetujuan Asesmen dan Kerahasiaan')
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
                                     ->options(function () {
@@ -86,14 +99,17 @@ class Ak01Resource extends Resource
                         Forms\Components\Group::make()
                             ->statePath('ak01_data')
                             ->schema([
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Skema Sertifikasi')
                                     ->statePath('certification_scheme')
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('name')
                                             ->label('Judul Skema')
                                             ->required()
                                             ->disabled()
                                             ->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('code')
                                             ->label('Nomor Skema')
                                             ->required()
@@ -103,17 +119,20 @@ class Ak01Resource extends Resource
 
                                 Forms\Components\Grid::make(3)
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('tuk')
                                             ->label('TUK')
                                             ->disabled()
                                             ->dehydrated(),
 
+                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                         Forms\Components\Select::make('asesor_name')
                                             ->label('Nama Asesor')
                                             ->disabled()
                                             ->searchable()
                                             ->required(),
 
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('asesi_name')
                                             ->label('Nama Asesi')
                                             ->disabled()
@@ -121,6 +140,7 @@ class Ak01Resource extends Resource
                                             ->required(),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Bukti yang akan dikumpulkan')
                                     ->schema([
                                         Forms\Components\CheckboxList::make('evidence_selections')
@@ -137,6 +157,7 @@ class Ak01Resource extends Resource
                                             ->columns(2)
                                             ->reactive(),
                                         
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('evidence_other')
                                             ->label('Bukti Lainnya')
                                             ->placeholder('Sebutkan...')
@@ -154,25 +175,36 @@ class Ak01Resource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('ak01_data'))
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')
                     ->label('Registration ID')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Skema')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('confirmed_at')
                     ->label('Dikonfirmasi')
                     ->dateTime()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime()
@@ -192,6 +224,11 @@ class Ak01Resource extends Resource
             ]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

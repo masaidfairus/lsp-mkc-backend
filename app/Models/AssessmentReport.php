@@ -18,6 +18,11 @@ class AssessmentReport extends Model
         'validation_data' => 'array',
     ];
 
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return mixed
+     */
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class, 'registration_id');

@@ -11,6 +11,11 @@ enum AssessmentInstrumentStatus: string implements HasLabel, HasColor
     case ONGOING = 'ongoing';
     case COMPLETED = 'completed';
 
+    /**
+     * Mengambil label.
+     *
+     * @return ?string
+     */
     public function getLabel(): ?string
     {
         return match($this) {
@@ -20,6 +25,11 @@ enum AssessmentInstrumentStatus: string implements HasLabel, HasColor
         };
     }
 
+    /**
+     * Mengambil color.
+     *
+     * @return string|array|null
+     */
     public function getColor(): string|array|null
     {
         return match($this) {

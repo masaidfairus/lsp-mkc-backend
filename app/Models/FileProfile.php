@@ -26,16 +26,31 @@ class FileProfile extends Model
         'verified_at' => 'datetime',
     ];
 
+    /**
+     * Mendapatkan relasi documentList.
+     *
+     * @return mixed
+     */
     public function documentList()
     {
         return $this->belongsTo(DocumentList::class, 'list_id');
     }
 
+    /**
+     * Mendapatkan relasi user.
+     *
+     * @return mixed
+     */
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    /**
+     * Mendapatkan relasi apl02Portfolio.
+     *
+     * @return mixed
+     */
     public function apl02Portfolio()
     {
         return $this->hasMany(Apl02Portfolio::class, 'list_id');

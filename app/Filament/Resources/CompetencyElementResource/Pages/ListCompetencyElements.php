@@ -10,6 +10,11 @@ class ListCompetencyElements extends ListRecords
 {
     protected static string $resource = CompetencyElementResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

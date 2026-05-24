@@ -10,6 +10,11 @@ class ListWorkGroups extends ListRecords
 {
     protected static string $resource = WorkGroupResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

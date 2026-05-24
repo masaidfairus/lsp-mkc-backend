@@ -20,6 +20,11 @@ class Payment extends Model
         'amount' => 'decimal:2',
     ];
 
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return mixed
+     */
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class, 'registration_id');

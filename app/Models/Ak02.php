@@ -9,6 +9,11 @@ class Ak02 extends AssessmentResult
 {
     protected $table = 'assessment_results';
 
+    /**
+     * Booted.
+     *
+     * @return void
+     */
     protected static function booted(): void
     {
         static::addGlobalScope('document_type', fn ($q) => $q->where('document_type', 'FR.AK.02'));
@@ -46,6 +51,11 @@ class Ak02 extends AssessmentResult
         });
     }
 
+    /**
+     * Mendapatkan relasi candidate.
+     *
+     * @return mixed
+     */
     public function candidate()
     {
         return $this->hasOneThrough(
@@ -58,6 +68,11 @@ class Ak02 extends AssessmentResult
         );
     }
 
+    /**
+     * Mendapatkan relasi scheme.
+     *
+     * @return mixed
+     */
     public function scheme()
     {
         return $this->hasOneThrough(

@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 
 class SignatureVerificationController extends Controller
 {
+    /**
+     * Menampilkan detail dari resource yang ditentukan.
+     *
+     * @param  mixed  $id
+     * @return mixed
+     */
     public function show($id)
     {
         $signatureRequest = SignatureRequest::with(['user', 'registration'])->find($id);
@@ -23,6 +29,13 @@ class SignatureVerificationController extends Controller
         ]);
     }
 
+    /**
+     * Stream.
+     *
+     * @param  mixed  $id
+     * @param  mixed  $type
+     * @return mixed
+     */
     public function stream($id, $type)
     {
         $path = null;

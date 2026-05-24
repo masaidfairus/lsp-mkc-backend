@@ -26,19 +26,29 @@ class DocumentListResource extends Resource
     protected static ?string $pluralModelLabel = 'Daftar Dokumen';
     protected static ?int $navigationSort = 6;
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Section::make('Informasi Utama')
                     ->schema([
+                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                         Forms\Components\TextInput::make('title')->required()->label('Judul Dokumen'),
                         Forms\Components\Textarea::make('description')->label('Deskripsi Dokumen'),
                     ]),
 
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('Detail Portofolio')
                     ->description('Hanya muncul untuk dokumen tipe Portofolio')
                     ->schema([
+                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                         Forms\Components\Select::make('portfolioScheme.scheme_id')
                             ->label('Pilih Skema')
                             ->relationship('portfolioScheme.scheme', 'name')
@@ -55,6 +65,7 @@ class DocumentListResource extends Resource
                     ->schema([
                         Forms\Components\Toggle::make('basicRequirementProof.is_mandatory')
                             ->label('Apakah dokumen wajib'),
+                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                         Forms\Components\TextInput::make('basicRequirementProof.or_group')
                             ->label('Kelompok Bukti Pilihan (OR Group)')
                             ->placeholder('Contoh: G1, G2, dst'),
@@ -63,10 +74,17 @@ class DocumentListResource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('title')
                     ->label('Judul Dokumen')
                     ->searchable(),
@@ -79,14 +97,17 @@ class DocumentListResource extends Resource
                     ->label('Apakah Wajib')
                     ->visible(fn($livewire) => $livewire->activeTab === 'persyaratan_dasar'),
 
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('portfolioScheme.scheme.name')
                     ->label('Skema')
                     ->visible(fn($livewire) => $livewire->activeTab === 'portfolio'),
 
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('basicRequirementProof.scheme.name')
                     ->label('Skema')
                     ->visible(fn($livewire) => $livewire->activeTab === 'persyaratan_dasar'),
 
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('basicRequirementProof.or_group')
                     ->label('Kelompok Pilihan (Pilih Salah Satu)')
                     ->visible(fn($livewire) => $livewire->activeTab === 'persyaratan_dasar' || $livewire->activeTab === 'portfolio')
@@ -94,11 +115,13 @@ class DocumentListResource extends Resource
                     ->color('warning')
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat pada')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -117,6 +140,11 @@ class DocumentListResource extends Resource
             ]);
     }
 
+    /**
+     * Mendapatkan relasi getRelations.
+     *
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -124,6 +152,11 @@ class DocumentListResource extends Resource
         ];
     }
 
+    /**
+     * Mengambil eloquent query.
+     *
+     * @return Builder
+     */
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->with([
@@ -133,6 +166,11 @@ class DocumentListResource extends Resource
         ]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

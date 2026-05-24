@@ -34,12 +34,17 @@ class RolePermissionSeeder extends Seeder
 
             // 1. Hak akses read semua dokumen
             if (str_starts_with($name, 'view_') || str_starts_with($name, 'view_any_')) {
-                if (preg_match('/(assessment_registration|assessment::registration|apl|ak|appeal|ia|mapa|va|assessment_instrument|competency|scheme|signature::inbox|work_group|criterion|element)/', $name)) {
+                if (preg_match('/(assessment_registration|assessment::registration|apl|ak|appeal|ia|mapa|va|assessment_instrument|competency|scheme|signature::inbox|work_group|work::group|criterion|element|document::list|master::education|user::signature)/', $name)) {
                     $adminPermissions->push($name);
                 }
             }
             // 2. Hak akses update APL.01 (AssessmentRegistration) untuk verifikasi admin
             if (str_contains($name, 'assessment_registration') && str_starts_with($name, 'update_')) {
+                $adminPermissions->push($name);
+            }
+
+            // 3. Hak akses penuh (CRUD) untuk Mastering Data bagi admin
+            if (preg_match('/(scheme|competency::unit|competency::element|performance::criterion|work::group|document::list|master::education|user::signature)/', $name)) {
                 $adminPermissions->push($name);
             }
 

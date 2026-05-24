@@ -10,6 +10,11 @@ class ListSchemes extends ListRecords
 {
     protected static string $resource = SchemeResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

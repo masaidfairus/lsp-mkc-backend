@@ -9,6 +9,11 @@ class ListSignatureInboxes extends ListRecords
 {
     protected static string $resource = SignatureInboxResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [];

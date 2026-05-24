@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Storage;
 
 class PrivateFileController extends Controller
 {
+    /**
+     * Mengunduh.
+     *
+     * @param  FileProfile  $record
+     * @return mixed
+     */
     public function download(FileProfile $record)
     {
         if(!auth()->user()->can('view_document')) {

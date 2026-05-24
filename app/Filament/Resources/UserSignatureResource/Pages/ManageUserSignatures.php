@@ -10,6 +10,11 @@ class ManageUserSignatures extends ManageRecords
 {
     protected static string $resource = UserSignatureResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

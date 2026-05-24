@@ -10,6 +10,12 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class SignatureRequestController extends Controller
 {
+    /**
+     * Menampilkan daftar resource.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function index(Request $request)
     {
         $user = $request->user();
@@ -30,6 +36,13 @@ class SignatureRequestController extends Controller
         ]);
     }
 
+    /**
+     * Menampilkan detail dari resource yang ditentukan.
+     *
+     * @param  Request  $request
+     * @param  mixed  $id
+     * @return mixed
+     */
     public function show(Request $request, $id)
     {
         $user = $request->user();
@@ -76,6 +89,13 @@ class SignatureRequestController extends Controller
         ]);
     }
 
+    /**
+     * Sign.
+     *
+     * @param  Request  $request
+     * @param  mixed  $id
+     * @return mixed
+     */
     public function sign(Request $request, $id)
     {
         $user = $request->user();

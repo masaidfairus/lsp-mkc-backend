@@ -8,6 +8,11 @@ enum NavigationGroup: string implements HasLabel
 {
     case APL = 'APL';
 
+    /**
+     * Mengambil label.
+     *
+     * @return ?string
+     */
     public function getLabel(): ?string
     {
         return match ($this) {

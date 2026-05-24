@@ -6,6 +6,11 @@ class Ak07 extends AssessmentPlanning
 {
     protected $table = 'assessment_plannings';
 
+    /**
+     * Mendapatkan relasi candidate.
+     *
+     * @return mixed
+     */
     public function candidate()
     {
         return $this->hasOneThrough(
@@ -18,6 +23,11 @@ class Ak07 extends AssessmentPlanning
         );
     }
 
+    /**
+     * Mendapatkan relasi scheme.
+     *
+     * @return mixed
+     */
     public function scheme()
     {
         return $this->hasOneThrough(

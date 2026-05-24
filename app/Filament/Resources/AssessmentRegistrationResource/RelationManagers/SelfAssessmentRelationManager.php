@@ -14,10 +14,17 @@ class SelfAssessmentRelationManager extends RelationManager
     protected static string $relationship = 'selfAssessments';
     protected static ?string $title = 'Asesmen Mandiri - APL.02';
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make(fn(SelfAssessment $record): string => $record->element->competencyUnit->unit_title)
                     ->description(fn(SelfAssessment $record): string => $record->element->competencyUnit->unit_code)
                     ->compact() // Membuat padding lebih ringkas
@@ -60,6 +67,11 @@ class SelfAssessmentRelationManager extends RelationManager
             ]);
     }
 
+    /**
+     * Mengambil eloquent query.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         return parent::getEloquentQuery()->with([
@@ -68,16 +80,24 @@ class SelfAssessmentRelationManager extends RelationManager
         ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public function table(Table $table): Table
     {
         return $table
             ->paginated([10, 25, 50])
             ->recordTitleAttribute('is_competent')
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('element.competencyUnit.unit_title')
                     ->label('Unit Kompetensi')
                     ->description(fn(SelfAssessment $record): string => $record->element->competencyUnit->unit_code)
                     ->wrap(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('element.title')
                     ->label('Elemen'),
                 Tables\Columns\IconColumn::make('is_competent')

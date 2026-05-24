@@ -9,6 +9,13 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class PdfAk03Controller extends Controller
 {
+    /**
+     * Menampilkan detail dari resource yang ditentukan.
+     *
+     * @param  Request  $request
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function show(Request $request, AssessmentRegistration $registration)
     {
         $registration->load([

@@ -21,6 +21,12 @@ class Apl02Controller extends Controller
 {
     use AuthorizesRequests;
 
+    /**
+     * Form.
+     *
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function form(AssessmentRegistration $registration)
     {
         if ($registration->user_id !== request()->user()->id) {
@@ -81,6 +87,13 @@ class Apl02Controller extends Controller
             ],
         ]);
     }
+    /**
+     * Submit.
+     *
+     * @param  Request  $request
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function submit(Request $request, AssessmentRegistration $registration)
     {
         if ($registration->user_id !== $request->user()->id) {
@@ -210,6 +223,13 @@ class Apl02Controller extends Controller
         );
     }
 
+    /**
+     * Toogle active.
+     *
+     * @param  Request  $request
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function toogleActive(Request $request, AssessmentRegistration $registration)
     {
         if ($registration->user_id !== $request->user()->id) {

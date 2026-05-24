@@ -47,6 +47,7 @@ trait HasStandardIaForm
      */
     protected static function standardAssessorSignatureBlock(string $statePath): Forms\Components\Section
     {
+        // BAGIAN FORM: Grup bidang form berbingkai (Section)
         return Forms\Components\Section::make('Tanda Tangan Asesor')
             ->statePath($statePath)
             ->schema([
@@ -103,6 +104,7 @@ trait HasStandardIaForm
      */
     protected static function standardAsesiDisclaimer(): Forms\Components\Section
     {
+        // BAGIAN FORM: Grup bidang form berbingkai (Section)
         return Forms\Components\Section::make('Tanda Tangan Asesi')
             ->schema([
                 Forms\Components\Placeholder::make('asesi_disclaimer')
@@ -126,10 +128,12 @@ trait HasStandardIaForm
      */
     protected static function standardDocumentControlBlock(string $statePath): Forms\Components\Section
     {
+        // BAGIAN FORM: Grup bidang form berbingkai (Section)
         return Forms\Components\Section::make('Kontrol Dokumen')
             ->schema([
                 Forms\Components\Grid::make(2)
                     ->schema([
+                        // BAGIAN FORM: Grup bidang form berbingkai (Section)
                         Forms\Components\Section::make('Penyusun Dokumen')
                             ->schema([
                                 Forms\Components\Repeater::make('compilers')
@@ -144,6 +148,7 @@ trait HasStandardIaForm
                                     ->disableItemMovement()
                             ])->columnSpan(1),
 
+                        // BAGIAN FORM: Grup bidang form berbingkai (Section)
                         Forms\Components\Section::make('Validator Dokumen')
                             ->schema([
                                 Forms\Components\Repeater::make('validators')
@@ -168,6 +173,7 @@ trait HasStandardIaForm
     {
         return Forms\Components\Group::make()
             ->schema([
+                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                 Forms\Components\Select::make('user_id')
                     ->label("Pilih {$role}")
                     ->options(User::role(strtolower($role))->pluck('name', 'id'))

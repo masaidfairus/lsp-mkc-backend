@@ -10,6 +10,11 @@ class EditMasterEducation extends EditRecord
 {
     protected static string $resource = MasterEducationResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

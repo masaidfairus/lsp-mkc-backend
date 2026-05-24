@@ -6,6 +6,11 @@ class Apl01 extends AssessmentRegistration
 {
     protected $table = 'assessment_registrations';
 
+    /**
+     * Mendapatkan relasi filteredUserFiles.
+     *
+     * @return mixed
+     */
     public function filteredUserFiles()
     {
         return $this->hasMany(FileProfile::class, 'user_id', 'user_id')
@@ -17,6 +22,11 @@ class Apl01 extends AssessmentRegistration
             });
     }
 
+    /**
+     * Mendapatkan relasi filteredAplUserFiles.
+     *
+     * @return mixed
+     */
     public function filteredAplUserFiles()
     {
         return $this->hasMany(FileProfile::class, 'user_id', 'user_id')
@@ -26,6 +36,11 @@ class Apl01 extends AssessmentRegistration
             });
     }
 
+    /**
+     * Mendapatkan relasi portfolioFiles.
+     *
+     * @return mixed
+     */
     public function portfolioFiles()
     {
         return $this->hasMany(FileProfile::class, 'user_id', 'user_id')

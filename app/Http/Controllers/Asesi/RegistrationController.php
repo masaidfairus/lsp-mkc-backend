@@ -8,6 +8,12 @@ use Illuminate\Http\Request;
 
 class RegistrationController extends Controller
 {
+    /**
+     * Menampilkan daftar resource.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function index(Request $request)
     {
         $user = $request->user();
@@ -261,6 +267,12 @@ class RegistrationController extends Controller
         );
     }
 
+    /**
+     * Menghapus resource yang ditentukan dari penyimpanan.
+     *
+     * @param  mixed  $id
+     * @return mixed
+     */
     public function destroy($id)
 {
     $user = request()->user();

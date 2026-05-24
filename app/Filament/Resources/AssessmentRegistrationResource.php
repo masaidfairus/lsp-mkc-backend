@@ -31,6 +31,11 @@ class AssessmentRegistrationResource extends Resource
     protected static ?string $navigationGroup = 'Pendaftaran';
 
 
+    /**
+     * Mengambil eloquent query.
+     *
+     * @return Builder
+     */
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()
@@ -43,6 +48,12 @@ class AssessmentRegistrationResource extends Resource
         return $query;
     }
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
@@ -53,10 +64,12 @@ class AssessmentRegistrationResource extends Resource
                             ->schema([
                                 Forms\Components\Grid::make(2)
                                     ->schema([
+                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                         Forms\Components\Select::make('user_id')
                                             ->relationship('candidate', 'name')
                                             ->label('Asesi')
                                             ->disabled(),
+                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                         Forms\Components\Select::make('scheme_id')
                                             ->relationship('scheme', 'name')
                                             ->label('Skema')
@@ -64,12 +77,14 @@ class AssessmentRegistrationResource extends Resource
                                     ]),
                                 Forms\Components\Grid::make(2)
                                     ->schema([
+                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                         Forms\Components\Select::make('assessor_id')
                                             ->relationship('assessor', 'name', fn(Builder $query) => $query->role(Role::ASESOR->value))
                                             ->label('Asesor')
                                             ->searchable()
                                             ->preload(false)
                                             ->disabled(fn() => auth()->user()->hasRole('asesor')),
+                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                         Forms\Components\Select::make('status_apl01')
                                             ->options([
                                                 Apl01Status::PENDING->value => Apl01Status::PENDING->getLabel(),
@@ -87,6 +102,7 @@ class AssessmentRegistrationResource extends Resource
                                     ->columnSpanFull()
                                     ->hidden(fn() => auth()->user()->hasRole('asesor')),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Validasi Evaluasi Mandiri (APL.02)')
                                     ->schema([
                                         Forms\Components\Placeholder::make('apl02_warning')
@@ -95,6 +111,7 @@ class AssessmentRegistrationResource extends Resource
                                             ->visible(fn($record) => !$record || $record->selfAssessments->isEmpty())
                                             ->hidden(fn() => auth()->user()->hasRole('asesor'))
                                             ->columnSpanFull(),
+                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                         Forms\Components\Select::make('status_apl02')
                                             ->options(Apl02Status::class)
                                             ->label('Status APL.02')
@@ -111,6 +128,7 @@ class AssessmentRegistrationResource extends Resource
                                                     ])
                                                     ->inline()
                                                     ->required(fn() => !auth()->user()->hasRole(['admin', 'superadmin'])),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('apl02_approach')
                                                     ->label('Melalui Pendekatan')
                                                     ->placeholder('Contoh: Asesmen Mandiri / Verifikasi Portofolio')
@@ -118,6 +136,7 @@ class AssessmentRegistrationResource extends Resource
                                             ])->visible(fn($record) => $record && $record->status_apl02 !== null),
                                     ])->columns(1),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Penerbitan Sertifikat')
                                     ->schema([
                                         Forms\Components\FileUpload::make('certificate')
@@ -134,16 +153,19 @@ class AssessmentRegistrationResource extends Resource
                         Forms\Components\Tabs\Tab::make('APL.01')
                             ->schema([
                                 Forms\Components\Grid::make(3)->schema([
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_candidate_name')
                                         ->label('Nama Lengkap')
                                         ->afterStateHydrated(fn(Forms\Components\TextInput $component, $record) => $component->state($record?->candidate?->name))
                                         ->disabled()
                                         ->dehydrated(false),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_candidate_email')
                                         ->label('Email')
                                         ->afterStateHydrated(fn(Forms\Components\TextInput $component, $record) => $component->state($record?->candidate?->email ?? '-'))
                                         ->disabled()
                                         ->dehydrated(false),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_candidate_registration_number')
                                         ->label('No. Registrasi')
                                         ->afterStateHydrated(fn(Forms\Components\TextInput $component, $record) => $component->state($record?->candidate?->registration_number ?: 'Belum ada'))
@@ -151,6 +173,7 @@ class AssessmentRegistrationResource extends Resource
                                         ->dehydrated(false),
                                 ]),
                                 Forms\Components\Grid::make(2)->schema([
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_identity_type')
                                         ->label('Jenis Identitas')
                                         ->afterStateHydrated(fn(Forms\Components\TextInput $component, $record) => $component->state(match ($record?->candidate?->identity_type) {
@@ -160,6 +183,7 @@ class AssessmentRegistrationResource extends Resource
                                         }))
                                         ->disabled()
                                         ->dehydrated(false),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_identity_number')
                                         ->label('No. KTP / Paspor')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->identity_number ?? $record?->candidate?->identity_number ?? '-')
@@ -167,24 +191,29 @@ class AssessmentRegistrationResource extends Resource
                                         ->helperText('Nomor identitas yang diisi pada formulir APL.01'),
                                 ]),
                                 Forms\Components\Grid::make(3)->schema([
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_gender')
                                         ->label('Jenis Kelamin')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->gender?->getLabel() ?? '-')
                                         ->disabled(),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_place_of_birth')
                                         ->label('Tempat Lahir')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->place_of_birth)
                                         ->disabled(),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_date_of_birth')
                                         ->label('Tanggal Lahir')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->date_of_birth?->format('d/m/Y'))
                                         ->disabled(),
                                 ]),
                                 Forms\Components\Grid::make(2)->schema([
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_phone_number')
                                         ->label('No. Telepon')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->phone_number)
                                         ->disabled(),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_education')
                                         ->label('Pendidikan Terakhir')
                                         ->formatStateUsing(function ($record) {
@@ -207,6 +236,7 @@ class AssessmentRegistrationResource extends Resource
                                         ->label('Alamat Rumah')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->address)
                                         ->disabled(),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_home_postal_code')
                                         ->label('Kode Pos Rumah')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->home_postal_code)
@@ -214,26 +244,32 @@ class AssessmentRegistrationResource extends Resource
                                 ]),
                                 Forms\Components\Fieldset::make('Pekerjaan/Perusahaan')
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_company_name')
                                             ->label('Nama Perusahaan')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->company_name)
                                             ->disabled(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_job_title')
                                             ->label('Jabatan')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->job_title)
                                             ->disabled(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_company_contact')
                                             ->label('No. Telepon Kantor')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->company_contact)
                                             ->disabled(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_company_fax')
                                             ->label('Fax Perusahaan')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->company_fax ?? '-')
                                             ->disabled(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_company_email')
                                             ->label('Email Perusahaan')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->company_email ?? '-')
                                             ->disabled(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_company_postal_code')
                                             ->label('Kode Pos Perusahaan')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->company_postal_code)
@@ -272,6 +308,7 @@ class AssessmentRegistrationResource extends Resource
                                                     ->content(fn($record) => $record->documentList?->title ?? 'Dokumen Tanpa Judul')
                                                     ->columnSpan(6),
 
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('status')
                                                     ->label('Status Verifikasi')
                                                     ->formatStateUsing(fn($state) => $state instanceof \App\Enums\EvidenceStatus ? $state->getLabel() : ($state ?? '-'))
@@ -525,32 +562,44 @@ class AssessmentRegistrationResource extends Resource
 
 
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->deferLoading()
             ->defaultPaginationPageOption(10)
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('id')
                     ->label('Registration ID')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Skema')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('admin_notes')
                     ->label('Catatan Admin')
                     ->limit(50)
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Daftar')
                     ->dateTime()
@@ -578,6 +627,11 @@ class AssessmentRegistrationResource extends Resource
             ]);
     }
 
+    /**
+     * Mendapatkan relasi getRelations.
+     *
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -588,6 +642,11 @@ class AssessmentRegistrationResource extends Resource
         ];
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

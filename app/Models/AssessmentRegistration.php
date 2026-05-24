@@ -41,51 +41,101 @@ class AssessmentRegistration extends Model
         'is_apl02_continuable' => 'boolean',
     ];
 
+    /**
+     * Mendapatkan relasi candidate.
+     *
+     * @return mixed
+     */
     public function candidate()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    /**
+     * Mendapatkan relasi assessor.
+     *
+     * @return mixed
+     */
     public function assessor()
     {
         return $this->belongsTo(User::class, 'assessor_id', 'id');
     }
 
+    /**
+     * Mendapatkan relasi scheme.
+     *
+     * @return mixed
+     */
     public function scheme()
     {
         return $this->belongsTo(Scheme::class, 'scheme_id');
     }
 
+    /**
+     * Mendapatkan relasi selfAssessments.
+     *
+     * @return mixed
+     */
     public function selfAssessments()
     {
         return $this->hasMany(SelfAssessment::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi plannings.
+     *
+     * @return mixed
+     */
     public function plannings()
     {
         return $this->hasMany(AssessmentPlanning::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi appeals.
+     *
+     * @return mixed
+     */
     public function appeals()
     {
         return $this->hasMany(Appeal::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi payments.
+     *
+     * @return mixed
+     */
     public function payments()
     {
         return $this->hasOne(Payment::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi aplData.
+     *
+     * @return mixed
+     */
     public function aplData()
     {
         return $this->hasOne(Apl01Data::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi aplPortfolio.
+     *
+     * @return mixed
+     */
     public function aplPortfolio()
     {
         return $this->hasMany(Apl02Portfolio::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi filteredUserFiles.
+     *
+     * @return mixed
+     */
     public function filteredUserFiles()
     {
         return $this->hasMany(FileProfile::class, 'user_id', 'user_id')
@@ -97,6 +147,11 @@ class AssessmentRegistration extends Model
             });
     }
 
+    /**
+     * Mendapatkan relasi filteredAplUserFiles.
+     *
+     * @return mixed
+     */
     public function filteredAplUserFiles()
     {
         return $this->hasMany(FileProfile::class, 'user_id', 'user_id')
@@ -106,6 +161,11 @@ class AssessmentRegistration extends Model
             });
     }
 
+    /**
+     * Mendapatkan relasi portfolioFiles.
+     *
+     * @return mixed
+     */
     public function portfolioFiles()
     {
         return $this->hasMany(FileProfile::class, 'user_id', 'user_id')
@@ -114,31 +174,61 @@ class AssessmentRegistration extends Model
             });
     }
 
+    /**
+     * Mendapatkan relasi reports.
+     *
+     * @return mixed
+     */
     public function reports()
     {
         return $this->hasMany(AssessmentReport::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi instruments.
+     *
+     * @return mixed
+     */
     public function instruments()
     {
         return $this->hasMany(AssessmentInstrument::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi results.
+     *
+     * @return mixed
+     */
     public function results()
     {
         return $this->hasMany(AssessmentResult::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi validations.
+     *
+     * @return mixed
+     */
     public function validations()
     {
         return $this->hasMany(AssessmentValidation::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi signatureRequests.
+     *
+     * @return mixed
+     */
     public function signatureRequests()
     {
         return $this->hasMany(SignatureRequest::class, 'registration_id');
     }
 
+    /**
+     * Booted.
+     *
+     * @return mixed
+     */
     protected static function booted()
     {
         static::saving(function ($model) {

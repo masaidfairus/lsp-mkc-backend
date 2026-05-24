@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Auth;
 
 trait HasFormTemplates
 {
+    /**
+     * Mengambil save template action.
+     *
+     * @return Action
+     */
     protected function getSaveTemplateAction(): Action
     {
         return Action::make('saveTemplate')
@@ -18,6 +23,7 @@ trait HasFormTemplates
             ->icon('heroicon-o-bookmark')
             ->color(Color::Blue)
             ->form([
+                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                 TextInput::make('template_name')
                     ->label('Nama Template')
                     ->required()
@@ -43,6 +49,11 @@ trait HasFormTemplates
             });
     }
 
+    /**
+     * Mengambil load template action.
+     *
+     * @return Action
+     */
     protected function getLoadTemplateAction(): Action
     {
         return Action::make('loadTemplate')
@@ -50,6 +61,7 @@ trait HasFormTemplates
             ->icon('heroicon-o-arrow-down-tray')
             ->color(Color::Indigo)
             ->form([
+                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                 \Filament\Forms\Components\Select::make('template_id')
                     ->label('Pilih Template')
                     ->options(fn () => FormTemplate::where('document_type', $this->getTemplateDocumentType())

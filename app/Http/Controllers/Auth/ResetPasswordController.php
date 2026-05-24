@@ -16,6 +16,12 @@ use function Illuminate\Support\now;
 
 class ResetPasswordController extends Controller
 {
+    /**
+     * Change password.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function changePassword(Request $request)
     {
         $request->validate([
@@ -44,6 +50,12 @@ class ResetPasswordController extends Controller
         return $this->successResponse([], 'Password berhasil diganti');
     }
 
+    /**
+     * Forgot password.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function forgotPassword(Request $request)
     {
         $request->validate(['email' => ['required', 'email']]);
@@ -63,6 +75,12 @@ class ResetPasswordController extends Controller
         return $this->successResponse([], 'Kode OTP dikirimkan ke email Anda.');
     }
 
+    /**
+     * Memverifikasi otp.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -83,6 +101,12 @@ class ResetPasswordController extends Controller
         return $this->successResponse(['reset_token' => $resetToken], 'Kode OTP diverifikasi');
     }
 
+    /**
+     * Mengatur ulang password.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function resetPassword(Request $request)
     {
         $request->validate([

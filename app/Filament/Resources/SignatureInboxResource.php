@@ -23,11 +23,21 @@ class SignatureInboxResource extends Resource
     protected static ?string $pluralModelLabel = 'Permintaan TTD Saya';
     protected static ?string $slug = 'signature-inbox';
 
+    /**
+     * Can view any.
+     *
+     * @return bool
+     */
     public static function canViewAny(): bool
     {
         return auth()->user()->can('view_any_signature::inbox');
     }
 
+    /**
+     * Mengambil eloquent query.
+     *
+     * @return Builder
+     */
     public static function getEloquentQuery(): Builder
     {
         // Hanya tampilkan pendaftaran yang memiliki permintaan tanda tangan PENDING untuk user ini
@@ -44,6 +54,12 @@ class SignatureInboxResource extends Resource
             });
     }
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
@@ -53,6 +69,12 @@ class SignatureInboxResource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
@@ -61,16 +83,20 @@ class SignatureInboxResource extends Resource
                     ->where('status', 'pending');
             }))
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Skema')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('pending_requests_count')
                     ->label('Dokumen Menunggu')
                     ->badge()
                     ->color('warning'),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Pendaftaran')
                     ->dateTime()
@@ -89,6 +115,11 @@ class SignatureInboxResource extends Resource
             ]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

@@ -18,6 +18,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // First run the Spatie Role & Permission Seeder to populate roles and custom permissions
+        $this->call([
+            RolePermissionSeeder::class,
+        ]);
 
         $this->call([   
             SchemeSeeder::class,
@@ -56,6 +60,13 @@ class DatabaseSeeder extends Seeder
                 'password' => 'asesorbiasa123',
             ],
             [
+                'role' => 'asesor',
+                'name' => 'Asesor Filament',
+                'email' => 'asesor.filament@gmail.com',
+                'email_verified_at' => now(),
+                'password' => 'asesor123',
+            ],
+            [
                 'role' => 'admin',
                 'name' => 'adminbiasa',
                 'email' => 'adminbiasa@gmail.com',
@@ -65,7 +76,9 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($users as $user) {
-            User::create($user);
+            $createdUser = User::create($user);
+            // Sync Spatie role
+            $createdUser->assignRole($user['role']);
         }
     }
 }

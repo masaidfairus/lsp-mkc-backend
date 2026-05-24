@@ -37,11 +37,21 @@ class Apl01Data extends Model
         'asesi_signature_date' => 'datetime',
     ];
 
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return mixed
+     */
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class);
     }
 
+    /**
+     * Mendapatkan relasi education.
+     *
+     * @return mixed
+     */
     public function education()
     {
         return $this->belongsTo(MasterEducation::class, 'education_id');

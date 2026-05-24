@@ -22,6 +22,13 @@ class Apl01Controller extends Controller
 {
     use AuthorizesRequests;
 
+    /**
+     * Menyimpan resource baru ke dalam penyimpanan.
+     *
+     * @param  Request  $request
+     * @param  mixed  $step
+     * @return mixed
+     */
     public function store(Request $request, $step)
     {
         $user = $request->user();
@@ -365,6 +372,12 @@ class Apl01Controller extends Controller
         abort(404);
     }
 
+    /**
+     * Menampilkan detail dari resource yang ditentukan.
+     *
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function show(AssessmentRegistration $registration)
     {
         if ($registration->user_id !== request()->user()->id) {

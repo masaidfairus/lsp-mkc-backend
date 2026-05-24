@@ -14,6 +14,12 @@ class UserResource extends JsonResource
      * @return array<string, mixed>
      */
     public static $wrap = 'response';
+    /**
+     * To array.
+     *
+     * @param  Request  $request
+     * @return array
+     */
     public function toArray(Request $request): array
     {
         return [
@@ -30,6 +36,12 @@ class UserResource extends JsonResource
         ];
     }
 
+    /**
+     * With.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function with(Request $request)
     {
         return [

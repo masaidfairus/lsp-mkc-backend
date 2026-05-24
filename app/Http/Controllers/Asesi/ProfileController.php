@@ -9,6 +9,12 @@ use Illuminate\Validation\Rules\Enum;
 
 class ProfileController extends Controller
 {
+    /**
+     * Menampilkan daftar resource.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function index(Request $request)
     {
         return $this->successResponse(
@@ -17,6 +23,12 @@ class ProfileController extends Controller
         );
     }
 
+    /**
+     * Menyimpan resource baru ke dalam penyimpanan.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function store(Request $request)
     {
         $user = $request->user();
@@ -46,6 +58,12 @@ class ProfileController extends Controller
         );
     }
 
+    /**
+     * Memperbarui resource yang ditentukan di dalam penyimpanan.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function update(Request $request)
     {
         $user = $request->user();

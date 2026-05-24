@@ -10,6 +10,13 @@ use Carbon\Carbon;
 
 class PdfAk07Controller extends Controller
 {
+    /**
+     * Menampilkan detail dari resource yang ditentukan.
+     *
+     * @param  Request  $request
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function show(Request $request, AssessmentRegistration $registration)
     {
         // return view('components.status-page', [

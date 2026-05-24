@@ -28,11 +28,21 @@ class AssessmentPlanning extends Model
         'confirmed_at' => 'datetime',
     ];
 
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return mixed
+     */
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class);
     }
 
+    /**
+     * Signature requests.
+     *
+     * @return MorphMany
+     */
     public function signatureRequests(): MorphMany
     {
         return $this->morphMany(SignatureRequest::class, 'signable');

@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\DB;
 
 class PdfIa06aController extends Controller
 {
+    /**
+     * Menampilkan detail dari resource yang ditentukan.
+     *
+     * @param  Request  $request
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function show(Request $request, AssessmentRegistration $registration)
     {
         $user = $request->user();
@@ -111,6 +118,14 @@ class PdfIa06aController extends Controller
         return $pdf->stream($filename);
     }
 
+    /**
+     * Mengambil user signature.
+     *
+     * @param  mixed  $userId
+     * @param  mixed  $modelId
+     * @param  mixed  $role
+     * @return mixed
+     */
     public function getUserSignature($userId, $modelId = null, $role = null)
     {
         if (!$userId) return ['signature' => null, 'qr_code' => null];

@@ -10,6 +10,12 @@ abstract class Controller
     //
     use ApiResponse;
 
+    /**
+     * Convert date to local time.
+     *
+     * @param  mixed  $rawDate
+     * @return mixed
+     */
     public function convertDateToLocalTime($rawDate)
     {
         return Carbon::parse($rawDate)
@@ -18,6 +24,15 @@ abstract class Controller
             ->format('l, d F Y');
     }
 
+    /**
+     * Mengambil assessor signature data.
+     *
+     * @param  mixed  $assessor
+     * @param  mixed  $registrationId
+     * @param  mixed  $docLabel
+     * @param  mixed  $requireSigned
+     * @return mixed
+     */
     public function getAssessorSignatureData($assessor, $registrationId = null, $docLabel = null, $requireSigned = false)
     {
         if (!$assessor) {
@@ -33,6 +48,15 @@ abstract class Controller
         return $this->resolveSignature($assessor->id, $registrationId, $docLabel, $requireSigned, $assessor->name, $assessor->registration_number);
     }
 
+    /**
+     * Mengambil user signature.
+     *
+     * @param  mixed  $userId
+     * @param  mixed  $registrationId
+     * @param  mixed  $docLabel
+     * @param  mixed  $requireSigned
+     * @return mixed
+     */
     public function getUserSignature($userId, $registrationId = null, $docLabel = null, $requireSigned = false)
     {
         if (!$userId) {
@@ -43,6 +67,17 @@ abstract class Controller
         return $this->resolveSignature($userId, $registrationId, $docLabel, $requireSigned, $user?->name, $user?->registration_number);
     }
 
+    /**
+     * Resolve signature.
+     *
+     * @param  mixed  $userId
+     * @param  mixed  $registrationId
+     * @param  mixed  $docLabel
+     * @param  mixed  $requireSigned
+     * @param  mixed  $name
+     * @param  mixed  $regNumber
+     * @return mixed
+     */
     protected function resolveSignature($userId, $registrationId, $docLabel, $requireSigned, $name = null, $regNumber = null)
     {
         $sig = null;
@@ -83,6 +118,13 @@ abstract class Controller
         ];
     }
 
+    /**
+     * Is authorized reviewer.
+     *
+     * @param  mixed  $user
+     * @param  mixed  $registration
+     * @return mixed
+     */
     public function isAuthorizedReviewer($user, $registration)
     {
         // ✅ Berikan akses jika request memiliki signature yang valid (untuk mobile/link eksternal)
