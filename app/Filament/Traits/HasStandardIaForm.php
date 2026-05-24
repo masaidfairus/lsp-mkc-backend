@@ -124,6 +124,45 @@ trait HasStandardIaForm
     }
 
     /**
+     * Mendapatkan opsi dropdown pendaftaran yang sudah difilter.
+     *
+     * Logika:
+     * - Saat CREATE: hanya tampilkan registrasi yang BELUM memiliki dokumen dari tipe form ini.
+     * - Saat EDIT: tampilkan registrasi yang belum terpakai + registrasi milik record yang sedang diedit.
+     * - Memanfaatkan static::getEloquentQuery() sehingga filter document_type & scope lainnya ikut diterapkan.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $record  Record aktif (null saat create)
+     * @return array<int|string, string>  Peta [registration_id => label]
+     */
+    protected static function getFilteredRegistrationOptions(?\Illuminate\Database\Eloquent\Model $record): array
+    {
+        // Ambil semua registration_id yang sudah memiliki dokumen jenis ini
+        $usedIds = static::getEloquentQuery()->pluck('registration_id')->toArray();
+
+        // Saat mode EDIT: jangan kecualikan registrasi milik record yang sedang diedit
+        if ($record && $record->registration_id) {
+            $usedIds = array_values(array_filter(
+                $usedIds,
+                fn ($id) => (int) $id !== (int) $record->registration_id
+            ));
+        }
+
+        // Ambil semua pendaftaran yang masih tersedia (belum dibuatkan dokumen tipe ini)
+        $registrations = \App\Models\AssessmentRegistration::with(['candidate', 'scheme'])
+            ->whereNotIn('id', $usedIds)
+            ->get();
+
+        $occurrences = [];
+        return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
+            $key               = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
+            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
+            $candidate         = $reg->candidate?->name ?? 'Unknown';
+            $scheme            = $reg->scheme?->name ?? 'Tanpa Skema';
+            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
+        })->toArray();
+    }
+
+    /**
      * Standard Document Control (Penyusun & Validator).
      */
     protected static function standardDocumentControlBlock(string $statePath): Forms\Components\Section

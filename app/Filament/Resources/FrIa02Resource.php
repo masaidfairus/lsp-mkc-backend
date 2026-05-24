@@ -45,17 +45,7 @@ class FrIa02Resource extends Resource
                                 // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
-                                    ->options(function () {
-                                        $registrations = AssessmentRegistration::with(['candidate', 'scheme'])->get();
-                                        $occurrences = [];
-                                        return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
-                                            $key = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
-                                            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
-                                            $candidate = $reg->candidate?->name ?? 'Unknown';
-                                            $scheme = $reg->scheme?->name ?? 'Tanpa Skema';
-                                            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
-                                        });
-                                    })
+                                    ->options(fn (\Illuminate\Database\Eloquent\Model $record) => static::getFilteredRegistrationOptions($record))
                                     ->required()
                                     ->searchable()
                                     ->preload()

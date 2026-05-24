@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FrVaResource\Pages;
+use App\Filament\Traits\HasStandardIaForm;
 use App\Models\AssessmentValidation;
 use App\Models\PeerValidation;
 use App\Models\AssessmentRegistration;
@@ -14,6 +15,7 @@ use Filament\Tables\Table;
 
 class FrVaResource extends Resource
 {
+    use HasStandardIaForm;
     protected static ?string $model = AssessmentValidation::class;
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
     protected static ?string $navigationGroup = 'MKVA';
@@ -40,15 +42,7 @@ class FrVaResource extends Resource
                                 // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Pilih Registrasi')
-                                    ->options(function () {
-                                        $regs = AssessmentRegistration::with(['candidate', 'scheme'])->get();
-                                        $occ = [];
-                                        return $regs->mapWithKeys(function ($reg) use (&$occ) {
-                                            $key = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
-                                            $occ[$key] = ($occ[$key] ?? 0) + 1;
-                                            return [$reg->id => ($reg->candidate?->name ?? '-') . ' — ' . ($reg->scheme?->name ?? '-') . " #{$occ[$key]}"];
-                                        });
-                                    })
+                                    ->options(fn (\Illuminate\Database\Eloquent\Model $record) => static::getFilteredRegistrationOptions($record))
                                     ->required()
                                     ->searchable()
                                     ->preload()

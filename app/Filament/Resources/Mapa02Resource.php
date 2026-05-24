@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\Mapa02Resource\Pages;
+use App\Filament\Traits\HasStandardIaForm;
 use App\Models\Mapa02;
 use App\Models\AssessmentRegistration;
 use App\Models\UserSignature;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Mapa02Resource extends Resource
 {
+    use HasStandardIaForm;
     protected static ?string $model = Mapa02::class;
     protected static ?string $navigationIcon = 'heroicon-o-map';
     protected static ?string $navigationGroup = 'MAPA';
@@ -42,17 +44,7 @@ class Mapa02Resource extends Resource
                                 // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
-                                    ->options(function () {
-                                        $registrations = AssessmentRegistration::with(['candidate', 'scheme'])->get();
-                                        $occurrences   = [];
-                                        return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
-                                            $key          = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
-                                            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
-                                            $candidate    = $reg->candidate?->name ?? 'Unknown';
-                                            $scheme       = $reg->scheme?->name ?? 'Tanpa Skema';
-                                            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
-                                        });
-                                    })
+                                    ->options(fn (\Illuminate\Database\Eloquent\Model $record) => static::getFilteredRegistrationOptions($record))
                                     ->required()
                                     ->searchable()
                                     ->preload()
