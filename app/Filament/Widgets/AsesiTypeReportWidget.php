@@ -79,7 +79,7 @@ class AsesiTypeReportWidget extends Widget
         // 3. Status Sertifikasi Grouping
         if ($this->filterStatus !== 'all') {
             if ($this->filterStatus === 'permohonan') {
-                $query->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', ''); })
+                $query->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', '')->orWhere('certificate', '[]'); })
                       ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
                       ->whereIn('status', [
                           AssessmentStatus::APL01_DRAFT,
@@ -87,7 +87,7 @@ class AsesiTypeReportWidget extends Widget
                           AssessmentStatus::APL01_PAID
                       ]);
             } elseif ($this->filterStatus === 'proses') {
-                $query->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', ''); })
+                $query->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', '')->orWhere('certificate', '[]'); })
                       ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
                       ->whereNotIn('status', [
                           AssessmentStatus::APL01_DRAFT,
@@ -96,7 +96,7 @@ class AsesiTypeReportWidget extends Widget
                       ]);
             } elseif ($this->filterStatus === 'selesai') {
                 $query->where(function($q) {
-                    $q->whereNotNull('certificate')->where('certificate', '!=', '')
+                    $q->whereNotNull('certificate')->where('certificate', '!=', '')->where('certificate', '!=', '[]')
                       ->orWhere(function($sq) {
                           $sq->whereNotNull('final_result')->where('final_result', '!=', '');
                       });
@@ -121,13 +121,13 @@ class AsesiTypeReportWidget extends Widget
         $institusi = (clone $statsQuery)->where('asesi_type', 'institusi')->count();
         
         $selesai = (clone $statsQuery)->where(function($q) {
-            $q->whereNotNull('certificate')->where('certificate', '!=', '')
+            $q->whereNotNull('certificate')->where('certificate', '!=', '')->where('certificate', '!=', '[]')
               ->orWhere(function($sq) {
                   $sq->whereNotNull('final_result')->where('final_result', '!=', '');
               });
         })->count();
         
-        $permohonan = (clone $statsQuery)->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', ''); })
+        $permohonan = (clone $statsQuery)->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', '')->orWhere('certificate', '[]'); })
             ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
             ->whereIn('status', [
                 AssessmentStatus::APL01_DRAFT,
@@ -135,7 +135,7 @@ class AsesiTypeReportWidget extends Widget
                 AssessmentStatus::APL01_PAID
             ])->count();
             
-        $proses = (clone $statsQuery)->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', ''); })
+        $proses = (clone $statsQuery)->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', '')->orWhere('certificate', '[]'); })
             ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
             ->whereNotIn('status', [
                 AssessmentStatus::APL01_DRAFT,
