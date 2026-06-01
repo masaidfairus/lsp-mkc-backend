@@ -211,8 +211,11 @@
                                 <td class="fi-ta-cell p-0 first-of-type:ps-1 last-of-type:pe-1 sm:first-of-type:ps-3 sm:last-of-type:pe-3">
                                     <div class="fi-ta-col-wrp flex flex-col justify-center gap-y-1 px-3 py-4">
                                         @php
-                                            $isSelesai = !empty($reg->certificate) || !empty($reg->final_result);
-                                            $isPermohonan = empty($reg->certificate) && empty($reg->final_result) && in_array($reg->status, [
+                                            $hasCertificate = !empty($reg->certificate) && $reg->certificate !== '';
+                                            $hasFinalResult = !empty($reg->final_result) && $reg->final_result !== '';
+                                            
+                                            $isSelesai = $hasCertificate || $hasFinalResult;
+                                            $isPermohonan = !$hasCertificate && !$hasFinalResult && in_array($reg->status, [
                                                 \App\Enums\AssessmentStatus::APL01_DRAFT,
                                                 \App\Enums\AssessmentStatus::APL01_PENDING,
                                                 \App\Enums\AssessmentStatus::APL01_PAID

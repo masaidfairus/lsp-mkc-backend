@@ -79,16 +79,16 @@ class AsesiTypeReportWidget extends Widget
         // 3. Status Sertifikasi Grouping
         if ($this->filterStatus !== 'all') {
             if ($this->filterStatus === 'permohonan') {
-                $query->whereNull('certificate')
-                      ->whereNull('final_result')
+                $query->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', ''); })
+                      ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
                       ->whereIn('status', [
                           AssessmentStatus::APL01_DRAFT,
                           AssessmentStatus::APL01_PENDING,
                           AssessmentStatus::APL01_PAID
                       ]);
             } elseif ($this->filterStatus === 'proses') {
-                $query->whereNull('certificate')
-                      ->whereNull('final_result')
+                $query->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', ''); })
+                      ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
                       ->whereNotIn('status', [
                           AssessmentStatus::APL01_DRAFT,
                           AssessmentStatus::APL01_PENDING,
@@ -96,8 +96,10 @@ class AsesiTypeReportWidget extends Widget
                       ]);
             } elseif ($this->filterStatus === 'selesai') {
                 $query->where(function($q) {
-                    $q->whereNotNull('certificate')
-                      ->orWhereNotNull('final_result');
+                    $q->whereNotNull('certificate')->where('certificate', '!=', '')
+                      ->orWhere(function($sq) {
+                          $sq->whereNotNull('final_result')->where('final_result', '!=', '');
+                      });
                 });
             }
         }
@@ -119,19 +121,22 @@ class AsesiTypeReportWidget extends Widget
         $institusi = (clone $statsQuery)->where('asesi_type', 'institusi')->count();
         
         $selesai = (clone $statsQuery)->where(function($q) {
-            $q->whereNotNull('certificate')->orWhereNotNull('final_result');
+            $q->whereNotNull('certificate')->where('certificate', '!=', '')
+              ->orWhere(function($sq) {
+                  $sq->whereNotNull('final_result')->where('final_result', '!=', '');
+              });
         })->count();
         
-        $permohonan = (clone $statsQuery)->whereNull('certificate')
-            ->whereNull('final_result')
+        $permohonan = (clone $statsQuery)->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', ''); })
+            ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
             ->whereIn('status', [
                 AssessmentStatus::APL01_DRAFT,
                 AssessmentStatus::APL01_PENDING,
                 AssessmentStatus::APL01_PAID
             ])->count();
             
-        $proses = (clone $statsQuery)->whereNull('certificate')
-            ->whereNull('final_result')
+        $proses = (clone $statsQuery)->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', ''); })
+            ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
             ->whereNotIn('status', [
                 AssessmentStatus::APL01_DRAFT,
                 AssessmentStatus::APL01_PENDING,
