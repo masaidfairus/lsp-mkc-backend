@@ -32,7 +32,7 @@ class AsesiTypeReportWidget extends Widget
     public static function canView(): bool
     {
         $user = auth()->user();
-        return $user && ($user->hasRole('admin') || $user->hasRole('superadmin') || in_array($user->role, ['admin', 'superadmin']));
+        return $user && ($user->hasRole('admin') || $user->hasRole('superadmin') || $user->hasRole('asesor') || in_array($user->role, ['admin', 'superadmin', 'asesor']));
     }
 
     // Reset pagination to page 1 whenever any filter changes
@@ -59,6 +59,12 @@ class AsesiTypeReportWidget extends Widget
      */
     protected function applyFilters($query)
     {
+        // Restrict to assessor's own assigned assessments if the logged-in user is an assessor
+        $user = auth()->user();
+        if ($user && ($user->hasRole('asesor') || $user->role === 'asesor')) {
+            $query->where('assessor_id', $user->id);
+        }
+
         // 1. Tipe Asesi
         if ($this->filterAsesiType !== 'all') {
             $query->where('asesi_type', $this->filterAsesiType);
