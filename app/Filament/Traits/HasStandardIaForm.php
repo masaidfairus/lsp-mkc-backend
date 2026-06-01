@@ -148,9 +148,15 @@ trait HasStandardIaForm
         }
 
         // Ambil semua pendaftaran yang masih tersedia (belum dibuatkan dokumen tipe ini)
-        $registrations = \App\Models\AssessmentRegistration::with(['candidate', 'scheme'])
-            ->whereNotIn('id', $usedIds)
-            ->get();
+        $query = \App\Models\AssessmentRegistration::with(['candidate', 'scheme'])
+            ->whereNotIn('id', $usedIds);
+            
+        // Filter agar asesor hanya melihat pendaftaran yang ditugaskan kepadanya
+        if (auth()->check() && auth()->user()->hasRole('asesor')) {
+            $query->where('assessor_id', auth()->id());
+        }
+
+        $registrations = $query->get();
 
         $occurrences = [];
         return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
