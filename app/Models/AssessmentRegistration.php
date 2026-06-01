@@ -231,6 +231,31 @@ class AssessmentRegistration extends Model
      */
     protected static function booted()
     {
+        static::deleting(function ($model) {
+            // Hapus file fisik dan record FileProfile terkait agar tidak meninggalkan jejak / file broken
+            $files = \App\Models\FileProfile::where('user_id', $model->user_id)
+                ->where(function ($query) use ($model) {
+                    $query->where('upload_document', 'like', "bukti-admin/{$model->id}/%")
+                          ->orWhere('upload_document', 'like', "bukti-dasar/{$model->id}/%");
+                })
+                ->get();
+                
+            foreach ($files as $file) {
+                \Illuminate\Support\Facades\Storage::disk('local')->delete($file->upload_document);
+                $file->delete();
+            }
+            
+            // Hapus direktori fisik untuk registrasi ini
+            \Illuminate\Support\Facades\Storage::disk('local')->deleteDirectory("bukti-admin/{$model->id}");
+            \Illuminate\Support\Facades\Storage::disk('local')->deleteDirectory("bukti-dasar/{$model->id}");
+            
+            // Hapus file tanda tangan asesi dari APL01 Data
+            $aplData = \App\Models\Apl01Data::where('registration_id', $model->id)->first();
+            if ($aplData && $aplData->asesi_signature) {
+                \Illuminate\Support\Facades\Storage::disk('local')->delete($aplData->asesi_signature);
+            }
+        });
+
         static::saving(function ($model) {
             // Sinkronisasi status global berdasarkan status sub-form (APL.01 & APL.02)
             // Prioritas status APL.02 karena ini adalah tahapan selanjutnya

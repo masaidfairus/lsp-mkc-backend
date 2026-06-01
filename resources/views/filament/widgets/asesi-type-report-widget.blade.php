@@ -187,68 +187,38 @@
                                 
                                 <td class="fi-ta-cell p-0 first-of-type:ps-1 last-of-type:pe-1 sm:first-of-type:ps-3 sm:last-of-type:pe-3">
                                     <div class="fi-ta-col-wrp flex flex-col justify-center gap-y-1 px-3 py-4">
-                                        @if($reg->asesi_type === 'institusi')
-                                            <div>
+                                        <div class="flex flex-col gap-1 items-start">
+                                            @if($reg->asesi_type === 'institusi')
                                                 <x-filament::badge color="success" icon="heroicon-m-building-office">
                                                     Instansi
                                                 </x-filament::badge>
-                                            </div>
-                                            @if($reg->institution_name)
-                                                <div class="text-xs text-success-600 dark:text-success-400 mt-1 italic max-w-xs truncate" style="color: var(--success-600, #059669);">
-                                                    "{{ $reg->institution_name }}"
-                                                </div>
-                                            @endif
-                                        @else
-                                            <div>
+                                                @if($reg->institution_name)
+                                                    <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-white/5 px-2 py-0.5 rounded border border-gray-200 dark:border-white/10 max-w-[150px] truncate" title="{{ $reg->institution_name }}">
+                                                        {{ $reg->institution_name }}
+                                                    </span>
+                                                @endif
+                                            @else
                                                 <x-filament::badge color="info" icon="heroicon-m-user">
                                                     Pribadi
                                                 </x-filament::badge>
-                                            </div>
-                                        @endif
+                                            @endif
+                                        </div>
                                     </div>
                                 </td>
 
                                 <td class="fi-ta-cell p-0 first-of-type:ps-1 last-of-type:pe-1 sm:first-of-type:ps-3 sm:last-of-type:pe-3">
                                     <div class="fi-ta-col-wrp flex flex-col justify-center gap-y-1 px-3 py-4">
                                         @php
-                                            $hasCertificate = !empty($reg->certificate) && $reg->certificate !== '' && $reg->certificate !== '[]';
-                                            $hasFinalResult = !empty($reg->final_result) && $reg->final_result !== '';
-                                            
-                                            $isSelesai = $hasCertificate || $hasFinalResult;
-                                            $isPermohonan = !$hasCertificate && !$hasFinalResult && in_array($reg->status, [
-                                                \App\Enums\AssessmentStatus::APL01_DRAFT,
-                                                \App\Enums\AssessmentStatus::APL01_PENDING,
-                                                \App\Enums\AssessmentStatus::APL01_PAID
-                                            ]);
-                                            
-                                            $statusText = '';
-                                            $statusColor = 'warning';
-                                            
-                                            if ($isSelesai) {
-                                                $statusText = 'Selesai';
-                                                $statusColor = 'success';
-                                            } elseif ($isPermohonan) {
-                                                $statusText = 'Permohonan';
-                                                $statusColor = 'warning';
-                                            } else {
-                                                // Proses Sertifikasi. Find out which step it is.
-                                                $pendingSigs = $reg->signatureRequests->where('status', 'pending');
-                                                if ($pendingSigs->isNotEmpty()) {
-                                                    $latest = $pendingSigs->sortByDesc('id')->first();
-                                                    $statusText = $latest->document_label . ' (TTD ' . $latest->role . ')';
-                                                } else {
-                                                    $latest = $reg->signatureRequests->sortByDesc('id')->first();
-                                                    if ($latest) {
-                                                         $statusText = $latest->document_label . ' (Selesai TTD)';
-                                                    } else {
-                                                         $statusText = 'Proses Sertifikasi';
-                                                    }
-                                                }
-                                                $statusColor = 'info';
-                                            }
+                                            $statusText = $reg->status ? $reg->status->getLabel() : '-';
+                                            $statusColor = $reg->status ? $reg->status->getColor() : 'gray';
+                                            $statusIcon = $reg->status ? $reg->status->getIcon() : null;
                                         @endphp
 
-                                        <div><x-filament::badge :color="$statusColor">{{ $statusText }}</x-filament::badge></div>
+                                        <div>
+                                            <x-filament::badge :color="$statusColor" :icon="$statusIcon">
+                                                {{ $statusText }}
+                                            </x-filament::badge>
+                                        </div>
                                     </div>
                                 </td>
                                 

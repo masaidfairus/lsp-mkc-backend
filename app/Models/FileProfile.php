@@ -13,6 +13,7 @@ class FileProfile extends Model
         'user_id',
         'list_id',
         'upload_document',
+        'original_name',
         'status',
         'validation_result',
         'admin_notes',

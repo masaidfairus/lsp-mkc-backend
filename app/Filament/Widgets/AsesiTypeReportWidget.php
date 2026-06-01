@@ -85,28 +85,19 @@ class AsesiTypeReportWidget extends Widget
         // 3. Status Sertifikasi Grouping
         if ($this->filterStatus !== 'all') {
             if ($this->filterStatus === 'permohonan') {
-                $query->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', '')->orWhere('certificate', '[]'); })
-                      ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
-                      ->whereIn('status', [
-                          AssessmentStatus::APL01_DRAFT,
-                          AssessmentStatus::APL01_PENDING,
-                          AssessmentStatus::APL01_PAID
-                      ]);
+                $query->whereIn('status', [
+                    AssessmentStatus::APL01_DRAFT,
+                    AssessmentStatus::APL01_PENDING,
+                    AssessmentStatus::APL01_PAID
+                ]);
             } elseif ($this->filterStatus === 'proses') {
-                $query->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', '')->orWhere('certificate', '[]'); })
-                      ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
-                      ->whereNotIn('status', [
-                          AssessmentStatus::APL01_DRAFT,
-                          AssessmentStatus::APL01_PENDING,
-                          AssessmentStatus::APL01_PAID
-                      ]);
+                $query->whereIn('status', [
+                    AssessmentStatus::APL01_APPROVED,
+                    AssessmentStatus::APL02_SUBMITTED,
+                    AssessmentStatus::APL02_REJECTED
+                ]);
             } elseif ($this->filterStatus === 'selesai') {
-                $query->where(function($q) {
-                    $q->whereNotNull('certificate')->where('certificate', '!=', '')->where('certificate', '!=', '[]')
-                      ->orWhere(function($sq) {
-                          $sq->whereNotNull('final_result')->where('final_result', '!=', '');
-                      });
-                });
+                $query->where('status', AssessmentStatus::APL02_APPROVED);
             }
         }
     }
@@ -126,28 +117,19 @@ class AsesiTypeReportWidget extends Widget
         $pribadi = (clone $statsQuery)->where('asesi_type', 'pribadi')->count();
         $institusi = (clone $statsQuery)->where('asesi_type', 'institusi')->count();
         
-        $selesai = (clone $statsQuery)->where(function($q) {
-            $q->whereNotNull('certificate')->where('certificate', '!=', '')->where('certificate', '!=', '[]')
-              ->orWhere(function($sq) {
-                  $sq->whereNotNull('final_result')->where('final_result', '!=', '');
-              });
-        })->count();
+        $selesai = (clone $statsQuery)->where('status', AssessmentStatus::APL02_APPROVED)->count();
         
-        $permohonan = (clone $statsQuery)->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', '')->orWhere('certificate', '[]'); })
-            ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
-            ->whereIn('status', [
-                AssessmentStatus::APL01_DRAFT,
-                AssessmentStatus::APL01_PENDING,
-                AssessmentStatus::APL01_PAID
-            ])->count();
+        $permohonan = (clone $statsQuery)->whereIn('status', [
+            AssessmentStatus::APL01_DRAFT,
+            AssessmentStatus::APL01_PENDING,
+            AssessmentStatus::APL01_PAID
+        ])->count();
             
-        $proses = (clone $statsQuery)->where(function($q) { $q->whereNull('certificate')->orWhere('certificate', '')->orWhere('certificate', '[]'); })
-            ->where(function($q) { $q->whereNull('final_result')->orWhere('final_result', ''); })
-            ->whereNotIn('status', [
-                AssessmentStatus::APL01_DRAFT,
-                AssessmentStatus::APL01_PENDING,
-                AssessmentStatus::APL01_PAID
-            ])->count();
+        $proses = (clone $statsQuery)->whereIn('status', [
+            AssessmentStatus::APL01_APPROVED,
+            AssessmentStatus::APL02_SUBMITTED,
+            AssessmentStatus::APL02_REJECTED
+        ])->count();
 
         // Paginated list for table view
         $listQuery = AssessmentRegistration::with(['candidate.profile', 'scheme', 'signatureRequests'])

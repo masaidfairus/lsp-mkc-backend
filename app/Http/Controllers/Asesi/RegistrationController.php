@@ -220,6 +220,7 @@ class RegistrationController extends Controller
                 'created_at' => $reg->created_at->toIso8601String(),
                 'formatted_date' => $reg->created_at->translatedFormat('d F Y H:i'),
                 'apl01_next_step' => $apl01NextStep,
+                'asesi_type' => $reg->asesi_type,
                 'forms' => [
                     [
                         'code' => 'APL.01',

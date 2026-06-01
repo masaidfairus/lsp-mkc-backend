@@ -125,6 +125,7 @@ class Apl01Controller extends Controller
                         'is_uploaded' => $uploaded ? true : false,
                         'file_url' => $uploaded ? route('documents.stream', ['document' => $uploaded->id]) : null,
                         'file_profile_id' => $uploaded?->id,
+                        'original_name' => $uploaded?->original_name,
                     ];
                 });
 
@@ -140,6 +141,7 @@ class Apl01Controller extends Controller
                         'is_uploaded' => $uploaded ? true : false,
                         'file_url' => $uploaded ? route('documents.stream', ['document' => $uploaded->id]) : null,
                         'file_profile_id' => $uploaded?->id,
+                        'original_name' => $uploaded?->original_name,
                     ];
                 });
 
@@ -243,6 +245,7 @@ class Apl01Controller extends Controller
                             'user_id' => $user->id,
                             'list_id' => $item['list_id'],
                             'upload_document' => $path,
+                            'original_name' => $file->getClientOriginalName(),
                         ]);
                     }
                 }
@@ -316,6 +319,7 @@ class Apl01Controller extends Controller
                             'user_id' => $user->id,
                             'list_id' => $item['list_id'],
                             'upload_document' => $path,
+                            'original_name' => $file->getClientOriginalName(),
                         ]);
                     }
                 }
@@ -399,6 +403,7 @@ class Apl01Controller extends Controller
                     'is_uploaded' => $uploaded ? true : false,
                     'file_url' => $uploaded ? asset('storage/' . $uploaded->upload_document) : null,
                     'file_profile_id' => $uploaded?->id,
+                    'original_name' => $uploaded?->original_name,
                 ];
             });
 
@@ -413,6 +418,7 @@ class Apl01Controller extends Controller
                     'is_uploaded' => $uploaded ? true : false,
                     'file_url' => $uploaded ? asset('storage/' . $uploaded->upload_document) : null,
                     'file_profile_id' => $uploaded?->id,
+                    'original_name' => $uploaded?->original_name,
                 ];
             });
 

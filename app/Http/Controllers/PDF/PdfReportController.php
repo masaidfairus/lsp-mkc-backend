@@ -19,9 +19,9 @@ class PdfReportController extends Controller
      */
     public function asesiTypeReport(Request $request)
     {
-        // 1. Authorize Admin / Superadmin
+        // 1. Authorize Admin / Superadmin / Asesor
         $user = $request->user();
-        if (!$user || !($user->hasRole('admin') || $user->hasRole('superadmin') || in_array($user->role, ['admin', 'superadmin']))) {
+        if (!$user || !($user->hasRole('admin') || $user->hasRole('superadmin') || $user->hasRole('asesor') || in_array($user->role, ['admin', 'superadmin', 'asesor']))) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -33,6 +33,11 @@ class PdfReportController extends Controller
         // Compile filtered query
         $query = AssessmentRegistration::with(['candidate.profile', 'scheme'])
             ->latest();
+
+        // Restrict to assessor's own assigned assessments if the logged-in user is an assessor
+        if ($user->hasRole('asesor') || $user->role === 'asesor') {
+            $query->where('assessor_id', $user->id);
+        }
 
         // Apply Tipe Asesi Filter
         if ($filterAsesiType !== 'all') {
