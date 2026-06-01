@@ -22,6 +22,7 @@ class EditAk03 extends EditRecord
         return [
             $this->getSaveTemplateAction(),
             $this->getLoadTemplateAction(),
+            $this->getDeleteTemplateAction(),
             Actions\DeleteAction::make(),
         ];
     }

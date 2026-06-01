@@ -34,6 +34,7 @@ class CreateFrIa07 extends CreateRecord
         return [
             $this->getSaveTemplateAction(),
             $this->getLoadTemplateAction(),
+            $this->getDeleteTemplateAction(),
         ];
     }
 }

@@ -30,15 +30,34 @@ class PdfApl01Controller extends Controller
             );
         }
 
-        // ── Validasi Tanda Tangan Asesor (Kecuali untuk Admin/Asesor Peninjau) ───
-        $signatureData = $this->getAssessorSignatureData($registration->assessor, $registration->id, 'APL.01', true);
+        // ── Validasi Tanda Tangan Admin (Kecuali untuk Admin/Asesor Peninjau) ───
+        $sigReq = \App\Models\SignatureRequest::where('registration_id', $registration->id)
+            ->where('document_label', 'APL.01')
+            ->where('status', 'signed')
+            ->first();
+
+        if (!$sigReq) {
+            $sigReq = \App\Models\SignatureRequest::where('registration_id', $registration->id)
+                ->where('document_label', 'APL.01')
+                ->first();
+        }
+
+        $adminUser = $sigReq ? $sigReq->user : null;
+        if (!$adminUser) {
+            $adminUser = auth()->user();
+            if (!$adminUser || !in_array($adminUser->role, ['admin', 'superadmin'])) {
+                $adminUser = \App\Models\User::whereIn('role', ['admin', 'superadmin'])->first();
+            }
+        }
+
+        $signatureData = $this->getAssessorSignatureData($adminUser, $registration->id, 'APL.01', true);
         $isAuthorizedReviewer = $this->isAuthorizedReviewer($request->user(), $registration);
 
         if (!$signatureData['is_signed'] && !$isAuthorizedReviewer) {
             return app(\App\Http\Controllers\PdfFallbackController::class)->show(
                 $registration, 
                 'Dokumen APL.01 Belum Ditandatangani', 
-                'Dokumen FR.APL.01 belum dapat dicetak karena Asesor belum menandatangani dokumen ini di menu Inbox Tanda Tangan.'
+                'Dokumen FR.APL.01 belum dapat dicetak karena Admin belum menandatangani dokumen ini di menu Inbox Tanda Tangan.'
             );
         }
 
@@ -135,8 +154,8 @@ class PdfApl01Controller extends Controller
             },
             'asesor_reg' => $signatureData['reg_number'],
             'asesor_qr_code' => $signatureData['qr_code'],
-            'asesor_name' => $registration->assessor?->name ?? '',
-            'asesor_sign_date' => $registration->status->isApl01Complete() ? $this->convertDateToLocalTime($registration->updated_at) : '',
+            'asesor_name' => $signatureData['name'],
+            'asesor_sign_date' => $signatureData['is_signed'] && $signatureData['signed_at'] ? $this->convertDateToLocalTime($signatureData['signed_at']) : ($registration->status->isApl01Complete() ? $this->convertDateToLocalTime($registration->updated_at) : ''),
             'asesi_qr_code' => $aplData->asesi_qr_code ?? '',
             'asesi_sign_date' => $aplData->asesi_signature_date ? $this->convertDateToLocalTime($aplData->asesi_signature_date) : '',
             // ── Portfolio Dokumen Asesi ────────────────────────────────────────
@@ -148,7 +167,7 @@ class PdfApl01Controller extends Controller
         ];
 
 
-        $pdf = Pdf::loadView('forms.APL.apl01', $data)
+        $pdf = Pdf::loadView('forms.apl.apl01', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);

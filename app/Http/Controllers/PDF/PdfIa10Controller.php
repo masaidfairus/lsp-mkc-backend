@@ -38,8 +38,8 @@ class PdfIa10Controller extends Controller
 
         $registration->load(['candidate', 'scheme', 'assessor']);
 
-        $asesiSig  = $this->getUserSignature($registration->candidate?->id ?? null);
-        $asesorSig = $this->getUserSignature($registration->assessor?->id ?? null, $instrument?->id ?? ($record->id ?? null), 'Asesor');
+        $asesiSig  = $this->getUserSignature($registration->candidate?->id, $registration->id, 'IA.10');
+        $asesorSig = $this->getUserSignature($registration->assessor?->id, $registration->id, 'IA.10', true);
 
         $mainData = $instrument->main_data ?? [];
         $header   = $mainData['header'] ?? [];
@@ -90,38 +90,38 @@ class PdfIa10Controller extends Controller
             'validators' => $docControl['validators'] ?? [],
         ];
 
-                // --- Inject Signatures for Compilers & Validators ---
+        // --- Inject Signatures for Compilers & Validators ---
         if (isset($data['compilers']) && is_array($data['compilers'])) {
             foreach ($data['compilers'] as &$c) {
-                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+                $sig = $this->getUserSignature($c['user_id'] ?? null, $registration->id, 'IA.10');
                 $c['signature'] = $sig['signature'];
                 $c['qr_code']   = $sig['qr_code'];
             }
         }
         if (isset($data['penyusun']) && is_array($data['penyusun'])) {
             foreach ($data['penyusun'] as &$c) {
-                $sig = $this->getUserSignature($c['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Penyusun');
+                $sig = $this->getUserSignature($c['user_id'] ?? null, $registration->id, 'IA.10');
                 $c['signature'] = $sig['signature'];
                 $c['qr_code']   = $sig['qr_code'];
             }
         }
         if (isset($data['validators']) && is_array($data['validators'])) {
             foreach ($data['validators'] as &$v) {
-                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+                $sig = $this->getUserSignature($v['user_id'] ?? null, $registration->id, 'IA.10');
                 $v['signature'] = $sig['signature'];
                 $v['qr_code']   = $sig['qr_code'];
             }
         }
         if (isset($data['validator']) && is_array($data['validator'])) {
             foreach ($data['validator'] as &$v) {
-                $sig = $this->getUserSignature($v['user_id'] ?? null, $instrument?->id ?? ($record->id ?? null), 'Validator');
+                $sig = $this->getUserSignature($v['user_id'] ?? null, $registration->id, 'IA.10');
                 $v['signature'] = $sig['signature'];
                 $v['qr_code']   = $sig['qr_code'];
             }
         }
         // ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.IA.ia10', $data)
+        $pdf = Pdf::loadView('forms.ia.ia10', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true)
@@ -134,28 +134,5 @@ class PdfIa10Controller extends Controller
         return $pdf->stream($filename);
     }
 
-    /**
-     * Mengambil user signature.
-     *
-     * @param  mixed  $userId
-     * @param  mixed  $modelId
-     * @param  mixed  $role
-     * @return mixed
-     */
-    public function getUserSignature($userId, $modelId = null, $role = null)
-    {
-        if (!$userId) return ['signature' => null, 'qr_code' => null];
 
-        $query = \App\Models\SignatureRequest::where('user_id', $userId)->where('status', 'signed');
-        if ($modelId) $query->where('signable_id', $modelId);
-        if ($role) $query->where('role', $role);
-        
-        $req = $query->latest('signed_at')->first();
-        if ($req) {
-            return ['signature' => $req->raw_signature, 'qr_code' => $req->qr_code];
-        }
-
-        $sig = \Illuminate\Support\Facades\DB::table('user_signatures')->where('user_id', $userId)->latest('created_at')->first();
-        return $sig ? ['signature' => $sig->signature_image ?? $sig->signature, 'qr_code' => $sig->qr_code] : ['signature' => null, 'qr_code' => null];
-    }
 }

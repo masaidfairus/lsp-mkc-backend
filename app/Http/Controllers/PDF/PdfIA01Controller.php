@@ -55,7 +55,7 @@ class PdfIA01Controller extends Controller
         $rekomendasi = $mainData['rekomendasi'] ?? [];
 
         // Asesi signature (biasanya tidak wajib per dokumen/bisa ambil dari profil)
-        $asesiSig  = $this->getUserSignature($registration->candidate?->id);
+        $asesiSig  = $this->getUserSignature($registration->candidate?->id, $registration->id, 'IA.01');
 
         // Transform data
         $kelompok_pekerjaan = [];
@@ -155,7 +155,7 @@ class PdfIA01Controller extends Controller
         }
         // ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.IA.ia01', $data)
+        $pdf = Pdf::loadView('forms.ia.ia01', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true)

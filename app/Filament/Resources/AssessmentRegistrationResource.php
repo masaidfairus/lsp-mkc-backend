@@ -62,81 +62,109 @@ class AssessmentRegistrationResource extends Resource
                     ->tabs([
                         Forms\Components\Tabs\Tab::make('Status & Administrasi')
                             ->schema([
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
-                                        Forms\Components\Select::make('user_id')
-                                            ->relationship('candidate', 'name')
-                                            ->label('Asesi')
-                                            ->disabled(),
-                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
-                                        Forms\Components\Select::make('scheme_id')
-                                            ->relationship('scheme', 'name')
-                                            ->label('Skema')
-                                            ->disabled(),
-                                    ]),
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
-                                        Forms\Components\Select::make('assessor_id')
-                                            ->relationship('assessor', 'name', fn(Builder $query) => $query->role(Role::ASESOR->value))
-                                            ->label('Asesor')
-                                            ->searchable()
-                                            ->preload(false)
-                                            ->disabled(fn() => auth()->user()->hasRole('asesor')),
-                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
-                                        Forms\Components\Select::make('status_apl01')
-                                            ->options([
-                                                Apl01Status::PENDING->value => Apl01Status::PENDING->getLabel(),
-                                                Apl01Status::APPROVED->value => Apl01Status::APPROVED->getLabel(),
-                                                Apl01Status::REJECTED->value => Apl01Status::REJECTED->getLabel(),
-                                            ])
-                                            ->label('Status APL.01')
-                                            ->required()
-                                            ->hidden(fn() => auth()->user()->hasRole('asesor')),
-                                    ]),
-                                Forms\Components\Textarea::make('admin_notes')
-                                    ->label('Catatan Admin')
-                                    ->placeholder('Tambahkan catatan admin di sini...')
-                                    ->rows(3)
-                                    ->columnSpanFull()
-                                    ->hidden(fn() => auth()->user()->hasRole('asesor')),
 
-                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
+                                // =====================================================
+                                // SECTION APL.01 — hanya Admin/Superadmin yang bisa edit
+                                // Asesor: semua field di sini read-only (disabled)
+                                // =====================================================
+                                Forms\Components\Section::make('Biodata Asesi (APL.01)')
+                                    ->schema([
+                                        Forms\Components\Grid::make(2)
+                                            ->schema([
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
+                                                Forms\Components\Select::make('user_id')
+                                                    ->relationship('candidate', 'name')
+                                                    ->label('Asesi')
+                                                    ->disabled(),
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
+                                                Forms\Components\Select::make('scheme_id')
+                                                    ->relationship('scheme', 'name')
+                                                    ->label('Skema')
+                                                    ->disabled(),
+                                            ]),
+                                        Forms\Components\Grid::make(2)
+                                            ->schema([
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
+                                                Forms\Components\Select::make('assessor_id')
+                                                    ->relationship('assessor', 'name', fn(Builder $query) => $query->role(Role::ASESOR->value))
+                                                    ->label('Asesor')
+                                                    ->searchable()
+                                                    ->preload(false)
+                                                    // Admin bisa edit assessor_id, Asesor tidak bisa
+                                                    ->disabled(fn() => auth()->user()->hasRole('asesor')),
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
+                                                Forms\Components\Select::make('status_apl01')
+                                                    ->options([
+                                                        Apl01Status::PENDING->value  => Apl01Status::PENDING->getLabel(),
+                                                        Apl01Status::APPROVED->value => Apl01Status::APPROVED->getLabel(),
+                                                        Apl01Status::REJECTED->value => Apl01Status::REJECTED->getLabel(),
+                                                    ])
+                                                    ->label('Status APL.01')
+                                                    ->required()
+                                                    // Asesor: read-only (disabled), Admin: editable
+                                                    ->disabled(fn() => auth()->user()->hasRole('asesor')),
+                                            ]),
+                                        Forms\Components\Textarea::make('admin_notes')
+                                            ->label('Catatan Admin')
+                                            ->placeholder('Tambahkan catatan admin di sini...')
+                                            ->rows(3)
+                                            ->columnSpanFull()
+                                            // Asesor: read-only (disabled), Admin: editable
+                                            ->disabled(fn() => auth()->user()->hasRole('asesor')),
+                                    ])
+                                    ->columns(1),
+
+                                // =====================================================
+                                // SECTION APL.02 — hanya Asesor yang bisa edit
+                                // Admin/Superadmin: semua field di sini read-only (disabled)
+                                // =====================================================
                                 Forms\Components\Section::make('Validasi Evaluasi Mandiri (APL.02)')
                                     ->schema([
                                         Forms\Components\Placeholder::make('apl02_warning')
                                             ->label('')
                                             ->content(new \Illuminate\Support\HtmlString('<div style="color: #b45309; background-color: #fffbeb; padding: 12px; border-radius: 8px; border: 1px solid #fde68a;">Asesi belum mengisi Form Asesmen Mandiri (APL.02). Status tidak dapat diubah.</div>'))
                                             ->visible(fn($record) => !$record || $record->selfAssessments->isEmpty())
-                                            ->hidden(fn() => auth()->user()->hasRole('asesor'))
                                             ->columnSpanFull(),
-                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
-                                        Forms\Components\Select::make('status_apl02')
-                                            ->options(Apl02Status::class)
-                                            ->label('Status APL.02')
-                                            ->required(fn() => !auth()->user()->hasRole(['admin', 'superadmin']))
-                                            ->visible(fn($record) => $record && $record->status_apl02 !== null),
+
+                                        // Hidden field to persist status_apl02 — set automatically by the radio button below
+                                        Forms\Components\Hidden::make('status_apl02'),
 
                                         Forms\Components\Grid::make(2)
                                             ->schema([
                                                 Forms\Components\Radio::make('is_apl02_continuable')
                                                     ->label('Asesmen dapat dilanjutkan?')
                                                     ->options([
-                                                        true => 'Dapat dilanjutkan',
+                                                        true  => 'Dapat dilanjutkan',
                                                         false => 'Tidak dapat dilanjutkan',
                                                     ])
                                                     ->inline()
-                                                    ->required(fn() => !auth()->user()->hasRole(['admin', 'superadmin'])),
-                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
+                                                    ->live()
+                                                    ->afterStateUpdated(function ($state, callable $set) {
+                                                        $continuable = filter_var($state, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+                                                        if ($continuable === true) {
+                                                            $set('status_apl02', Apl02Status::APPROVED->value);
+                                                        } elseif ($continuable === false) {
+                                                            $set('status_apl02', Apl02Status::REJECTED->value);
+                                                        }
+                                                    })
+                                                    // Hanya Asesor yang bisa edit; Admin read-only
+                                                    ->disabled(fn() => auth()->user()->hasRole(['admin', 'superadmin']))
+                                                    ->required(fn() => auth()->user()->hasRole('asesor')),
+
                                                 Forms\Components\TextInput::make('apl02_approach')
                                                     ->label('Melalui Pendekatan')
                                                     ->placeholder('Contoh: Asesmen Mandiri / Verifikasi Portofolio')
-                                                    ->required(fn() => !auth()->user()->hasRole(['admin', 'superadmin'])),
+                                                    // Hanya Asesor yang bisa edit; Admin read-only
+                                                    ->disabled(fn() => auth()->user()->hasRole(['admin', 'superadmin']))
+                                                    ->required(false),
                                             ])->visible(fn($record) => $record && $record->status_apl02 !== null),
                                     ])->columns(1),
 
-                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
+                                // =====================================================
+                                // SECTION PENERBITAN SERTIFIKAT — hanya Admin/Superadmin
+                                // Asesor: section ini tidak ditampilkan (FileUpload hidden)
+                                // =====================================================
                                 Forms\Components\Section::make('Penerbitan Sertifikat')
                                     ->schema([
                                         Forms\Components\FileUpload::make('certificate')
@@ -144,9 +172,10 @@ class AssessmentRegistrationResource extends Resource
                                             ->directory('certificates')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
                                             ->maxSize(5120) // 5MB max
-                                            ->visible(fn() => auth()->user()->hasRole(['superadmin', 'admin']))
                                             ->hint('Pastikan semua tahapan asesmen sudah selesai sebelum mengunggah sertifikat.')
-                                            ->columnSpanFull(),
+                                            ->columnSpanFull()
+                                            // Asesor: read-only; Admin/Superadmin: editable
+                                            ->disabled(fn() => auth()->user()->hasRole('asesor')),
                                     ]),
                             ]),
 
@@ -177,9 +206,9 @@ class AssessmentRegistrationResource extends Resource
                                     Forms\Components\TextInput::make('apl_identity_type')
                                         ->label('Jenis Identitas')
                                         ->afterStateHydrated(fn(Forms\Components\TextInput $component, $record) => $component->state(match ($record?->candidate?->identity_type) {
-                                            'id' => 'KTP',
+                                            'id'       => 'KTP',
                                             'passport' => 'Passport',
-                                            default => $record?->candidate?->identity_type ?? '-',
+                                            default    => $record?->candidate?->identity_type ?? '-',
                                         }))
                                         ->disabled()
                                         ->dehydrated(false),
@@ -651,7 +680,7 @@ class AssessmentRegistrationResource extends Resource
     {
         return [
             'index' => Pages\ListAssessmentRegistrations::route('/'),
-            'edit' => Pages\EditAssessmentRegistration::route('/{record}/edit'),
+            'edit'  => Pages\EditAssessmentRegistration::route('/{record}/edit'),
         ];
     }
 }

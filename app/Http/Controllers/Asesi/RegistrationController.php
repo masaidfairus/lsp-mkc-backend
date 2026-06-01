@@ -133,37 +133,80 @@ class RegistrationController extends Controller
 
             $finalApl02Status = $isApl01Approved ? $apl02Status : 'locked';
             
+            // AK.01 logic (Persetujuan Asesmen dan Kerahasiaan)
+            $ak01Status = 'not_started';
+            if ($isApl02Approved) {
+                // Check signature status from database directly to ensure accuracy
+                $sigs01 = \App\Models\SignatureRequest::where('registration_id', $reg->id)
+                    ->whereIn('document_label', ['AK.01', 'FR.AK.01'])
+                    ->get();
+
+                $asesiSig01 = $sigs01->where('role', 'asesi')->first();
+                $assessorSig01 = $sigs01->whereIn('role', ['Asesor', 'asesor'])->first();
+
+                if ($asesiSig01 && $asesiSig01->status === 'signed' && $assessorSig01 && $assessorSig01->status === 'signed') {
+                    $ak01Status = 'finished';
+                } elseif ($assessorSig01 && $assessorSig01->status === 'signed') {
+                    $ak01Status = 'waiting_signature';
+                } else {
+                    $ak01Status = 'waiting_assessor';
+                }
+            } else {
+                $ak01Status = 'locked';
+            }
+
             // AK.02 logic (Rekaman Asesmen)
             $ak02Status = 'not_started';
-            if ($isApl02Approved) {
-                if ($ak02Exists) {
-                    // Check signature status from database directly to ensure accuracy
-                    $sigs = \App\Models\SignatureRequest::where('registration_id', $reg->id)
-                        ->whereIn('document_label', ['AK.02', 'FR.AK.02'])
-                        ->get();
+            
+            $sigs02 = \App\Models\SignatureRequest::where('registration_id', $reg->id)
+                ->whereIn('document_label', ['AK.02', 'FR.AK.02'])
+                ->get();
 
-                    $asesiSig = $sigs->where('role', 'asesi')->first();
-                    // Check both 'Asesor' and 'asesor' for robustness
-                    $assessorSig = $sigs->whereIn('role', ['Asesor', 'asesor'])->first();
+            $asesiSig02 = $sigs02->where('role', 'asesi')->first();
+            $assessorSig02 = $sigs02->whereIn('role', ['Asesor', 'asesor'])->first();
 
-                    if ($asesiSig && $asesiSig->status === 'signed' && $assessorSig && $assessorSig->status === 'signed') {
-                        $ak02Status = 'finished';
-                    } elseif ($assessorSig && $assessorSig->status === 'signed') {
-                        $ak02Status = 'waiting_signature';
-                    } else {
-                        // Jika asesor belum tanda tangan, atau request belum dibuat
-                        $ak02Status = 'waiting_assessor';
-                    }
+            if ($asesiSig02 || $assessorSig02 || $ak02Exists) {
+                if ($asesiSig02 && $asesiSig02->status === 'signed' && $assessorSig02 && $assessorSig02->status === 'signed') {
+                    $ak02Status = 'finished';
+                } elseif ($assessorSig02 && $assessorSig02->status === 'signed') {
+                    $ak02Status = 'waiting_signature';
                 } else {
                     $ak02Status = 'waiting_assessor';
                 }
             } else {
-                $ak02Status = 'locked';
+                if ($ak01Status === 'finished') {
+                    $ak02Status = 'waiting_assessor';
+                } else {
+                    $ak02Status = 'locked';
+                }
             }
 
             // AK.03 (Umpan Balik Asesi)
             $ak03Exists = $reg->results->where('document_type', 'FR.AK.03')->isNotEmpty();
-            $ak03Status = ($ak02Status === 'finished') ? ($ak03Exists ? 'finished' : 'not_started') : 'locked';
+            $ak03Status = 'not_started';
+
+            $sigs03 = \App\Models\SignatureRequest::where('registration_id', $reg->id)
+                ->whereIn('document_label', ['AK.03', 'FR.AK.03'])
+                ->get();
+
+            $asesiSig03 = $sigs03->where('role', 'asesi')->first();
+            $assessorSig03 = $sigs03->whereIn('role', ['Asesor', 'asesor'])->first();
+
+            if ($asesiSig03 || $assessorSig03 || $ak03Exists) {
+                if ($asesiSig03 && $asesiSig03->status === 'signed' && $assessorSig03 && $assessorSig03->status === 'signed') {
+                    $ak03Status = 'finished';
+                } elseif ($assessorSig03 && $assessorSig03->status === 'signed') {
+                    $ak03Status = 'waiting_signature';
+                } else {
+                    $ak03Status = 'waiting_assessor';
+                }
+            } else {
+                if ($ak02Status === 'finished') {
+                    $ak03Status = 'waiting_assessor';
+                } else {
+                    $ak03Status = 'locked';
+                }
+            }
             
             // AK.04 (Banding Asesmen)
             $ak04Exists = $reg->appeals->isNotEmpty();
@@ -187,6 +230,11 @@ class RegistrationController extends Controller
                         'code' => 'APL.02',
                         'label' => 'Asesmen Mandiri',
                         'status' => $finalApl02Status,
+                    ],
+                    [
+                        'code' => 'AK.01',
+                        'label' => 'Persetujuan Asesmen',
+                        'status' => $ak01Status,
                     ],
                     [
                         'code' => 'AK.02',

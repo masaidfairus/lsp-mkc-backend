@@ -34,6 +34,7 @@ class EditFrIa05b extends EditRecord
         return [
             $this->getSaveTemplateAction(),
             $this->getLoadTemplateAction(),
+            $this->getDeleteTemplateAction(),
             Actions\DeleteAction::make(),
         ];
     }

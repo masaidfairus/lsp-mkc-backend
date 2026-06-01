@@ -44,7 +44,7 @@ class Mapa01Resource extends Resource
                                 // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
-                                    ->options(fn (\Illuminate\Database\Eloquent\Model $record) => static::getFilteredRegistrationOptions($record))
+                                    ->options(fn (?\Illuminate\Database\Eloquent\Model $record) => static::getFilteredRegistrationOptions($record))
                                     ->required()
                                     ->searchable()
                                     ->preload()
@@ -306,9 +306,9 @@ class Mapa01Resource extends Resource
                                                 Forms\Components\CheckboxList::make('evidence_type')
                                                     ->label('Jenis Bukti')
                                                     ->options([
-                                                        'L'  => new HtmlString('<strong>L</strong> (Langsung)'),
-                                                        'TL' => new HtmlString('<strong>TL</strong> (Tidak Langsung)'),
-                                                        'T'  => new HtmlString('<strong>T</strong> (Tambahan)'),
+                                                        'L',
+                                                        'TL', 
+                                                        'T',
                                                     ])
                                                     ->required()
                                                     ->columns(3)

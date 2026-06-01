@@ -120,17 +120,37 @@ class ViewSignatureInbox extends EditRecord
         // AUTOMATICALLY CREATE ASESI SIGNATURE REQUEST
         \Log::info("Signature signed by assessor: label={$req->document_label}, reg_id={$req->registration_id}");
         
-        // Forms that need Asesi signature after Assessor signs
-        $needsAsesiSignature = ['AK.01', 'AK.02', 'AK.05', 'AK.06', 'IA.01', 'IA.02', 'IA.03', 'IA.05', 'IA.06', 'IA.07', 'IA.11', 'MAPA.01'];
-        if (in_array($req->document_label, $needsAsesiSignature)) {
+        // Forms that need Asesi signature after Assessor signs.
+        // Rule: A form is in this list ONLY if its PDF template has an Asesi/Assessee
+        //       signature block. Verify against resources/views/forms/*/
+        $cleanLabel = str_replace('FR.', '', $req->document_label);
+        $needsAsesiSignatureClean = [
+            // AK forms that require Asesi signature
+            // AK.01 - Persetujuan Asesmen (has Asesi signature block)
+            // AK.02 - Rekaman Asesmen (has $signatures['assessee'] block)
+            // AK.03 - Umpan Balik dan Catatan Asesmen (has $signatures['assessee']['signature'])
+            // AK.07 - Penyesuaian Asesmen (has $asesi_sign_date)
+            // NOTE: AK.04 is signed BY Asesi directly (no Assessor prerequisite flow)
+            // NOTE: AK.05 / AK.06 - only have Assessor signature blocks, NOT Asesi
+            'AK.01', 'AK.02', 'AK.03', 'AK.07',
+            // IA forms — all IA instruments require Asesi acknowledgment signature
+            'IA.01', 'IA.02', 'IA.03',
+            'IA.04a', 'IA.04b',
+            'IA.05a', 'IA.05b', 'IA.05c',
+            'IA.06a', 'IA.06b', 'IA.06c',
+            'IA.07', 'IA.08', 'IA.09', 'IA.10', 'IA.11',
+        ];
+
+        if (in_array($cleanLabel, $needsAsesiSignatureClean)) {
             $asesiId = $req->registration->user_id;
             
+            // Cari existing request menggunakan pencarian fleksibel
+            $possibleLabels = [$cleanLabel, 'FR.' . $cleanLabel];
             $existingAsesiReq = \App\Models\SignatureRequest::where([
                 'registration_id' => $req->registration_id,
                 'user_id'         => $asesiId,
-                'document_label'  => $req->document_label,
                 'role'            => 'asesi',
-            ])->first();
+            ])->whereIn('document_label', $possibleLabels)->first();
 
             if (!$existingAsesiReq) {
                 \App\Models\SignatureRequest::create([

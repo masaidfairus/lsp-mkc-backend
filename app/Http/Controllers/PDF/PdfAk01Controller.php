@@ -63,6 +63,7 @@ class PdfAk01Controller extends Controller
         }
 
         $asesiSign = $ak01Data['signatures']['asesi'] ?? ['date' => now()];
+        $asesiSignatureData = $this->getUserSignature($registration->candidate?->id, $registration->id, 'AK.01', true);
         // ── Validasi Tanda Tangan Asesor (Kecuali untuk Admin/Asesor Peninjau) ───
         $asesorSig = $this->getUserSignature($registration->assessor?->id, $registration->id, 'AK.01', true);
         $isAuthorizedReviewer = $this->isAuthorizedReviewer($request->user(), $registration);
@@ -85,10 +86,11 @@ class PdfAk01Controller extends Controller
             'agreement_time' => $time . ' WIB',
             'agreement_tuk' => $tuk,
             'evidence_map' => $evidenceMap,
-            'asesor_sign_date' => $this->convertDateToLocalTime($asesorSign['date'] ?? now()),
-            'asesor_reg' => $signatureData['reg_number'],
-            'asesor_qr_code' => $signatureData['qr_code'],
+            'asesor_sign_date' => $asesorSig['is_signed'] ? $this->convertDateToLocalTime($asesorSig['signed_at'] ?? now()) : '',
+            'asesor_reg' => $asesorSig['reg_number'] ?? '-',
+            'asesor_qr_code' => $asesorSig['qr_code'] ?? null,
             'asesi_sign_date' => $this->convertDateToLocalTime($asesiSign['date'] ?? now()),
+            'asesi_qr_code' => $asesiSignatureData['qr_code'] ?? null,
         ];
 
                 // --- Inject Signatures for Compilers & Validators ---
@@ -122,7 +124,7 @@ class PdfAk01Controller extends Controller
         }
         // ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.AK.ak01', $data)
+        $pdf = Pdf::loadView('forms.ak.ak01', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);

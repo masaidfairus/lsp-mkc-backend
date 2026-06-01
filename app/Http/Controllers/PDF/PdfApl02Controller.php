@@ -81,7 +81,7 @@ class PdfApl02Controller extends Controller
 
 
 
-        $pdf = Pdf::loadView('forms.APL.apl02', $data)
+        $pdf = Pdf::loadView('forms.apl.apl02', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);

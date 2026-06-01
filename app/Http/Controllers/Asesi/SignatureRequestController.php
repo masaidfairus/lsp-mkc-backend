@@ -151,6 +151,42 @@ class SignatureRequestController extends Controller
                 ];
                 $signable->main_data = $mainData;
                 $signable->save();
+            } elseif (get_class($signable) === \App\Models\AssessmentPlanning::class) {
+                $cleanLabel = str_replace('FR.', '', $signatureRequest->document_label);
+                if ($cleanLabel === 'AK.01') {
+                    $data = $signable->ak01_data ?? [];
+                    $data['signatures']['asesi'] = [
+                        'name' => $user->name,
+                        'date' => now()->toDateString(),
+                        'signature' => $sigPath,
+                        'qr_code' => $qrBase64,
+                    ];
+                    $signable->ak01_data = $data;
+                    $signable->ak01_asesi_signature = $sigPath;
+                    $signable->ak01_asesi_qr_code = $qrBase64;
+                    $signable->ak01_asesi_signature_date = now();
+                    $signable->save();
+                } elseif ($cleanLabel === 'AK.07') {
+                    $data = $signable->ak07_data ?? [];
+                    $data['signatures']['asesi'] = [
+                        'name' => $user->name,
+                        'date' => now()->toDateString(),
+                        'signature' => $sigPath,
+                        'qr_code' => $qrBase64,
+                    ];
+                    $signable->ak07_data = $data;
+                    $signable->save();
+                } elseif ($cleanLabel === 'MAPA.01') {
+                    $data = $signable->mapa01_data ?? [];
+                    $data['signatures']['asesi'] = [
+                        'name' => $user->name,
+                        'date' => now()->toDateString(),
+                        'signature' => $sigPath,
+                        'qr_code' => $qrBase64,
+                    ];
+                    $signable->mapa01_data = $data;
+                    $signable->save();
+                }
             } elseif (get_class($signable) === \App\Models\AssessmentRegistration::class) {
 
                 // Special case for APL01/APL02 if signable is registration

@@ -118,6 +118,10 @@ Route::get('admin/view-document/{record}', [PrivateFileController::class, 'downl
     ->name('private.file.view')
     ->middleware(['auth']);
 
+Route::get('admin/reports/asesi-type/pdf', [\App\Http\Controllers\PDF\PdfReportController::class, 'asesiTypeReport'])
+    ->name('admin.reports.asesi-type.pdf')
+    ->middleware(['web', 'auth']);
+
 // ============================================================
 // PDF Documents (Supports Signed URLs for Mobile)
 // ============================================================
@@ -685,7 +689,7 @@ Route::get('/ia01/preview', function () {
         ],
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.IA.ia01', $data)
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.ia.ia01', $data)
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('ia01_preview.pdf');
@@ -754,7 +758,7 @@ Route::get('/ia02/preview', function () {
         ],
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.IA.ia02', $data)
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.ia.ia02', $data)
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('ia02_preview.pdf');
@@ -837,7 +841,7 @@ Route::get('/ia03/preview', function () {
         'asesor_ttd_tanggal' => '',
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.IA.ia03', $data)
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.ia.ia03', $data)
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('ia03_preview.pdf');
@@ -922,7 +926,7 @@ Route::get('/ia04a/preview', function () {
         ],
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.IA.ia04a', $data)
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.ia.ia04a', $data)
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('ia04a_preview.pdf');
@@ -976,7 +980,7 @@ Route::get('/ia04b/preview', function () {
         ],
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.IA.ia04b', $data)
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.ia.ia04b', $data)
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('ia04b_preview.pdf');
@@ -1021,7 +1025,7 @@ Route::get('/ia05a/preview', function () {
         ],
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.IA.ia05a', $data)
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.ia.ia05a', $data)
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('ia05a_preview.pdf');
@@ -1093,7 +1097,7 @@ Route::get('/ia05b/preview', function () {
         ],
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.IA.ia05b', $data)
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.ia.ia05b', $data)
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('ia05b_preview.pdf');
@@ -1136,7 +1140,7 @@ Route::get('/ak02/preview', function () {
         'asesor_ttd_tanggal' => '',
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.AK.ak02', $data)
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.ak.ak02', $data)
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('ak02_preview.pdf');
@@ -1173,7 +1177,7 @@ Route::get('/ak03/preview', function () {
         'asesor_ttd_tanggal' => '',
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.AK.ak03', $data)
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.ak.ak03', $data)
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('ak03_preview.pdf');
@@ -1204,7 +1208,7 @@ Route::get('/ak05/preview', function () {
         'asesor_ttd_tanggal' => '',
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.AK.ak05', $data)
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.ak.ak05', $data)
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('ak05_preview.pdf');
@@ -1239,7 +1243,7 @@ Route::get('/ak06/preview', function () {
         'lead_asesor_komentar' => '',
     ];
 
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.AK.ak06', $data)
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('forms.ak.ak06', $data)
         ->setPaper('a4', 'portrait');
 
     return $pdf->stream('ak06_preview.pdf');

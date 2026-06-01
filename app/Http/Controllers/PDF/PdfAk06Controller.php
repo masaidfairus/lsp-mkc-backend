@@ -98,7 +98,7 @@ class PdfAk06Controller extends Controller
         }
         // ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.AK.ak06', $data)
+        $pdf = Pdf::loadView('forms.ak.ak06', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);

@@ -56,6 +56,7 @@ class PdfAk07Controller extends Controller
             'asesor' => ['date' => now()],
         ];
         $signatureData = $this->getAssessorSignatureData($assessor, $registration->id, 'AK.07', true);
+        $asesiSignatureData = $this->getUserSignature($registration->candidate?->id, $registration->id, 'AK.07', false);
         $isAuthorizedReviewer = $this->isAuthorizedReviewer($request->user(), $registration);
 
         if (!$signatureData['is_signed'] && !$isAuthorizedReviewer) {
@@ -79,11 +80,10 @@ class PdfAk07Controller extends Controller
             'data_part_b' => $ak07Data['part_b'] ?? [],
             'adjustment_results_a' => $ak07Data['adjustment_results_a'] ?? [],
             'adjustment_results_b' => $ak07Data['adjustment_results_b'] ?? [],
-            // 'asesi_sign' => $signatures['asesi']['signature'],
-            // 'asesor_sign' => $signatures['asesor']['signature'],
             'asesor_reg' => $signatureData['reg_number'] ?? '',
             'asesor_qr_code' => $signatureData['qr_code'] ?? '',
-            'asesi_sign_date' => $this->convertDateToLocalTime($signatures['asesi']['date'] ?? now()),
+            'asesi_qr_code' => $asesiSignatureData['qr_code'] ?? null,
+            'asesi_sign_date' => $asesiSignatureData['is_signed'] ? $this->convertDateToLocalTime($asesiSignatureData['signed_at'] ?? now()) : ($this->convertDateToLocalTime($signatures['asesi']['date'] ?? now())),
             'asesor_sign_date' => $this->convertDateToLocalTime($signatures['asesor']['date'] ?? now()),
         ];
 
@@ -118,7 +118,7 @@ class PdfAk07Controller extends Controller
         }
         // ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.AK.ak07', $data)
+        $pdf = Pdf::loadView('forms.ak.ak07', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);

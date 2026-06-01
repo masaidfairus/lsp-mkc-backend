@@ -13,6 +13,7 @@ class Ak03 extends AssessmentResult
      */
     protected static function booted(): void
     {
+        parent::booted();
         static::addGlobalScope('document_type', fn ($q) => $q->where('document_type', 'FR.AK.03'));
         static::creating(fn ($m) => $m->document_type = 'FR.AK.03');
     }

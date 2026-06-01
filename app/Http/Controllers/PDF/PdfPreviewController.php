@@ -71,7 +71,7 @@
         }
         // ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.APL.apl01', compact($data))
+        $pdf = Pdf::loadView('forms.apl.apl01', compact($data))
 //             ->setPaper('a4', 'portrait');
 
 //         return $pdf->stream('apl01_preview.pdf');
@@ -140,7 +140,7 @@
         }
         // ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.APL.apl01', $data)
+        $pdf = Pdf::loadView('forms.apl.apl01', $data)
 //             ->setPaper('a4', 'portrait');
 
 //         return $pdf->download('APL01-' . $apl01->nama . '.pdf');

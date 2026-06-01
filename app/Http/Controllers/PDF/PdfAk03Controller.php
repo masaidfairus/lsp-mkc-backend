@@ -43,6 +43,7 @@ class PdfAk03Controller extends Controller
         $assessmentDate = $this->convertDateToLocalTime($ak03Data['date'] ?? now()->format('Y-m-d'));
         
         $signatureData = $this->getAssessorSignatureData($assessor, $registration->id, 'AK.03', true);
+        $asesiSignatureData = $this->resolveSignature($candidate->id, $registration->id, 'AK.03', false);
         $isAuthorizedReviewer = $this->isAuthorizedReviewer($request->user(), $registration);
 
         if (!$signatureData['is_signed'] && !$isAuthorizedReviewer) {
@@ -57,6 +58,15 @@ class PdfAk03Controller extends Controller
             $ak03Data['signatures']['assessor']['qr_preview'] = $signatureData['qr_code'];
         }
 
+        $signatures = $ak03Data['signatures'] ?? [];
+        if ($asesiSignatureData['is_signed']) {
+            $signatures['assessee'] = [
+                'signature' => $asesiSignatureData['signature'] ? storage_path('app/' . $asesiSignatureData['signature']) : null,
+                'qr_code' => $asesiSignatureData['qr_code'],
+                'date' => $asesiSignatureData['signed_at'] ? \Carbon\Carbon::parse($asesiSignatureData['signed_at'])->translatedFormat('d F Y') : '',
+            ];
+        }
+
         $data = [
             'scheme_name' => $scheme?->name ?? '-',
             'scheme_code' => $scheme?->code ?? '-',
@@ -69,7 +79,7 @@ class PdfAk03Controller extends Controller
             'asesor_reg' => $signatureData['reg_number'],
             'asesor_qr_code' => $signatureData['qr_code'],
             'notes' => $ak03Data['additional_footer']['other_comments'] ?? '',
-            'signatures' => $ak03Data['signatures'] ?? [],
+            'signatures' => $signatures,
         ];
 
                 // --- Inject Signatures for Compilers & Validators ---
@@ -103,7 +113,7 @@ class PdfAk03Controller extends Controller
         }
         // ----------------------------------------------------
 
-        $pdf = Pdf::loadView('forms.AK.ak03', $data)
+        $pdf = Pdf::loadView('forms.ak.ak03', $data)
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);

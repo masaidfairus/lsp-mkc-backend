@@ -84,9 +84,13 @@ abstract class Controller
 
         // Coba cari signature request yang sudah di-sign
         if ($registrationId && $docLabel) {
+            // Dukung pencarian dengan atau tanpa prefix "FR." untuk kompatibilitas penuh
+            $cleanLabel = str_replace('FR.', '', $docLabel);
+            $possibleLabels = [$cleanLabel, 'FR.' . $cleanLabel];
+
             $req = \App\Models\SignatureRequest::where('registration_id', $registrationId)
                 ->where('user_id', $userId)
-                ->where('document_label', $docLabel)
+                ->whereIn('document_label', $possibleLabels)
                 ->where('status', 'signed')
                 ->latest('signed_at')
                 ->first();

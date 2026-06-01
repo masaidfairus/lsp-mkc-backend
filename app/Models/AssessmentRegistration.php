@@ -267,47 +267,77 @@ class AssessmentRegistration extends Model
                 ->when($model->assessor_id, fn($q) => $q->where('user_id', '!=', $model->assessor_id))
                 ->delete();
 
-            // Jika asesor tidak ada, stop
-            if (!$model->assessor_id) {
-                return;
-            }
-
             // 2. Sinkronkan permintaan TTD secara bertahap
-            // APL.01: Butuh TTD jika status PENDING/PAID/APPROVED
-            // APL.02: Butuh TTD jika status SUBMITTED/APPROVED
-            $docs = [
-                'APL.01' => in_array($model->status_apl01, [\App\Enums\Apl01Status::PENDING, \App\Enums\Apl01Status::PAID, \App\Enums\Apl01Status::APPROVED]),
-                'APL.02' => in_array($model->status_apl02, [\App\Enums\Apl02Status::SUBMITTED, \App\Enums\Apl02Status::APPROVED]),
-            ];
 
-            foreach ($docs as $label => $shouldHaveRequest) {
-                if ($shouldHaveRequest) {
+            // APL.01: Butuh TTD dari Admin jika status PENDING/PAID/APPROVED
+            $shouldHaveApl01 = in_array($model->status_apl01, [\App\Enums\Apl01Status::PENDING, \App\Enums\Apl01Status::PAID, \App\Enums\Apl01Status::APPROVED]);
+            if ($shouldHaveApl01) {
+                // Cari admin yang meng-acc APL.01 (dari user login, fallback ke admin pertama)
+                $adminUser = auth()->user();
+                if (!$adminUser || !in_array($adminUser->role, ['admin', 'superadmin'])) {
+                    $adminUser = \App\Models\User::whereIn('role', ['admin', 'superadmin'])->first();
+                }
+                $adminId = $adminUser?->id;
+
+                if ($adminId) {
                     $existing = \App\Models\SignatureRequest::where([
                         'registration_id' => $model->id,
-                        'user_id' => $model->assessor_id,
-                        'document_label' => $label,
+                        'user_id' => $adminId,
+                        'document_label' => 'APL.01',
+                        'role' => 'Admin',
                     ])->first();
 
                     if (!$existing) {
                         \App\Models\SignatureRequest::create([
                             'registration_id' => $model->id,
-                            'user_id' => $model->assessor_id,
-                            'document_label' => $label,
+                            'user_id' => $adminId,
+                            'document_label' => 'APL.01',
                             'status' => 'pending',
                             'signable_type' => get_class($model),
                             'signable_id' => $model->id,
-                            'role' => 'Asesor',
+                            'role' => 'Admin',
                         ]);
                     }
-                } else {
-                    // Jika status tidak memenuhi syarat, hapus request yang masih pending
-                    \App\Models\SignatureRequest::where([
+                }
+            } else {
+                // Jika status tidak memenuhi syarat, hapus request APL.01 yang masih pending
+                \App\Models\SignatureRequest::where([
+                    'registration_id' => $model->id,
+                    'document_label' => 'APL.01',
+                    'role' => 'Admin',
+                    'status' => 'pending',
+                ])->delete();
+            }
+
+            // APL.02: Butuh TTD dari Asesor jika status SUBMITTED/APPROVED dan asesor_id ada
+            $shouldHaveApl02 = in_array($model->status_apl02, [\App\Enums\Apl02Status::SUBMITTED, \App\Enums\Apl02Status::APPROVED]) && $model->assessor_id;
+            if ($shouldHaveApl02) {
+                $existing = \App\Models\SignatureRequest::where([
+                    'registration_id' => $model->id,
+                    'user_id' => $model->assessor_id,
+                    'document_label' => 'APL.02',
+                    'role' => 'Asesor',
+                ])->first();
+
+                if (!$existing) {
+                    \App\Models\SignatureRequest::create([
                         'registration_id' => $model->id,
                         'user_id' => $model->assessor_id,
-                        'document_label' => $label,
+                        'document_label' => 'APL.02',
                         'status' => 'pending',
-                    ])->delete();
+                        'signable_type' => get_class($model),
+                        'signable_id' => $model->id,
+                        'role' => 'Asesor',
+                    ]);
                 }
+            } else {
+                // Jika status tidak memenuhi syarat atau asesor tidak diset, hapus request APL.02 yang masih pending
+                \App\Models\SignatureRequest::where([
+                    'registration_id' => $model->id,
+                    'document_label' => 'APL.02',
+                    'role' => 'Asesor',
+                    'status' => 'pending',
+                ])->delete();
             }
         });
     }

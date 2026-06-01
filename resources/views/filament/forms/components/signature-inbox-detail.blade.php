@@ -33,6 +33,7 @@
             <div x-data="{
                 signaturePad: null,
                 isDrawing: false,
+                isLocked: false,
                 charCount: 0,
 
                 init() {
@@ -55,31 +56,86 @@
                         maxWidth: 2.5,
                     });
 
-                    this.resizeCanvas();
-                    window.addEventListener('resize', () => this.resizeCanvas());
+                    // Wait for container to have a non-zero size before first resize
+                    const waitForSize = setInterval(() => {
+                        const container = this.$refs.container;
+                        if (!container) return;
+                        const rect = container.getBoundingClientRect();
+                        if (rect.width > 0 && rect.height > 0) {
+                            clearInterval(waitForSize);
+                            this.resizeCanvas();
+                        }
+                    }, 30);
 
-                    this.signaturePad.addEventListener('beginStroke', () => { this.isDrawing = true; });
+                    this.signaturePad.addEventListener('beginStroke', () => { 
+                        this.isDrawing = true; 
+                        this.isLocked = true;
+                    });
                     this.signaturePad.addEventListener('endStroke', () => { 
                         this.isDrawing = false; 
-                        this.charCount = JSON.stringify(this.signaturePad.toData()).length;
+                        const data = this.signaturePad.toData();
+                        this.charCount = JSON.stringify(data).length;
+                        setTimeout(() => {
+                            this.isLocked = false;
+                        }, 150);
                     });
+
+                    let lastW = 0, lastH = 0;
+                    const ro = new ResizeObserver(() => {
+                        if (this.isDrawing || this.isLocked) return;
+                        const container = this.$refs.container;
+                        if (!container) return;
+                        const rect = container.getBoundingClientRect();
+                        if (Math.abs(rect.width - lastW) < 10 && Math.abs(rect.height - lastH) < 10) return;
+                        lastW = rect.width;
+                        lastH = rect.height;
+                        setTimeout(() => {
+                            if (!this.isDrawing && !this.isLocked) this.resizeCanvas();
+                        }, 200);
+                    });
+                    ro.observe(this.$refs.container);
                 },
 
                 resizeCanvas() {
                     const canvas = this.$refs.canvas;
                     const container = this.$refs.container;
                     if (!canvas || !container) return;
+                    if (this.isDrawing) return;
+
+                    const rect = container.getBoundingClientRect();
+                    if (rect.width === 0 || rect.height === 0) return;
 
                     const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                    canvas.width = container.offsetWidth * ratio;
-                    canvas.height = container.offsetHeight * ratio;
+                    const displayWidth = rect.width;
+                    const displayHeight = rect.height;
+
+                    canvas.style.width = displayWidth + 'px';
+                    canvas.style.height = displayHeight + 'px';
+
+                    const data = this.signaturePad ? this.signaturePad.toData() : [];
+
+                    canvas.width = Math.round(displayWidth * ratio);
+                    canvas.height = Math.round(displayHeight * ratio);
                     canvas.getContext('2d').scale(ratio, ratio);
+
                     this.signaturePad.clear();
+
+                    if (data && data.length > 0) {
+                        this.signaturePad.fromData(data);
+                    }
                 },
 
                 clear() {
+                    if (this.isDrawing) return;
+                    this.isLocked = true;
                     this.signaturePad.clear();
                     this.charCount = 0;
+                    setTimeout(() => {
+                        this.resizeCanvas();
+                        setTimeout(() => {
+                            this.isLocked = false;
+                        }, 100);
+                    }, 50);
                 },
 
                 submit() {
@@ -102,7 +158,7 @@
                 </div>
 
                 <div x-ref="container" class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl overflow-hidden bg-white" style="height: 300px; width: 100%;">
-                    <canvas x-ref="canvas" style="touch-action: none; cursor: crosshair; display: block; width: 100%; height: 100%;"></canvas>
+                    <canvas x-ref="canvas" style="touch-action: none; cursor: crosshair; display: block;"></canvas>
                 </div>
 
                 <div class="mt-6 flex justify-end">

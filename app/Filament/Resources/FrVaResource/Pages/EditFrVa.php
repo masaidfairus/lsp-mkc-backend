@@ -22,6 +22,7 @@ class EditFrVa extends EditRecord
         return [
             $this->getSaveTemplateAction(),
             $this->getLoadTemplateAction(),
+            $this->getDeleteTemplateAction(),
             Actions\DeleteAction::make(),
         ];
     }

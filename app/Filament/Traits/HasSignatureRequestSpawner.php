@@ -38,6 +38,13 @@ trait HasSignatureRequestSpawner
         // Asesor (path bisa 'asesor' atau 'assessor')
         $asesorId = data_get($mainData, 'signatures.asesor.user_id')
                  ?? data_get($mainData, 'signatures.assessor.user_id');
+
+        // Fallback: baca langsung dari relasi registration (mencegah cleanup
+        // menghapus SignatureRequest yang dibuat oleh model booted() hook)
+        if (!$asesorId && method_exists($record, 'registration')) {
+            $asesorId = optional($record->registration)->assessor_id;
+        }
+
         if ($asesorId) {
             $mappings[] = ['user_id' => (int) $asesorId, 'role' => 'Asesor'];
         }
