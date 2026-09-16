@@ -24,22 +24,32 @@ class CompetencyUnitResource extends Resource
     protected static ?string $pluralModelLabel = 'Unit Kompetensi';
     protected static ?int $navigationSort = 2;
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('Data Unit Kompetensi')
                     ->schema([
+                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                         Forms\Components\Select::make('scheme_id')
                             ->relationship('scheme', 'name')
                             ->label('Skema')
                             ->searchable()
                             ->preload()
                             ->required(),
+                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                         Forms\Components\TextInput::make('unit_code')
                             ->label('Kode Unit')
                             ->required()
                             ->maxLength(255),
+                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                         Forms\Components\TextInput::make('unit_title')
                             ->label('Judul Unit')
                             ->required()
@@ -48,23 +58,33 @@ class CompetencyUnitResource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Skema')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('unit_code')
                     ->label('Kode')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('unit_title')
                     ->label('Judul Unit')
                     ->searchable()
                     ->sortable()
                     ->wrap(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('competency_elements_count')
                     ->label('Elemen')
                     ->counts('competencyElements')
@@ -83,6 +103,11 @@ class CompetencyUnitResource extends Resource
             ]);
     }
 
+    /**
+     * Mendapatkan relasi getRelations.
+     *
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -90,6 +115,11 @@ class CompetencyUnitResource extends Resource
         ];
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

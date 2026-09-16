@@ -12,6 +12,11 @@ class PerformanceCriterion extends Model
         'description',
     ];
 
+    /**
+     * Mendapatkan relasi element.
+     *
+     * @return mixed
+     */
     public function element()
     {
         return $this->belongsTo(CompetencyElement::class);

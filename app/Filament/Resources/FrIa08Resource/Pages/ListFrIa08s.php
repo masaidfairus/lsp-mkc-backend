@@ -10,6 +10,11 @@ class ListFrIa08s extends ListRecords
 {
     protected static string $resource = FrIa08Resource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

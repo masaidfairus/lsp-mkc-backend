@@ -12,6 +12,11 @@ class EditAssessmentRegistration extends EditRecord
 {
     protected static string $resource = AssessmentRegistrationResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [
@@ -19,6 +24,11 @@ class EditAssessmentRegistration extends EditRecord
         ];
     }
 
+    /**
+     * Mengambil form actions.
+     *
+     * @return array
+     */
     protected function getFormActions(): array
     {
         return [

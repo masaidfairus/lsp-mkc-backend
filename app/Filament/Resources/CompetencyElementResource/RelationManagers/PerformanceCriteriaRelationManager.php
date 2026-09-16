@@ -14,6 +14,12 @@ class PerformanceCriteriaRelationManager extends RelationManager
 {
     protected static string $relationship = 'performanceCriteria';
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public function form(Form $form): Form
     {
         return $form
@@ -26,11 +32,18 @@ class PerformanceCriteriaRelationManager extends RelationManager
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('description')
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('description')
                     ->label('Deskripsi KUK')
                     ->searchable()

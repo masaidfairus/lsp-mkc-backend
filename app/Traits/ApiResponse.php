@@ -6,6 +6,14 @@ use Illuminate\Http\JsonResponse;
 
 trait ApiResponse
 {
+    /**
+     * Success response.
+     *
+     * @param  mixed  $data
+     * @param  mixed  $message
+     * @param  mixed  $code
+     * @return JsonResponse
+     */
     protected function successResponse($data = [], $message = "OK", $code = 200): JsonResponse
     {
         return response()->json([
@@ -17,6 +25,14 @@ trait ApiResponse
         ], $code);
     }
 
+    /**
+     * Error response.
+     *
+     * @param  mixed  $errorCode
+     * @param  mixed  $httpStatus
+     * @param  mixed  $data
+     * @return JsonResponse
+     */
     protected function errorResponse($errorCode, $httpStatus = 400, $data = []): JsonResponse
     {
         $message = config("errors.$errorCode") ?? 'Terjadi kesalahan sistem';

@@ -18,11 +18,19 @@ class Ak03Controller extends Controller
             return $this->errorResponse('E1005', 403);
         }
 
+        if (!$registration->status->isApl01Complete()) {
+            return $this->errorResponse('E2018', 403);
+        }
+
         $record = Ak03::where('registration_id', $registration->id)->first();
 
         // If record exists, return its main_data
         if ($record) {
-            return $this->successResponse($record->main_data);
+            $data = $record->main_data;
+            if (!isset($data['feedback_items']) || empty($data['feedback_items'])) {
+                $data['feedback_items'] = $this->defaultFeedbackItems();
+            }
+            return $this->successResponse($data);
         }
 
         // Otherwise return default template with master data
@@ -54,6 +62,10 @@ class Ak03Controller extends Controller
             return $this->errorResponse('E1005', 403);
         }
 
+        if (!$registration->status->isApl01Complete()) {
+            return $this->errorResponse('E2018', 403);
+        }
+
         $validated = $request->validate([
             'main_data' => ['required', 'array'],
         ]);
@@ -69,6 +81,11 @@ class Ak03Controller extends Controller
         );
     }
 
+    /**
+     * Default feedback items.
+     *
+     * @return array
+     */
     private function defaultFeedbackItems(): array
     {
         return [

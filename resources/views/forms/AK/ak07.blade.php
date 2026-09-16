@@ -472,7 +472,17 @@
         </tr>
         <tr>
             <td>Nama Asesi : {{ $asesi_name }}</td>
-            <td class="ttd-space">Tanggal dan Tanda Tangan Asesi: {{ $asesi_sign_date }}</td>
+            <td class="ttd-space" style="vertical-align: middle; padding: 6px;">
+                Tanggal dan Tanda Tangan Asesi:<br>
+                <div style="margin-top: 10px;">
+                    @if($asesi_qr_code)
+                        <img src="{{ $asesi_qr_code }}" style="width: 50px; height: 50px; vertical-align: middle;">
+                    @endif
+                    <span style="vertical-align: middle; margin-left: 8px;">
+                        {{ $asesi_sign_date }}
+                    </span>
+                </div>
+            </td>
         </tr>
     </table>
 

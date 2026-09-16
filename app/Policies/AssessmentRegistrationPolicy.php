@@ -51,6 +51,7 @@ class AssessmentRegistrationPolicy
      */
     public function delete(User $user, AssessmentRegistration $assessmentRegistration): bool
     {
+        if ($user->hasRole(['superadmin', 'admin'])) return true;
         return $user->can('delete_assessment::registration');
     }
 
@@ -59,6 +60,7 @@ class AssessmentRegistrationPolicy
      */
     public function deleteAny(User $user): bool
     {
+        if ($user->hasRole(['superadmin', 'admin'])) return true;
         return $user->can('delete_any_assessment::registration');
     }
 
@@ -67,6 +69,7 @@ class AssessmentRegistrationPolicy
      */
     public function forceDelete(User $user, AssessmentRegistration $assessmentRegistration): bool
     {
+        if ($user->hasRole(['superadmin', 'admin'])) return true;
         return $user->can('force_delete_assessment::registration');
     }
 
@@ -75,6 +78,7 @@ class AssessmentRegistrationPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
+        if ($user->hasRole(['superadmin', 'admin'])) return true;
         return $user->can('force_delete_any_assessment::registration');
     }
 

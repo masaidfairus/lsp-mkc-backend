@@ -257,8 +257,8 @@
                 <tr class="data-row">
                     <td class="col-no">{{ $index + 1 }}.</td>
                     <td>{{ $a['assessee_name'] ?? '' }}</td>
-                    <td class="col-k"><span style="font-size: 13pt;">{!! ($a['recommendation'] ?? '') === 'K' ? '☑' : '☐' !!}</span></td>
-                    <td class="col-bk"><span style="font-size: 13pt;">{!! ($a['recommendation'] ?? '') === 'BK' ? '☑' : '☐' !!}</span></td>
+                    <td class="col-k"><span style="font-size: 13pt;">{!! ($a['recommendation'] ?? '') === 'K' ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>' !!}</span></td>
+                    <td class="col-bk"><span style="font-size: 13pt;">{!! ($a['recommendation'] ?? '') === 'BK' ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>' !!}</span></td>
                     <td>{{ $a['description'] ?? '' }}</td>
                 </tr>
             @endforeach

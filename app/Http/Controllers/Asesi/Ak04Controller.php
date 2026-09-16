@@ -10,6 +10,12 @@ use Illuminate\Http\Request;
 
 class Ak04Controller extends Controller
 {
+    /**
+     * Menampilkan detail dari resource yang ditentukan.
+     *
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function show(AssessmentRegistration $registration)
     {
         if ($registration->user_id !== request()->user()->id) {
@@ -20,9 +26,7 @@ class Ak04Controller extends Controller
             return $this->errorResponse('E2009', 403);
         }
 
-        if (!$registration->status->isApl02Complete()) {
-            return $this->errorResponse('E2018', 403);
-        }
+        // Removed overly strict isApl02Complete check here because AK.04 is unlocked manually by the frontend when AK.02 is finished
 
         return $this->successResponse([
             'registration_id' => $registration->id,
@@ -51,10 +55,21 @@ class Ak04Controller extends Controller
         ]);
     }
 
+    /**
+     * Menyimpan resource baru ke dalam penyimpanan.
+     *
+     * @param  Request  $request
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function store(Request $request, AssessmentRegistration $registration)
     {
         if ($registration->user_id !== $request->user()->id) {
             return $this->errorResponse('E1005', 403);
+        }
+
+        if (!$registration->status->isApl01Complete()) {
+            return $this->errorResponse('E2009', 403);
         }
 
         $validated = $request->validate([

@@ -6,6 +6,11 @@ class Apl02 extends AssessmentRegistration
 {
     protected $table = 'assessment_registrations';
 
+    /**
+     * Mendapatkan relasi portfolioFiles.
+     *
+     * @return mixed
+     */
     public function portfolioFiles()
     {
         return $this->hasMany(FileProfile::class, 'user_id', 'user_id')

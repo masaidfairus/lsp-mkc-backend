@@ -18,6 +18,11 @@ class ListDocumentLists extends ListRecords
 {
     protected static string $resource = DocumentListResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [
@@ -30,12 +35,14 @@ class ListDocumentLists extends ListRecords
                 ->label('Tambah Dokumen Skema')
                 ->form([
                     Grid::make(2)->schema([
+                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                         Select::make('scheme_id')
                             ->label('Pilih Skema')
                             ->relationship('portfolioScheme.scheme', 'name')
                             ->required()
                             ->searchable(),
 
+                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                         Select::make('type')
                             ->label('Pilih Tipe Dokumen')
                             ->native(false)
@@ -47,6 +54,7 @@ class ListDocumentLists extends ListRecords
                             ->live(),
                     ]),
 
+                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                     TextInput::make('title')->required()
                         ->label('Judul Dokumen'),
 
@@ -59,6 +67,7 @@ class ListDocumentLists extends ListRecords
                             ->label('Wajib Diisi?')
                             ->default(true),
 
+                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                         TextInput::make('or_group')
                             ->label('Kelompok Pilihan (Pilih Salah Satu)')
                             ->helperText('Isi dengan kode yang sama untuk dokumen pilihan (Salah satu wajib)')
@@ -84,6 +93,11 @@ class ListDocumentLists extends ListRecords
         ];
     }
 
+    /**
+     * Mengambil tabs.
+     *
+     * @return array
+     */
     public function getTabs(): array
     {
         return [

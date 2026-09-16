@@ -12,6 +12,11 @@ enum ValidationResult: string implements HasLabel, HasColor, HasIcon
     case TMS = 'tms';     // Tidak Memenuhi Syarat
     case Pending = 'pending'; // Default/Gray Stripes
 
+    /**
+     * Mengambil label.
+     *
+     * @return ?string
+     */
     public function getLabel(): ?string
     {
         return match($this) {
@@ -21,6 +26,11 @@ enum ValidationResult: string implements HasLabel, HasColor, HasIcon
         };
     }
 
+    /**
+     * Mengambil icon.
+     *
+     * @return string
+     */
     public function getIcon(): string
     {
         return match($this) {
@@ -30,6 +40,11 @@ enum ValidationResult: string implements HasLabel, HasColor, HasIcon
         };
     }
 
+    /**
+     * Mengambil color.
+     *
+     * @return string
+     */
     public function getColor(): string
     {
         return match($this) {

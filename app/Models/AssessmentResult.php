@@ -20,6 +20,11 @@ class AssessmentResult extends Model
         'validation_data' => 'array',
     ];
 
+    /**
+     * Booted.
+     *
+     * @return void
+     */
     protected static function booted(): void
     {
         static::saved(function ($model) {
@@ -61,6 +66,11 @@ class AssessmentResult extends Model
         });
     }
 
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return mixed
+     */
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class, 'registration_id');

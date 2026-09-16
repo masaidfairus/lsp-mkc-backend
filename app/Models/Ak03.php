@@ -6,12 +6,23 @@ class Ak03 extends AssessmentResult
 {
     protected $table = 'assessment_results';
 
+    /**
+     * Mendapatkan relasi booted.
+     *
+     * @return void
+     */
     protected static function booted(): void
     {
+        parent::booted();
         static::addGlobalScope('document_type', fn ($q) => $q->where('document_type', 'FR.AK.03'));
         static::creating(fn ($m) => $m->document_type = 'FR.AK.03');
     }
 
+    /**
+     * Mendapatkan relasi candidate.
+     *
+     * @return mixed
+     */
     public function candidate()
     {
         return $this->hasOneThrough(
@@ -24,6 +35,11 @@ class Ak03 extends AssessmentResult
         );
     }
 
+    /**
+     * Mendapatkan relasi scheme.
+     *
+     * @return mixed
+     */
     public function scheme()
     {
         return $this->hasOneThrough(

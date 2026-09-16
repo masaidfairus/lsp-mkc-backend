@@ -24,25 +24,45 @@ class Ak04Resource extends Resource
     protected static ?string $pluralModelLabel = 'AK.04';
     protected static ?int $navigationSort = 4;
 
+    /**
+     * Can edit.
+     *
+     * @param  mixed  $record
+     * @return bool
+     */
     public static function canEdit($record): bool
     {
         return auth()->user()->hasRole(['admin', 'superadmin']);
     }
 
+    /**
+     * Can delete.
+     *
+     * @param  mixed  $record
+     * @return bool
+     */
     public static function canDelete($record): bool
     {
         return auth()->user()->hasRole(['admin', 'superadmin']);
     }
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('Status Verifikasi')
                     ->icon('heroicon-m-check-badge')
                     ->schema([
                         Forms\Components\Grid::make(12)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Pendaftaran Terkait')
                                     ->relationship('registration', 'id')
@@ -54,6 +74,7 @@ class Ak04Resource extends Resource
                                     ->dehydrated()
                                     ->columnSpan(4),
                                 
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('status')
                                     ->label('Status Verifikasi')
                                     ->options(AppealStatus::class)
@@ -68,6 +89,7 @@ class Ak04Resource extends Resource
                             ]),
                     ]),
 
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('Detail Banding (AK.04)')
                     ->schema([
                         Forms\Components\Grid::make(12)
@@ -95,6 +117,7 @@ class Ak04Resource extends Resource
                                     ])->columnSpan(6),
                             ]),
                         
+                        // BAGIAN FORM: Grup bidang form berbingkai (Section)
                         Forms\Components\Section::make('Pertanyaan Banding')
                             ->schema([
                                 Forms\Components\Placeholder::make('appeal_questions_view')
@@ -132,6 +155,7 @@ class Ak04Resource extends Resource
                             ->content(fn ($record) => $record?->ak04_data['reason_notes'] ?? '-')
                             ->columnSpanFull(),
 
+                        // BAGIAN FORM: Grup bidang form berbingkai (Section)
                         Forms\Components\Section::make('Tanda Tangan Asesi')
                             ->schema([
                                 Forms\Components\Placeholder::make('signature_preview')
@@ -162,22 +186,32 @@ class Ak04Resource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')
                     ->label('ID Daftar')
                     ->sortable()
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.candidate.name')
                     ->label('Asesi')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.scheme.name')
                     ->label('Skema')
                     ->searchable()
                     ->limit(30),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (AppealStatus $state): string => match ($state) {
@@ -186,6 +220,7 @@ class Ak04Resource extends Resource
                         AppealStatus::REJECTED => 'danger',
                     })
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Diajukan')
                     ->dateTime('d/m/Y H:i')
@@ -213,6 +248,11 @@ class Ak04Resource extends Resource
             ]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

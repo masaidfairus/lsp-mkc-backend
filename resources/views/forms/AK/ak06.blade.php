@@ -291,16 +291,20 @@
                         <span style="margin-right:5px">&#8226;</span>{{ $p['aspect_name'] ?? '' }}
                     </td>
                         <td style="text-align:center;">
-                            <span style="font-size: 13pt;">{!! !is_null($p['validitas'] ?? null) ? ($p['validitas'] ? '☑' : '☐') : '<span class="cell-disabled">&nbsp;&nbsp;&nbsp;&nbsp;</span>' !!}</span>
+                            <span style="font-size: 13pt;">{!! !is_null($p['validitas'] ?? null) ? ($p['validitas'] ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>') : '<span class="cell-disabled">&nbsp;&nbsp;&nbsp;&nbsp;</span>' !!}</span>
                         </td>
                         <td style="text-align:center;">
-                            <span style="font-size: 13pt;">{!! !is_null($p['reliabel'] ?? null) ? ($p['reliabel'] ? '☑' : '☐') : '<span class="cell-disabled">&nbsp;&nbsp;&nbsp;&nbsp;</span>' !!}</span>
+                            <span style="font-size: 13pt;">{!! !is_null($p['reliabel'] ?? null) ? ($p['reliabel'] ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>') : '<span class="cell-disabled">&nbsp;&nbsp;&nbsp;&nbsp;</span>' !!}</span>
                         </td>
+                        @if(in_array($p['aspect_name'] ?? '', ['Keputusan asesmen', 'Umpan balik asesmen']))
+                        <td style="background-color:#000; border:1px solid #000;"></td>
+                        @else
                         <td style="text-align:center;">
-                            <span style="font-size: 13pt;">{!! !is_null($p['fleksibel'] ?? null) ? ($p['fleksibel'] ? '☑' : '☐') : '<span class="cell-disabled">&nbsp;&nbsp;&nbsp;&nbsp;</span>' !!}</span>
+                            <span style="font-size: 13pt;">{!! !is_null($p['fleksibel'] ?? null) ? ($p['fleksibel'] ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>') : '<span class="cell-disabled">&nbsp;&nbsp;&nbsp;&nbsp;</span>' !!}</span>
                         </td>
+                        @endif
                         <td style="text-align:center;">
-                            <span style="font-size: 13pt;">{!! !is_null($p['adil'] ?? null) ? ($p['adil'] ? '☑' : '☐') : '<span class="cell-disabled">&nbsp;&nbsp;&nbsp;&nbsp;</span>' !!}</span>
+                            <span style="font-size: 13pt;">{!! !is_null($p['adil'] ?? null) ? ($p['adil'] ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>') : '<span class="cell-disabled">&nbsp;&nbsp;&nbsp;&nbsp;</span>' !!}</span>
                         </td>
                 </tr>
             @endforeach
@@ -338,11 +342,11 @@
                             ({{ explode('(', $item['aspect_name'])[1] }}
                         @endif
                     </td>
-                    <td><span style="font-size: 13pt;">{!! !empty($item['task_skills']) ? '☑' : '☐' !!}</span></td>
-                    <td><span style="font-size: 13pt;">{!! !empty($item['task_management_skills']) ? '☑' : '☐' !!}</span></td>
-                    <td><span style="font-size: 13pt;">{!! !empty($item['contingency_management_skills']) ? '☑' : '☐' !!}</span></td>
-                    <td><span style="font-size: 13pt;">{!! !empty($item['job_role_environment_skills']) ? '☑' : '☐' !!}</span></td>
-                    <td><span style="font-size: 13pt;">{!! !empty($item['transfer_skills']) ? '☑' : '☐' !!}</span></td>
+                    <td><span style="font-size: 13pt;">{!! !empty($item['task_skills']) ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>' !!}</span></td>
+                    <td><span style="font-size: 13pt;">{!! !empty($item['task_management_skills']) ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>' !!}</span></td>
+                    <td><span style="font-size: 13pt;">{!! !empty($item['contingency_management_skills']) ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>' !!}</span></td>
+                    <td><span style="font-size: 13pt;">{!! !empty($item['job_role_environment_skills']) ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>' !!}</span></td>
+                    <td><span style="font-size: 13pt;">{!! !empty($item['transfer_skills']) ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>' !!}</span></td>
                 </tr>
             @endforeach
             <tr class="row-rekomendasi">

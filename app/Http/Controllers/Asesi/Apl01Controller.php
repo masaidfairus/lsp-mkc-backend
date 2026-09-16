@@ -38,6 +38,7 @@ class Apl01Controller extends Controller
                 'education_id' => ['required', 'exists:master_education,id'],
                 'company_name' => ['required', 'string', 'max:255'],
                 'job_title' => ['required', 'string', 'max:255'],
+                'job_code' => ['nullable', 'string', 'max:255'],
                 'company_address' => ['required', 'string', 'max:1000'],
                 'company_postal_code' => ['required', 'numeric', 'digits:5', 'between:10000,99999'],
                 'company_fax' => ['nullable', 'string', 'max:20'],
@@ -54,24 +55,35 @@ class Apl01Controller extends Controller
 
             $user->profile()->updateOrCreate([], array_merge(collect($validated)->except('registration_id')->toArray(), $asesiType));
 
-            if (!empty($validated['registration_id'])) {
-                $registration = $user->registrations()->findOrFail($validated['registration_id']);
-                $registration->update(['scheme_id' => $validated['scheme_id']]);
-                
-                $registration->aplData()->updateOrCreate(
-                    ['registration_id' => $registration->id],
-                    collect($validated)->except(['registration_id', 'scheme_id'])->toArray()
-                );
-            } else {
-                $registration = $user->registrations()->firstOrCreate([
-                    'scheme_id' => $validated['scheme_id'],
-                    'status' => \App\Enums\AssessmentStatus::APL01_DRAFT,
-                ]);
-                $registration->aplData()->updateOrCreate(
-                    ['registration_id' => $registration->id],
-                    collect($validated)->except(['registration_id', 'scheme_id'])->toArray()
-                );
-            }
+           // Cari bagian ini di step 'data-pemohon-sertifikasi'
+if (!empty($validated['registration_id'])) {
+    $registration = $user->registrations()->findOrFail($validated['registration_id']);
+    $registration->update([
+        'scheme_id' => $validated['scheme_id'],
+        'asesi_type' => $asesiType['asesi_type'],           // ← TAMBAH INI
+        'institution_name' => $asesiType['institution_name'] ?? null, // ← TAMBAH INI
+    ]);
+    
+    $registration->aplData()->updateOrCreate(
+        ['registration_id' => $registration->id],
+        collect($validated)->except(['registration_id', 'scheme_id'])->toArray()
+    );
+} else {
+    $registration = $user->registrations()->firstOrCreate([
+        'scheme_id' => $validated['scheme_id'],
+        'status' => \App\Enums\AssessmentStatus::APL01_DRAFT,
+    ]);
+    // ← TAMBAH INI
+    $registration->update([
+        'asesi_type' => $asesiType['asesi_type'],
+        'institution_name' => $asesiType['institution_name'] ?? null,
+    ]);
+    
+    $registration->aplData()->updateOrCreate(
+        ['registration_id' => $registration->id],
+        collect($validated)->except(['registration_id', 'scheme_id'])->toArray()
+    );
+}
 
             return $this->successResponse([
                 'next_step' => 'data-sertifikasi',
@@ -117,6 +129,7 @@ class Apl01Controller extends Controller
                         'or_group' => $req->or_group,
                         'is_uploaded' => $uploaded ? true : false,
                         'file_url' => $uploaded ? route('documents.stream', ['document' => $uploaded->id]) : null,
+                        'file_name' => $uploaded?->original_name ?? 'Dokumen Profil',
                         'file_profile_id' => $uploaded?->id,
                     ];
                 });
@@ -132,6 +145,7 @@ class Apl01Controller extends Controller
                         'is_mandatory' => true,
                         'is_uploaded' => $uploaded ? true : false,
                         'file_url' => $uploaded ? route('documents.stream', ['document' => $uploaded->id]) : null,
+                        'file_name' => $uploaded?->original_name ?? 'Dokumen Profil',
                         'file_profile_id' => $uploaded?->id,
                     ];
                 });
@@ -336,6 +350,22 @@ class Apl01Controller extends Controller
                         'asesi_qr_code' => $qrBase64,
                         'asesi_signature_date' => now(),
                     ]);
+                } else {
+                    // Tidak ada signature manual — gunakan UserSignature yang sudah tersimpan di profil
+                    // (diambil dari fitur reusable TTD yang sudah dibuat asesi sebelumnya)
+                    $existingAplData = $registration->aplData;
+                    if ($existingAplData && empty($existingAplData->asesi_qr_code)) {
+                        $qrText = route('signature.verify', ['id' => $registration->id, 'type' => 'apl01']);
+                        $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(200)->generate($qrText));
+
+                        $userSig = \App\Models\UserSignature::where('user_id', $user->id)->latest()->first();
+
+                        $registration->aplData()->update([
+                            'asesi_signature' => $userSig?->signature_image ?? null,
+                            'asesi_qr_code' => $qrBase64,
+                            'asesi_signature_date' => now(),
+                        ]);
+                    }
                 }
             });
 
@@ -385,6 +415,7 @@ class Apl01Controller extends Controller
                     'or_group' => $req->or_group,
                     'is_uploaded' => $uploaded ? true : false,
                     'file_url' => $uploaded ? asset('storage/' . $uploaded->upload_document) : null,
+                    'file_name' => $uploaded?->original_name ?? 'Dokumen Profil',
                     'file_profile_id' => $uploaded?->id,
                 ];
             });
@@ -399,6 +430,7 @@ class Apl01Controller extends Controller
                     'is_mandatory' => true,
                     'is_uploaded' => $uploaded ? true : false,
                     'file_url' => $uploaded ? asset('storage/' . $uploaded->upload_document) : null,
+                    'file_name' => $uploaded?->original_name ?? 'Dokumen Profil',
                     'file_profile_id' => $uploaded?->id,
                 ];
             });

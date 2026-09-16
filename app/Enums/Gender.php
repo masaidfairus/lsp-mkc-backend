@@ -9,6 +9,11 @@ enum Gender: string implements HasLabel
     case MALE = 'male';
     case FEMALE = 'female';
 
+    /**
+     * Mengambil label.
+     *
+     * @return ?string
+     */
     public function getLabel(): ?string
     {
         return match ($this) {

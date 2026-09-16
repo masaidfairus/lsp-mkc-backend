@@ -9,6 +9,36 @@ use Illuminate\Support\HtmlString;
 trait HasStandardIaForm
 {
     /**
+     * Helper untuk membungkus form agar mengecek eksistensi Tanda Tangan Master.
+     * Jika Asesor belum punya, sembunyikan seluruh input dan beri peringatan.
+     */
+    public static function wrapFormSchema(array $schema): array
+    {
+        if (auth()->check() && auth()->user()->hasRole('asesor') && !\App\Models\UserSignature::where('user_id', auth()->id())->exists()) {
+            return [
+                Forms\Components\Placeholder::make('no_signature_warning')
+                    ->label('')
+                    ->content(new \Illuminate\Support\HtmlString('
+                        <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 16px; margin-bottom: 20px; border-radius: 8px;">
+                            <div style="display: flex; align-items: center;">
+                                <svg style="color: #ef4444; width: 24px; height: 24px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                <div>
+                                    <h3 style="color: #991b1b; font-weight: 600; font-size: 16px; margin: 0;">Akses Terbatas: Tanda Tangan Master Belum Dibuat</h3>
+                                    <p style="color: #b91c1c; font-size: 14px; margin: 4px 0 0 0;">Anda belum membuat Tanda Tangan Master Data. Anda harus membuat TTD terlebih dahulu di menu <strong>Mastering Data -> Daftar Tanda Tangan</strong> sebelum dapat membuat atau mengisi form asesmen.</p>
+                                </div>
+                            </div>
+                        </div>
+                    '))
+                    ->columnSpanFull(),
+                Forms\Components\Group::make($schema)->hidden()
+            ];
+        }
+
+        return $schema;
+    }
+    /**
      * Render status info card setelah memilih user (menggantikan signature preview dari library).
      */
     protected static function renderSignatureStatus($get, string $role): HtmlString
@@ -47,6 +77,7 @@ trait HasStandardIaForm
      */
     protected static function standardAssessorSignatureBlock(string $statePath): Forms\Components\Section
     {
+        // BAGIAN FORM: Grup bidang form berbingkai (Section)
         return Forms\Components\Section::make('Tanda Tangan Asesor')
             ->statePath($statePath)
             ->schema([
@@ -69,8 +100,8 @@ trait HasStandardIaForm
                                         <p style='font-size:11px;color:#16a34a;margin:2px 0 0;'>Asesor &middot; Reg: {$get('reg_number')}</p>
                                     </div>
                                 </div>
-                                <div style='margin-top:10px;padding:8px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#92400e;line-height:1.5;'>
-                                    &#9203; Permintaan tanda tangan akan dikirim ke <strong>{$get('name')}</strong> setelah dokumen disimpan.
+                                <div style='margin-top:10px;padding:8px 12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:11px;color:#15803d;line-height:1.5;'>
+                                    &#10004; Tanda tangan Anda akan disematkan secara otomatis menggunakan Master Data Tanda Tangan.
                                 </div>
                             </div>
                         ")
@@ -103,6 +134,7 @@ trait HasStandardIaForm
      */
     protected static function standardAsesiDisclaimer(): Forms\Components\Section
     {
+        // BAGIAN FORM: Grup bidang form berbingkai (Section)
         return Forms\Components\Section::make('Tanda Tangan Asesi')
             ->schema([
                 Forms\Components\Placeholder::make('asesi_disclaimer')
@@ -122,14 +154,162 @@ trait HasStandardIaForm
     }
 
     /**
+     * Mendapatkan opsi dropdown pendaftaran yang sudah difilter.
+     *
+     * Logika:
+     * - Saat CREATE: hanya tampilkan registrasi yang BELUM memiliki dokumen dari tipe form ini.
+     * - Saat EDIT: tampilkan registrasi yang belum terpakai + registrasi milik record yang sedang diedit.
+     * - Memanfaatkan static::getEloquentQuery() sehingga filter document_type & scope lainnya ikut diterapkan.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $record  Record aktif (null saat create)
+     * @return array<int|string, string>  Peta [registration_id => label]
+     */
+    protected static function getFilteredRegistrationOptions(?\Illuminate\Database\Eloquent\Model $record): array
+    {
+        if (auth()->check() && auth()->user()->hasRole('asesor') && !\App\Models\UserSignature::where('user_id', auth()->id())->exists()) {
+            return []; // Kosongkan dropdown
+        }
+        // Ambil semua registration_id yang sudah memiliki dokumen jenis ini
+        $query = static::getEloquentQuery();
+        
+        $resourceClass = static::class;
+        if (str_contains($resourceClass, 'Mapa01Resource')) {
+            $query = $query->whereNotNull('mapa01_data');
+        } elseif (str_contains($resourceClass, 'Mapa02Resource')) {
+            $query = $query->whereNotNull('mapa02_data');
+        } elseif (str_contains($resourceClass, 'Ak01Resource')) {
+            $query = $query->whereNotNull('ak01_data');
+        } elseif (str_contains($resourceClass, 'Ak07Resource')) {
+            $query = $query->whereNotNull('ak07_data');
+        }
+
+        $usedIds = $query->pluck('registration_id')->toArray();
+
+        // Saat mode EDIT: jangan kecualikan registrasi milik record yang sedang diedit
+        if ($record && $record->registration_id) {
+            $usedIds = array_values(array_filter(
+                $usedIds,
+                fn ($id) => (int) $id !== (int) $record->registration_id
+            ));
+        }
+
+        // Ambil semua pendaftaran yang masih tersedia (belum dibuatkan dokumen tipe ini)
+        $query = \App\Models\AssessmentRegistration::with(['candidate', 'scheme'])
+            ->whereNotIn('id', $usedIds);
+            
+        // Filter agar asesor hanya melihat pendaftaran yang ditugaskan kepadanya
+        if (auth()->check() && auth()->user()->hasRole('asesor')) {
+            $query->where('assessor_id', auth()->id());
+        }
+
+        $registrations = $query->get();
+
+        $occurrences = [];
+        return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
+            $key               = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
+            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
+            $candidate         = $reg->candidate?->name ?? 'Unknown';
+            $scheme            = $reg->scheme?->name ?? 'Tanpa Skema';
+            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
+        })->toArray();
+    }
+
+    /**
+     * Mendapatkan opsi dropdown pendaftaran yang difilter berdasarkan metode MAPA.01.
+     *
+     * Hanya registrasi yang memiliki MAPA.01 dengan setidaknya satu unit kompetensi
+     * menggunakan salah satu metode dalam $allowedMapaMethods yang akan ditampilkan.
+     *
+     * Contoh nilai $allowedMapaMethods: ['CL'], ['DIT'], ['VPK', 'CRP'], dst.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $record  Record aktif (null saat create)
+     * @param  array<string>  $allowedMapaMethods  Kode metode MAPA yang diizinkan (CL, DIT, VPK, CRP, dll)
+     * @return array<int|string, string>
+     */
+    protected static function getFilteredRegistrationOptionsByMapaMethod(
+        ?\Illuminate\Database\Eloquent\Model $record,
+        array $allowedMapaMethods
+    ): array {
+        if (auth()->check() && auth()->user()->hasRole('asesor') && !\App\Models\UserSignature::where('user_id', auth()->id())->exists()) {
+            return []; // Kosongkan dropdown
+        }    // Ambil semua registration_id yang sudah memiliki dokumen jenis ini
+        $usedIds = static::getEloquentQuery()->pluck('registration_id')->toArray();
+
+        // Saat mode EDIT: jangan kecualikan registrasi milik record yang sedang diedit
+        if ($record && $record->registration_id) {
+            $usedIds = array_values(array_filter(
+                $usedIds,
+                fn ($id) => (int) $id !== (int) $record->registration_id
+            ));
+        }
+
+        // Ambil semua pendaftaran yang masih tersedia (belum dibuatkan dokumen tipe ini)
+        $query = \App\Models\AssessmentRegistration::with(['candidate', 'scheme'])
+            ->whereNotIn('id', $usedIds);
+
+        // Filter agar asesor hanya melihat pendaftaran yang ditugaskan kepadanya
+        if (auth()->check() && auth()->user()->hasRole('asesor')) {
+            $query->where('assessor_id', auth()->id());
+        }
+
+        $registrations = $query->get();
+
+        // Filter berdasarkan metode MAPA.01
+        $filteredRegistrations = $registrations->filter(function ($reg) use ($allowedMapaMethods, $record) {
+            // Saat mode EDIT: selalu sertakan registrasi milik record yang sedang diedit
+            if ($record && $record->registration_id && (int) $reg->id === (int) $record->registration_id) {
+                return true;
+            }
+
+            // Cari record MAPA.01 untuk registrasi ini
+            $planning = \App\Models\AssessmentPlanning::where('registration_id', $reg->id)
+                ->whereNotNull('mapa01_data')
+                ->first();
+
+            // Jika tidak ada MAPA.01, sembunyikan Asesi ini
+            if (!$planning) {
+                return false;
+            }
+
+            $mapa01Data = $planning->mapa01_data;
+            $assessmentPlan = $mapa01Data['section_2_assessment_plan'] ?? [];
+
+            // Periksa setiap unit kompetensi dalam MAPA.01
+            foreach ($assessmentPlan as $unit) {
+                $methods = $unit['assessment_methods'] ?? [];
+                foreach ($methods as $method) {
+                    $answer = trim($method['answer'] ?? '');
+                    if ($answer !== '' && in_array($answer, $allowedMapaMethods, true)) {
+                        return true; // OR logic: cukup satu unit yang cocok
+                    }
+                }
+            }
+
+            return false;
+        });
+
+        $occurrences = [];
+        return $filteredRegistrations->mapWithKeys(function ($reg) use (&$occurrences) {
+            $key               = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
+            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
+            $candidate         = $reg->candidate?->name ?? 'Unknown';
+            $scheme            = $reg->scheme?->name ?? 'Tanpa Skema';
+            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
+        })->toArray();
+    }
+
+    /**
      * Standard Document Control (Penyusun & Validator).
      */
     protected static function standardDocumentControlBlock(string $statePath): Forms\Components\Section
     {
+        // BAGIAN FORM: Grup bidang form berbingkai (Section)
         return Forms\Components\Section::make('Kontrol Dokumen')
+            ->statePath($statePath)
             ->schema([
                 Forms\Components\Grid::make(2)
                     ->schema([
+                        // BAGIAN FORM: Grup bidang form berbingkai (Section)
                         Forms\Components\Section::make('Penyusun Dokumen')
                             ->schema([
                                 Forms\Components\Repeater::make('compilers')
@@ -144,6 +324,7 @@ trait HasStandardIaForm
                                     ->disableItemMovement()
                             ])->columnSpan(1),
 
+                        // BAGIAN FORM: Grup bidang form berbingkai (Section)
                         Forms\Components\Section::make('Validator Dokumen')
                             ->schema([
                                 Forms\Components\Repeater::make('validators')
@@ -158,19 +339,37 @@ trait HasStandardIaForm
                                     ->disableItemMovement()
                             ])->columnSpan(1),
                     ])
-            ])->statePath($statePath);
+            ]);
     }
 
     /**
-     * Schema untuk Penyusun/Validator.
+     * Standard Signature (Penyusun & Validator).
+     *
+     * @param  string  $role
+     * @return Forms\Components\Group
      */
     protected static function standardSignatureSchema(string $role): Forms\Components\Group
     {
         return Forms\Components\Group::make()
             ->schema([
+                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                 Forms\Components\Select::make('user_id')
                     ->label("Pilih {$role}")
-                    ->options(User::role(strtolower($role))->pluck('name', 'id'))
+                    ->options(function (\Filament\Forms\Get $get, $state) use ($role) {
+                        $compilers = $get("../../compilers") ?? [];
+                        $validators = $get("../../validators") ?? [];
+                        
+                        $selectedIds = collect($compilers)
+                            ->merge($validators)
+                            ->pluck('user_id')
+                            ->filter()
+                            ->reject(fn($id) => (string) $id === (string) $state)
+                            ->toArray();
+
+                        return User::role(strtolower($role))
+                            ->whereNotIn('id', $selectedIds)
+                            ->pluck('name', 'id');
+                    })
                     ->live()
                     ->searchable()
                     ->preload()

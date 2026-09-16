@@ -6,6 +6,12 @@ use App\Models\UserSignature;
 
 class UserSignatureObserver
 {
+    /**
+     * Saved.
+     *
+     * @param  UserSignature  $userSignature
+     * @return void
+     */
     public function saved(UserSignature $userSignature): void
     {
         if ($userSignature->wasChanged(['signature_image', 'signature_shape', 'name']) || $userSignature->wasRecentlyCreated) {

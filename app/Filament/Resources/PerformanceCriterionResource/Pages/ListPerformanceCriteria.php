@@ -10,6 +10,11 @@ class ListPerformanceCriteria extends ListRecords
 {
     protected static string $resource = PerformanceCriterionResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

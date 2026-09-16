@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\Mapa01Resource\Pages;
+use App\Filament\Traits\HasStandardIaForm;
 use App\Models\Mapa01;
 use App\Models\AssessmentRegistration;
 use App\Models\UserSignature;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 
 class Mapa01Resource extends Resource
 {
+    use HasStandardIaForm;
     protected static ?string $model = Mapa01::class;
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?string $navigationGroup = 'MAPA';
@@ -25,6 +27,12 @@ class Mapa01Resource extends Resource
     protected static ?string $modelLabel = 'MAPA.01';
     protected static ?string $pluralModelLabel = 'MAPA.01';
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
@@ -33,19 +41,10 @@ class Mapa01Resource extends Resource
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
-                                    ->options(function () {
-                                        $registrations = AssessmentRegistration::with(['candidate', 'scheme'])->get();
-                                        $occurrences   = [];
-                                        return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
-                                            $key          = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
-                                            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
-                                            $candidate    = $reg->candidate?->name ?? 'Unknown';
-                                            $scheme       = $reg->scheme?->name ?? 'Tanpa Skema';
-                                            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
-                                        });
-                                    })
+                                    ->options(fn (?\Illuminate\Database\Eloquent\Model $record) => static::getFilteredRegistrationOptions($record))
                                     ->required()
                                     ->searchable()
                                     ->preload()
@@ -150,13 +149,16 @@ class Mapa01Resource extends Resource
                             ->statePath('mapa01_data')
                             ->schema([
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Skema Sertifikasi (KKNI/Okupasi/Klaster)')
                                     ->statePath('header')
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('certification_scheme')
                                             ->label('Judul Skema')
                                             ->disabled()
                                             ->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('scheme_code')
                                             ->label('Nomor Skema')
                                             ->disabled()
@@ -166,20 +168,24 @@ class Mapa01Resource extends Resource
                                 Forms\Components\Grid::make(3)
                                     ->statePath('header')
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('asesi_name')
                                             ->label('Nama Asesi')
                                             ->disabled()
                                             ->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('tuk')
                                             ->label('TUK')
                                             ->disabled()
                                             ->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('assessment_date')
                                             ->label('Tanggal Asesmen')
                                             ->disabled()
                                             ->dehydrated(),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('1. Menentukan Pendekatan Asesmen')
                                     ->statePath('section_1_approach')
                                     ->schema([
@@ -209,6 +215,7 @@ class Mapa01Resource extends Resource
                                             ->reactive()
                                             ->columns(2),
 
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('tujuan_asesmen_other')
                                             ->label('Tujuan Asesmen Lainnya')
                                             ->placeholder('Sebutkan...')
@@ -217,6 +224,7 @@ class Mapa01Resource extends Resource
 
                                         Forms\Components\Fieldset::make('Konteks Asesmen:')
                                             ->schema([
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                                 Forms\Components\Select::make('lingkungan')
                                                     ->label('Lingkungan')
                                                     ->options([
@@ -226,6 +234,7 @@ class Mapa01Resource extends Resource
                                                     ])
                                                     ->searchable()
                                                     ->required(),
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                                 Forms\Components\Select::make('peluang')
                                                     ->label('Peluang mengumpulkan bukti')
                                                     ->options([
@@ -234,6 +243,7 @@ class Mapa01Resource extends Resource
                                                     ])
                                                     ->searchable()
                                                     ->required(),
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                                 Forms\Components\Select::make('hubungan')
                                                     ->label('Hubungan antara standar kompetensi dan:')
                                                     ->options([
@@ -243,6 +253,7 @@ class Mapa01Resource extends Resource
                                                     ])
                                                     ->searchable()
                                                     ->required(),
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                                 Forms\Components\Select::make('pelaku')
                                                     ->label('Siapa yang melakukan asesmen / RPL')
                                                     ->options([
@@ -254,6 +265,7 @@ class Mapa01Resource extends Resource
                                                     ->required(),
                                             ])->columns(2),
 
+                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                         Forms\Components\Select::make('benchmark_standards')
                                             ->label('1.2 Standar Pembanding')
                                             ->options([
@@ -267,6 +279,7 @@ class Mapa01Resource extends Resource
                                             ->required(),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('2. Rencana Asesmen')
                                     ->schema([
                                         Forms\Components\Repeater::make('section_2_assessment_plan')
@@ -293,20 +306,22 @@ class Mapa01Resource extends Resource
                                                 Forms\Components\CheckboxList::make('evidence_type')
                                                     ->label('Jenis Bukti')
                                                     ->options([
-                                                        'L'  => new HtmlString('<strong>L</strong> (Langsung)'),
-                                                        'TL' => new HtmlString('<strong>TL</strong> (Tidak Langsung)'),
-                                                        'T'  => new HtmlString('<strong>T</strong> (Tambahan)'),
+                                                        'L',
+                                                        'TL', 
+                                                        'T',
                                                     ])
                                                     ->required()
                                                     ->columns(3)
                                                     ->columnSpan(1),
 
+                                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                                 Forms\Components\Section::make('Metode dan Perangkat Asesmen')
                                                     ->schema([
                                                         Forms\Components\Repeater::make('assessment_methods')
                                                             ->label('')
                                                             ->schema([
                                                                 Forms\Components\Hidden::make('method'),
+                                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                                                 Forms\Components\Select::make('answer')
                                                                     ->label(fn ($get) => $get('method'))
                                                                     ->options([
@@ -335,6 +350,7 @@ class Mapa01Resource extends Resource
                                             ->itemLabel(fn (array $state): ?string => $state['unit_code'] ?? null),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('3. Mengidentifikasi Persyaratan Modifikasi dan Kontekstualisasi:')
                                     ->schema([
                                         Forms\Components\Repeater::make('section_3_contextualization')
@@ -379,6 +395,7 @@ class Mapa01Resource extends Resource
                                             ->columnSpanFull(),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('4. Konfirmasi & Persetujuan')
                                     ->schema([
                                         Forms\Components\Fieldset::make('Konfirmasi dengan orang yang relevan')
@@ -409,25 +426,36 @@ class Mapa01Resource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query->whereNotNull('mapa01_data'))
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')
                     ->label('Registration ID')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Skema')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('confirmed_at')
                     ->label('Dikonfirmasi')
                     ->dateTime()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime()
@@ -444,6 +472,11 @@ class Mapa01Resource extends Resource
             ]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [
@@ -550,11 +583,19 @@ class Mapa01Resource extends Resource
         }
     }
 
+    /**
+     * Confirmation party schema.
+     *
+     * @param  string  $fieldKey
+     * @param  string  $label
+     * @return Forms\Components\Group
+     */
     private static function confirmationPartySchema(string $fieldKey, string $label): Forms\Components\Group
     {
         return Forms\Components\Group::make()
             ->statePath($fieldKey)
             ->schema([
+                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                 Forms\Components\Select::make('user_id')
                     ->label($label)
                     ->options(User::role('Asesor')->pluck('name', 'id'))
@@ -589,11 +630,20 @@ class Mapa01Resource extends Resource
             ]);
     }
 
+    /**
+     * Assessor signature schema.
+     *
+     * @param  string  $fieldKey
+     * @param  string  $label
+     * @param  string  $excludeKey
+     * @return Forms\Components\Group
+     */
     private static function assessorSignatureSchema(string $fieldKey, string $label, string $excludeKey = null): Forms\Components\Group
     {
         return Forms\Components\Group::make()
             ->statePath($fieldKey)
             ->schema([
+                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                 Forms\Components\Select::make('user_id')
                     ->label($label)
                     ->options(function (\Filament\Forms\Get $get) use ($excludeKey, $label) {
@@ -788,6 +838,11 @@ class Mapa01Resource extends Resource
         ];
     }
 
+    /**
+     * Default contextualization.
+     *
+     * @return array
+     */
     private static function defaultContextualization(): array
     {
         return [

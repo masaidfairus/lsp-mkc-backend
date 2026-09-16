@@ -17,6 +17,12 @@ use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
+    /**
+     * Is valid nik.
+     *
+     * @param  mixed  $nik
+     * @return mixed
+     */
     private function isValidNik($nik)
     {
         if (!preg_match('/^\d{16}$/', $nik)) {
@@ -36,18 +42,30 @@ class AuthController extends Controller
         return checkdate($month, $day, $year);
     }
 
+    /**
+     * Is valid passport.
+     *
+     * @param  mixed  $passport
+     * @return mixed
+     */
     private function isValidPassport($passport)
     {
         return preg_match('/^[A-Z0-9]{7,9}$/i', $passport);
     }
 
+    /**
+     * Melakukan pendaftaran (register).
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'max:255'],
             'identity_type' => ['required', 'in:id,passport'],
             'identity_number' => ['required', 'unique:users,identity_number'],
-            'email' => ['required', 'email:rfc', 'unique:users'],
+            'email' => ['required', 'email:rfc,dns', 'unique:users'],
             'password' => [
                 'required',
                 'confirmed',
@@ -56,7 +74,26 @@ class AuthController extends Controller
                     ->letters()
                     ->numbers()
                     ->symbols()
-            ]
+            ],
+            // Profile fields
+            'gender' => ['sometimes', 'in:male,female'],
+            'place_of_birth' => ['sometimes', 'string', 'max:1000'],
+            'date_of_birth' => ['sometimes', 'date', 'before:today'],
+            'address' => ['sometimes', 'string', 'max:1000'],
+            'home_postal_code' => ['sometimes', 'numeric', 'digits:5'],
+            'phone_number' => ['sometimes', 'string', 'regex:/^(\+62|0)8[1-9][0-9]{6,10}$/'],
+            'education_id' => ['sometimes', 'exists:master_education,id'],
+            'company_name' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'job_title' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'job_code' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'company_address' => ['sometimes', 'nullable', 'string', 'max:1000'],
+            'company_postal_code' => ['sometimes', 'nullable', 'numeric'],
+            'company_contact' => ['sometimes', 'nullable', 'string', 'max:20'],
+            'company_email' => ['sometimes', 'nullable', 'email'],
+            'company_fax' => ['sometimes', 'nullable', 'string'],
+            'asesi_type' => ['sometimes', 'in:pribadi,institusi'],
+            'institution_name' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'signature' => ['sometimes', 'nullable', 'string'],
         ], [
             'email.unique' => 'E2001',
             'identity_number.unique' => 'E2002',
@@ -85,11 +122,38 @@ class AuthController extends Controller
 
         $validated = $validator->validated();
 
-        $user = User::create($validated);
+        $user = User::create([
+            'name' => $validated['name'],
+            'identity_type' => $validated['identity_type'],
+            'identity_number' => $validated['identity_number'],
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+        ]);
 
         $user->asesiPassword()->create([
             'asesi_password' => $validated['password']
         ]);
+
+        // Create Profile if Profile data is present
+        $profileFields = [
+            'gender', 'place_of_birth', 'date_of_birth', 'address',
+            'home_postal_code', 'phone_number', 'education_id',
+            'company_name', 'job_title', 'job_code', 'company_address',
+            'company_postal_code', 'company_contact', 'company_email',
+            'company_fax', 'asesi_type', 'institution_name'
+        ];
+        $profileData = array_intersect_key($validated, array_flip($profileFields));
+        if (!empty($profileData)) {
+            $user->profile()->create($profileData);
+        }
+
+        // Create User Signature if present
+        if (!empty($validated['signature'])) {
+            $user->userSignature()->create([
+                'signature_image' => 'data:image/png;base64,' . $validated['signature'],
+                'name' => $validated['name']
+            ]);
+        }
 
         $user->load('asesiPassword');
 
@@ -99,7 +163,11 @@ class AuthController extends Controller
             ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
         );
 
-        $user->notify(new VerifyEmailNotification($verificationUrl));
+        try {
+            $user->notify(new VerifyEmailNotification($verificationUrl));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal mengirim email verifikasi: ' . $e->getMessage());
+        }
 
         $user->asesiPassword()->delete();
 
@@ -108,18 +176,41 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Melakukan proses masuk (login).
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function login(Request $request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => [
                 'required',
-                'exists:users',
+                'exists:users,email',
                 'email',
             ],
             'password' => [
                 'required',
             ],
+        ], [
+            'email.exists' => 'Email atau password salah.',
+            'email.required' => 'Email tidak boleh kosong.',
+            'email.email' => 'Format email tidak valid.',
+            'password.required' => 'Kata sandi tidak boleh kosong.',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'metadata' => [
+                    'code' => 'E4002',
+                    'message' => $validator->errors()->first()
+                ],
+                'response' => $validator->errors()
+            ], 422);
+        }
+
+        $validated = $validator->validated();
 
         $user = User::where('email', $request->email)->first();
 
@@ -151,6 +242,12 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Melakukan proses keluar (logout).
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function logout(Request $request)
     {
         if (Auth::user()->role == 'admin' || Auth::user()->role == 'asesor') {
@@ -164,6 +261,12 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
+    /**
+     * Memverifikasi.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function verify(Request $request)
     {
         if (!$request->hasValidSignature()) {
@@ -182,6 +285,12 @@ class AuthController extends Controller
         return view('auth.activation');
     }
 
+    /**
+     * Resend.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function resend(Request $request)
     {
         $request->validate([
@@ -200,10 +309,20 @@ class AuthController extends Controller
             ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
         );
 
-        $user->notify(new VerifyEmailNotification($verificationUrl));
+        try {
+            $user->notify(new VerifyEmailNotification($verificationUrl));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal mengirim email verifikasi (resend): ' . $e->getMessage());
+        }
         return $this->successResponse([], 'Link verifikasi telah dikirim ke email anda.');
     }
 
+    /**
+     * Memeriksa status.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function checkStatus(Request $request)
     {
         $user = $request->user();

@@ -11,6 +11,11 @@ enum Role: string
     case PENYUSUN = 'penyusun';
     case SUPERADMIN = 'superadmin';
 
+    /**
+     * Mengambil label.
+     *
+     * @return ?string
+     */
     public function getLabel(): ?string
     {
         return match ($this) {

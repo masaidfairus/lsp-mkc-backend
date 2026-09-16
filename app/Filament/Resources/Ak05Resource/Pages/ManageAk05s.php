@@ -11,6 +11,11 @@ class ManageAk05s extends ManageRecords
 {
     protected static string $resource = Ak05Resource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

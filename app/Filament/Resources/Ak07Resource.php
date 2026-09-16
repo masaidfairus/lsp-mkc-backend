@@ -20,6 +20,12 @@ class Ak07Resource extends Resource
     protected static ?string $modelLabel = 'AK.07';
     protected static ?string $pluralModelLabel = 'AK.07';
     protected static ?int $navigationSort = 7;
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
@@ -30,19 +36,10 @@ class Ak07Resource extends Resource
                         // ── 1. Registration selector with scheme name + occurrence ──────
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
-                                    ->options(function () {
-                                        $registrations = \App\Models\AssessmentRegistration::with(['candidate', 'scheme'])->get();
-                                        $occurrences   = [];
-                                        return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
-                                            $key          = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
-                                            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
-                                            $candidate    = $reg->candidate?->name ?? 'Unknown';
-                                            $scheme       = $reg->scheme?->name ?? 'Tanpa Skema';
-                                            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
-                                        });
-                                    })
+                                    ->options(fn (?\Illuminate\Database\Eloquent\Model $record) => static::getFilteredRegistrationOptions($record))
                                     ->required()
                                     ->searchable()
                                     ->preload()
@@ -82,11 +79,13 @@ class Ak07Resource extends Resource
                                 Forms\Components\Section::make('Skema Sertifikasi (KKNI/Okupasi/Klaster)')
                                     ->statePath('certification_scheme')
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('name')
                                             ->label('Judul')
                                             ->required()
                                             ->disabled()
                                             ->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('code')
                                             ->label('Nomor')
                                             ->required()
@@ -97,17 +96,20 @@ class Ak07Resource extends Resource
                                 // ── Header fields ──────────────────────────────────────
                                 Forms\Components\Grid::make(4)
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('tuk')
                                             ->label('TUK')
                                             ->disabled()
                                             ->dehydrated(),
 
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('asesi_name')
                                             ->label('Nama Asesi')
                                             ->disabled()
                                             ->dehydrated()
                                             ->required(),
 
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('asesor_name')
                                             ->label('Nama Asesor')
                                             ->disabled()
@@ -168,25 +170,36 @@ class Ak07Resource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query->whereNotNull('ak07_data'))
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')
                     ->label('Registration ID')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Skema')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('confirmed_at')
                     ->label('Dikonfirmasi')
                     ->dateTime()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime()
@@ -205,6 +218,11 @@ class Ak07Resource extends Resource
             ]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [
@@ -225,6 +243,11 @@ class Ak07Resource extends Resource
         ];
     }
 
+    /**
+     * Default part a.
+     *
+     * @return array
+     */
     private static function defaultPartA(): array
     {
         return [
@@ -327,6 +350,11 @@ class Ak07Resource extends Resource
         ];
     }
 
+    /**
+     * Default part b.
+     *
+     * @return array
+     */
     private static function defaultPartB(): array
     {
         $emptyDecisions = [

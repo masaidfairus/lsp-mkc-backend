@@ -1,4 +1,4 @@
-<!-- <?php
+<?php
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PrivateFileController;
@@ -15,12 +15,46 @@ use App\Http\Controllers\PDF\PdfApl02Controller;
 use App\Http\Controllers\PDF\PdfMapa01Controller;
 use App\Http\Controllers\PDF\PdfMapa02Controller;
 
-Route::redirect('/', '/admin');
-Route::permanentRedirect('/', '/admin');
-
 Route::get('/test-activation', function () {
     return view('auth.activation');
 });
+
+Route::get('/', function () {
+    return redirect('/admin');
+});
+
+Route::get('/privacy', function () {
+    return view('privacy');
+});
+
+Route::get('/privacy.html', function () {
+    return view('privacy');
+});
+
+Route::get('/pengaduan', function () {
+    return view('pengaduan');
+});
+
+Route::get('/hapus-akun', function () {
+    return view('pengaduan');
+});
+
+// Route::get('/active', function () {
+//     return view('auth.activation');
+// })->name('verif');
+
+// Route::get('/', function () {
+//     return view('welcome');
+// })->name('login');
+
+// Route::post('/login', [AuthController::class, 'login']);
+
+// Route::middleware(['auth', 'is_admin:admin,asesor'])->group(function () {
+//     Route::get('/admin', function () {
+//         return view('pages.dashboard');
+//     })->name('admin');
+//     Route::get('/logout', [AuthController::class, 'logout']);
+// });
 
 Route::get('/logout', [AuthController::class, 'logout']);
 
@@ -38,7 +72,8 @@ Route::get('/signature/verify', function (\Illuminate\Http\Request $request) {
                     'r' => 'Asesi / Kandidat',
                     'd' => 'FR.APL.01 - Permohonan Sertifikasi',
                     't' => $reg->aplData->asesi_signature_date?->format('Y-m-d H:i:s') ?? '-',
-                    's' => $reg->aplData->asesi_signature ? route('signature.stream', ['id' => $reg->id, 'type' => 'apl01']) : null,
+                    // Selalu sertakan stream URL — controller stream sudah fallback ke UserSignature jika asesi_signature null
+                    's' => route('signature.stream', ['id' => $reg->id, 'type' => 'apl01']),
                     'v' => true,
                 ];
             }
@@ -77,7 +112,7 @@ Route::get('/signature/verify', function (\Illuminate\Http\Request $request) {
                     'r' => $req->role,
                     'd' => $req->document_label,
                     't' => $req->signed_at->format('Y-m-d H:i:s'),
-                    's' => $req->raw_signature,
+                    's' => $req->raw_signature, 
                     'v' => true,
                 ];
             } else {
@@ -103,6 +138,10 @@ Route::get('/signature/verify', function (\Illuminate\Http\Request $request) {
 Route::get('admin/view-document/{record}', [PrivateFileController::class, 'download'])
     ->name('private.file.view')
     ->middleware(['auth']);
+
+Route::get('admin/reports/asesi-type/pdf', [\App\Http\Controllers\PDF\PdfReportController::class, 'asesiTypeReport'])
+    ->name('admin.reports.asesi-type.pdf')
+    ->middleware(['web', 'auth']);
 
 // ============================================================
 // PDF Documents (Supports Signed URLs for Mobile)
@@ -140,3 +179,12 @@ Route::middleware(['web', 'signed'])->group(function () {
 
 Route::get('cek-ttd/{id}', [\App\Http\Controllers\SignatureVerificationController::class, 'show'])->name('ttd.cek');
 Route::get('signature-img/{id}/{type}', [\App\Http\Controllers\SignatureVerificationController::class, 'stream'])->name('signature.stream');
+
+// TEMPORARY - HAPUS SETELAH DIPAKAI
+// Route::get('/clear-cache', function () {
+//     Artisan::call('cache:clear');
+//     Artisan::call('config:clear');
+//     Artisan::call('view:clear');
+//     Artisan::call('route:clear');
+//     return '✅ Cache berhasil dihapus!';
+// });

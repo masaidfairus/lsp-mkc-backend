@@ -21,17 +21,30 @@ class UserSignatureResource extends Resource
 
     protected static bool $shouldRegisterNavigation = true;
 
+    /**
+     * Mengambil create button label.
+     *
+     * @return string
+     */
     public static function getCreateButtonLabel(): string
     {
         return 'Buat Tanda Tangan';
     }
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('Buat Tanda Tangan Anda')
                     ->schema([
+                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                         Forms\Components\Select::make('name')
                             ->label('Nama / Identifier')
                             ->options(\App\Models\User::pluck('name', 'name'))
@@ -61,16 +74,24 @@ class UserSignatureResource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('signature_image')
                     ->label('Tanda Tangan'),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat Pada')
                     ->dateTime('d M Y H:i')
@@ -90,6 +111,11 @@ class UserSignatureResource extends Resource
             ]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

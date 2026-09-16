@@ -33,21 +33,41 @@ class SignatureRequest extends Model
         return $this->morphTo();
     }
 
+    /**
+     * Mendapatkan relasi user.
+     *
+     * @return BelongsTo
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return BelongsTo
+     */
     public function registration(): BelongsTo
     {
         return $this->belongsTo(AssessmentRegistration::class, 'registration_id');
     }
 
+    /**
+     * Is pending.
+     *
+     * @return bool
+     */
     public function isPending(): bool
     {
         return $this->status === 'pending';
     }
 
+    /**
+     * Is signed.
+     *
+     * @return bool
+     */
     public function isSigned(): bool
     {
         return $this->status === 'signed';

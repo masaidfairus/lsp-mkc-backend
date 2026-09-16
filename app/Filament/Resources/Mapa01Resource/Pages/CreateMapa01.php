@@ -13,11 +13,22 @@ class CreateMapa01 extends CreateRecord
     use HasFormTemplates;
     use HasSignatureRequestSpawner;
 
+    /**
+     * Mengambil document label.
+     *
+     * @return string
+     */
     protected function getDocumentLabel(): string
     {
         return 'MAPA.01';
     }
 
+    /**
+     * Extract signer mappings.
+     *
+     * @param  mixed  $record
+     * @return array
+     */
     protected function extractSignerMappings($record): array
     {
         $data = $record->mapa01_data ?? [];
@@ -40,6 +51,12 @@ class CreateMapa01 extends CreateRecord
 
     protected static string $resource = Mapa01Resource::class;
 
+    /**
+     * Menangani record creation.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Database\Eloquent\Model
+     */
     protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
     {
         $record = static::getModel()::updateOrCreate(
@@ -59,16 +76,27 @@ class CreateMapa01 extends CreateRecord
         return $record;
     }
 
+    /**
+     * Mengambil redirect url.
+     *
+     * @return string
+     */
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
     }
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [
             $this->getSaveTemplateAction(),
             $this->getLoadTemplateAction(),
+            $this->getDeleteTemplateAction(),
         ];
     }
 }

@@ -14,10 +14,17 @@ class RequirementsRelationManager extends RelationManager
 {
     protected static string $relationship = 'requirements';
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public function form(Form $form): Form
     {
         return $form
             ->schema([
+                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                 Forms\Components\TextInput::make('requirement_name')
                     ->label('Nama Persyaratan')
                     ->required()
@@ -28,11 +35,18 @@ class RequirementsRelationManager extends RelationManager
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('requirement_name')
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('requirement_name')
                     ->label('Nama Persyaratan')
                     ->searchable()

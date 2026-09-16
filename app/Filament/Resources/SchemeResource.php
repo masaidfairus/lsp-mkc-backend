@@ -24,23 +24,33 @@ class SchemeResource extends Resource
     protected static ?string $pluralModelLabel = 'Skema';
     protected static ?int $navigationSort = 1;
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('Informasi Utama')
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                 Forms\Components\TextInput::make('code')
                                     ->label('Kode Skema')
                                     ->placeholder('e.g. SKM/01/MKC')
                                     ->required()
                                     ->maxLength(255),
+                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                 Forms\Components\TextInput::make('name')
                                     ->label('Nama Skema')
                                     ->required()
                                     ->maxLength(255),
+                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                 Forms\Components\TextInput::make('type')
                                     ->label('Jenis Skema')
                                     ->placeholder('e.g. Klaster')
@@ -52,16 +62,19 @@ class SchemeResource extends Resource
                             ->rows(3)
                             ->columnSpanFull(),
                     ]),
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('Biaya Sertifikasi')
                     ->schema([
                         Forms\Components\Grid::make(2)
                             ->schema([
+                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                 Forms\Components\TextInput::make('certification_fee')
                                     ->label('Biaya Sertifikasi')
                                     ->numeric()
                                     ->prefix('Rp')
                                     ->required()
                                     ->default(0.00),
+                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                 Forms\Components\TextInput::make('recertification_fee')
                                     ->label('Biaya Sertifikasi Ulang')
                                     ->numeric()
@@ -73,26 +86,37 @@ class SchemeResource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('code')
                     ->label('Kode')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Skema')
                     ->searchable()
                     ->sortable()
                     ->wrap(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('type')
                     ->label('Jenis')
                     ->badge(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('certification_fee')
                     ->label('Biaya')
                     ->money('IDR')
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('competency_units_count')
                     ->label('Unit')
                     ->counts('competencyUnits')
@@ -103,6 +127,13 @@ class SchemeResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('export_peta_excel')
+                    ->label('Export Peta Excel')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('success')
+                    ->action(function (\App\Models\Scheme $record) {
+                        return (new \App\Services\WorkGroupExcelExportService())->export($record);
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -111,6 +142,11 @@ class SchemeResource extends Resource
             ]);
     }
 
+    /**
+     * Mendapatkan relasi getRelations.
+     *
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -119,6 +155,11 @@ class SchemeResource extends Resource
         ];
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

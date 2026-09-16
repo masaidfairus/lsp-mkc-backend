@@ -17,16 +17,31 @@ class Apl02Portfolio extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return mixed
+     */
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class, 'registration_id');
     }
 
+    /**
+     * Mendapatkan relasi fileProfile.
+     *
+     * @return mixed
+     */
     public function fileProfile()
     {
         return $this->belongsTo(FileProfile::class, 'file_profile_id');
     }
 
+    /**
+     * Mendapatkan relasi documentList.
+     *
+     * @return mixed
+     */
     public function documentList()
     {
         return $this->belongsTo(DocumentList::class, 'list_id');

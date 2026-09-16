@@ -10,6 +10,13 @@ use Carbon\Carbon;
 
 class PdfAk07Controller extends Controller
 {
+    /**
+     * Menampilkan detail dari resource yang ditentukan.
+     *
+     * @param  Request  $request
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function show(Request $request, AssessmentRegistration $registration)
     {
         // return view('components.status-page', [
@@ -49,6 +56,7 @@ class PdfAk07Controller extends Controller
             'asesor' => ['date' => now()],
         ];
         $signatureData = $this->getAssessorSignatureData($assessor, $registration->id, 'AK.07', true);
+        $asesiSignatureData = $this->getUserSignature($registration->candidate?->id, $registration->id, 'AK.07', false);
         $isAuthorizedReviewer = $this->isAuthorizedReviewer($request->user(), $registration);
 
         if (!$signatureData['is_signed'] && !$isAuthorizedReviewer) {
@@ -72,11 +80,10 @@ class PdfAk07Controller extends Controller
             'data_part_b' => $ak07Data['part_b'] ?? [],
             'adjustment_results_a' => $ak07Data['adjustment_results_a'] ?? [],
             'adjustment_results_b' => $ak07Data['adjustment_results_b'] ?? [],
-            // 'asesi_sign' => $signatures['asesi']['signature'],
-            // 'asesor_sign' => $signatures['asesor']['signature'],
             'asesor_reg' => $signatureData['reg_number'] ?? '',
             'asesor_qr_code' => $signatureData['qr_code'] ?? '',
-            'asesi_sign_date' => $this->convertDateToLocalTime($signatures['asesi']['date'] ?? now()),
+            'asesi_qr_code' => $asesiSignatureData['qr_code'] ?? null,
+            'asesi_sign_date' => $asesiSignatureData['is_signed'] ? $this->convertDateToLocalTime($asesiSignatureData['signed_at'] ?? now()) : ($this->convertDateToLocalTime($signatures['asesi']['date'] ?? now())),
             'asesor_sign_date' => $this->convertDateToLocalTime($signatures['asesor']['date'] ?? now()),
         ];
 

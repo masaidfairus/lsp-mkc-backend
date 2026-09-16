@@ -22,27 +22,38 @@ class WorkGroupResource extends Resource
     protected static ?string $navigationLabel = 'Kelompok Pekerjaan';
     protected static ?string $modelLabel = 'Kelompok Pekerjaan';
     protected static ?string $pluralModelLabel = 'Kelompok Pekerjaan';
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                 Forms\Components\Select::make('scheme_id')
                     ->label('Skema Sertifikasi')
                     ->relationship('scheme', 'name')
                     ->searchable()
                     ->required(),
+                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                 Forms\Components\TextInput::make('name')
                     ->label('Nama Kelompok Pekerjaan')
                     ->required()
                     ->maxLength(255),
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('Unit Kompetensi yang Terkait')
                     ->schema([
                         Forms\Components\Repeater::make('competencyUnits')
                             ->relationship()
                             ->schema([
+                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                 Forms\Components\TextInput::make('unit_code')
                                     ->label('Kode Unit')
                                     ->disabled(),
+                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                 Forms\Components\TextInput::make('unit_title')
                                     ->label('Judul Unit')
                                     ->disabled(),
@@ -56,42 +67,56 @@ class WorkGroupResource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.code')
                     ->label('Kode Skema')
                     ->sortable()
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Nama Skema')
                     ->sortable()
                     ->searchable()
                     ->wrap(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('name')
                     ->label('Kelompok Pekerjaan')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('competencyUnits.unit_code')
                     ->label('Units')
                     ->listWithLineBreaks()
                     ->bulleted()
                     ->searchable()
                     ->wrap(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('competencyUnits.unit_title')
                     ->label('Titles')
                     ->listWithLineBreaks()
                     ->bulleted()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->wrap(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('competency_units_count')
                     ->counts('competencyUnits')
                     ->label('Total')
                     ->badge(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -110,6 +135,11 @@ class WorkGroupResource extends Resource
             ]);
     }
 
+    /**
+     * Mendapatkan relasi getRelations.
+     *
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -117,6 +147,11 @@ class WorkGroupResource extends Resource
         ];
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

@@ -10,6 +10,13 @@ use Illuminate\Http\Request;
 
 class PdfVaController extends Controller
 {
+    /**
+     * Menampilkan detail dari resource yang ditentukan.
+     *
+     * @param  Request  $request
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function show(Request $request, AssessmentRegistration $registration)
     {
         $user = $request->user();
@@ -45,21 +52,45 @@ class PdfVaController extends Controller
             return array_map(fn($v) => ['label' => $v], $items);
         };
 
+        $selectedFocus = $prep['focus_and_purpose'] ?? [];
+        if (!empty($prep['has_focus_other_1']) && !empty($prep['focus_other_1'])) $selectedFocus[] = $prep['focus_other_1'];
+        if (!empty($prep['has_focus_other_2']) && !empty($prep['focus_other_2'])) $selectedFocus[] = $prep['focus_other_2'];
+
+        $selectedContext = $prep['validation_context'] ?? [];
+        if (!empty($prep['has_context_other_1']) && !empty($prep['context_other_1'])) $selectedContext[] = $prep['context_other_1'];
+        if (!empty($prep['has_context_other_2']) && !empty($prep['context_other_2'])) $selectedContext[] = $prep['context_other_2'];
+
+        $selectedBench = $references['benchmarks'] ?? [];
+        if (!empty($references['has_benchmark_other_1']) && !empty($references['benchmark_other_1'])) $selectedBench[] = $references['benchmark_other_1'];
+        
+        $selectedMaterials = $references['materials'] ?? [];
+        if (!empty($references['has_material_other_1']) && !empty($references['material_other_1'])) $selectedMaterials[] = $references['material_other_1'];
+
+        $selectedComm = $valData['communication_skills'] ?? [];
+        if (!empty($valData['has_communication_other_1']) && !empty($valData['communication_other_1'])) $selectedComm[] = $valData['communication_other_1'];
+        if (!empty($valData['has_communication_other_2']) && !empty($valData['communication_other_2'])) $selectedComm[] = $valData['communication_other_2'];
+
         $tujuanFokusOpts = [
             'Bagian dari Proses Penjaminan Mutu Organisasi', 'Mengantisipasi Risiko', 'Memenuhi Persyaratan BNSP',
-            'Memastikan Kesesuaian Bukti', 'Meningkatkan Kualitas Asesmen', 'Mengevaluasi Kualitas Perangkat Asesmen'
+            'Memastikan Kesesuaian Bukti', 'Meningkatkan Kualitas Asesmen', 'Mengevaluasi Kualitas Perangkat Asesmen',
+            (!empty($prep['has_focus_other_1']) && !empty($prep['focus_other_1']) ? $prep['focus_other_1'] : '...'), 
+            (!empty($prep['has_focus_other_2']) && !empty($prep['focus_other_2']) ? $prep['focus_other_2'] : '...')
         ];
         $konteksOpts = [
-            'Karakteristik Asesi', 'Lingkungan', 'Kebijakan / SOP', 'Bahan dan Alat Pendukung', 'Persyaratan Khusus', 'Lainnya'
+            'Internal Organisasi', 'Eksternal Organisasi', 'Proses Lisensi/ Re lisensi', 'Dengan Kolega Asesor', 'Kolega dari Organisasi Pelatihan atau Asesmen', 
+            (!empty($prep['has_context_other_1']) && !empty($prep['context_other_1']) ? $prep['context_other_1'] : '...'), 
+            (!empty($prep['has_context_other_2']) && !empty($prep['context_other_2']) ? $prep['context_other_2'] : '...')
         ];
         $pendekatanOpts = [
-            'Asesmen Berbasis Kompetensi', 'Asesmen Portofolio', 'Asesmen RPL', 'Observasi Langsung', 'Pendekatan Tertulis/Lisan'
+            'Panel asesmen', 'Pertemuan moderasi', 'Mengkaji perangkat asesmen', 'Acuan pembanding', 'Pengujian lapangan dan uji coba perangkat asesmen', 'Umpan balik dari klien', 'Mengkaji bukti-bukti'
         ];
         $acuanOpts = [
-            'Standar Kompetensi (SKKNI/SKK/SKI)', 'Skema Sertifikasi', 'SOP/IK', 'Manual Instruction / Book Manual', 'Standar Kinerja'
+            'Standar Kompetensi (SKKNI/SKKK/SKI)', 'Skema Sertifikasi', 'SOP/IK', 'Manual Instruction / Book Manual', 'Standar Kinerja', 
+            (!empty($references['has_benchmark_other_1']) && !empty($references['benchmark_other_1']) ? $references['benchmark_other_1'] : '...')
         ];
         $dokumenOpts = [
-            'Perangkat Asesmen', 'Peraturan / Pedoman', 'Bukti-bukti hasil asesmen'
+            'Perangkat Asesmen', 'Peraturan / Pedoman', 'Bukti-bukti hasil asesmen', 
+            (!empty($references['has_material_other_1']) && !empty($references['material_other_1']) ? $references['material_other_1'] : '...')
         ];
 
         $mapWithOptions = function($selected, $options) {
@@ -96,23 +127,19 @@ class PdfVaController extends Controller
             return $result;
         };
 
-        $tujuanFokus = $mapWithOptions($prep['focus_and_purpose'] ?? [], $tujuanFokusOpts);
-        $konteks = $mapWithOptions($prep['validation_context'] ?? [], $konteksOpts);
+        $tujuanFokus = $mapWithOptions($selectedFocus, $tujuanFokusOpts);
+        $konteks = $mapWithOptions($selectedContext, $konteksOpts);
         $pendekatan = $mapWithOptions($prep['validation_approach'] ?? [], $pendekatanOpts);
         
-        $acuan = $mapWithOptions($references['benchmarks'] ?? [], $acuanOpts);
-        $dokumen = $mapWithOptions($references['materials'] ?? [], $dokumenOpts);
+        $acuan = $mapWithOptions($selectedBench, $acuanOpts);
+        $dokumen = $mapWithOptions($selectedMaterials, $dokumenOpts);
         
-        // Komunikasi skills usually just lists what is selected, but if we need a list:
-        $komunikasiMap = [
-            'proactive' => 'PRO AKTIF',
-            'active_listening' => 'ACTIVE LISTENING',
-            'empathy' => 'Empati'
+        $komunikasiOpts = [
+            'PRO AKTIF', 'ACTIVE LISTENING', 
+            (!empty($valData['has_communication_other_1']) && !empty($valData['communication_other_1']) ? $valData['communication_other_1'] : '......'),
+            (!empty($valData['has_communication_other_2']) && !empty($valData['communication_other_2']) ? $valData['communication_other_2'] : '......')
         ];
-        $komunikasi = [];
-        foreach ($valData['communication_skills'] ?? [] as $k) {
-            $komunikasi[] = ['label' => $komunikasiMap[$k] ?? $k];
-        }
+        $komunikasi = $mapWithOptions($selectedComm, $komunikasiOpts);
 
         $aspekValidasi = [];
         $matrix = $valData['validation_matrix'] ?? [];
@@ -135,14 +162,12 @@ class PdfVaController extends Controller
         }
 
         $temuanRekomendasi = [];
-        $temuan = $contributions['findings_list'] ?? [];
-        $rekom = $contributions['recommendations_list'] ?? [];
-        $maxTemuan = max(count($temuan), count($rekom));
-        for ($i = 0; $i < $maxTemuan; $i++) {
+        $temuanData = $contributions['findings_list'] ?? [];
+        foreach ($temuanData as $idx => $item) {
             $temuanRekomendasi[] = [
-                'no' => $i + 1,
-                'temuan' => $temuan[$i]['finding'] ?? '',
-                'rekomendasi' => $rekom[$i]['recommendation'] ?? '',
+                'no' => $idx + 1,
+                'temuan' => $item['finding'] ?? '',
+                'rekomendasi' => $item['recommendation'] ?? '',
             ];
         }
 
@@ -205,54 +230,31 @@ class PdfVaController extends Controller
             ];
         }
 
-        // Fetch Validator and Lead Assessor
-        $validator = null;
-        if (!empty($header['validator_id'])) {
-            $validator = \App\Models\User::with('userSignature')->find($header['validator_id']);
-        }
-        
-        $leadAssessor = null;
-        if (!empty($header['lead_assessor_id'])) {
-            $leadAssessor = \App\Models\User::with('userSignature')->find($header['lead_assessor_id']);
-        }
-
         $data = [
-            'validator' => $validator,
-            'leadAssessor' => $leadAssessor,
+            'header' => $header,
+            'references' => $references,
+            'preparation' => $prep,
+            'contributions' => $contributions,
+            'assessor' => $registration->assessor,
+            'tujuanFokus' => $tujuanFokus,
+            'konteks' => $konteks,
+            'pendekatan' => $pendekatan,
+            'acuan' => $acuan,
+            'dokumen' => $dokumen,
+            'komunikasi' => $komunikasi,
+            'aspek_validasi' => $aspekValidasi,
+            'temuan_rekomendasi' => $temuanRekomendasi,
+            'rencana_implementasi' => $rencanaImpl ?? [],
             'tim_validasi' => $timValidasi,
             'hari_tanggal' => $header['day_date'] ?? now()->format('d-m-Y'),
             'tempat' => $header['location'] ?? 'TUK ' . ($registration->tuk ?? ''),
             'periode' => $header['period'] ?? [],
             'nama_skema' => $header['scheme_name'] ?? $registration->scheme?->name ?? '',
             'nomor_skema' => $header['scheme_number'] ?? $registration->scheme?->code ?? '',
-            'tujuan_fokus' => $tujuanFokus,
-            'konteks_validasi' => $konteks,
-            'pendekatan_validasi' => $pendekatan,
             'orang_relevan' => $orangRelevan,
             'acuan_pembanding' => $acuan,
             'dokumen_terkait' => $dokumen,
-            'komunikasi' => $komunikasi,
-            'aspek_validasi' => $aspekValidasi,
-            'temuan_rekomendasi' => $temuanRekomendasi,
-            'rencana_implementasi' => $rencanaImpl,
-            'assessor' => $registration->assessor,
-            'candidate' => $registration->candidate,
         ];
-
-        // --- Inject Signatures for Compilers & Validators ---
-        // (Assuming $data['penyusun'] and $data['validator'] might be objects or arrays)
-        // If they are single objects, we can handle them directly
-        if ($validator) {
-            $sig = $this->getUserSignature($validator->id, $registration->id, 'Validator');
-            $data['validator_qr_code'] = $sig['qr_code'];
-            $data['validator_date']    = $sig['is_signed'] ? $this->convertDateToLocalTime($sig['signed_at'] ?? now()) : '';
-        }
-
-        // Add assessor signature too for consistency
-        $assessorSig = $this->getUserSignature($registration->assessor?->id, $registration->id, 'Asesor');
-        $data['assessor_qr_code'] = $assessorSig['qr_code'];
-        $data['assessor_date']    = $assessorSig['is_signed'] ? $this->convertDateToLocalTime($assessorSig['signed_at'] ?? $registration->updated_at) : '';
-        // ----------------------------------------------------
 
         $pdf = Pdf::loadView('forms.mkva', $data)
             ->setPaper('a4', 'portrait')

@@ -6,6 +6,7 @@ use App\Enums\Apl01Status;
 use App\Enums\Apl02Status;
 use App\Enums\Role;
 use App\Enums\AssessmentStatus;
+use App\Exports\AsesiBlankoExport;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\PortfolioFilesRelationManager;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\SelfAssessmentRelationManager;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\EvidenceRelationManager;
@@ -18,6 +19,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class AssessmentRegistrationResource extends Resource
 {
@@ -31,6 +33,11 @@ class AssessmentRegistrationResource extends Resource
     protected static ?string $navigationGroup = 'Pendaftaran';
 
 
+    /**
+     * Mengambil eloquent query.
+     *
+     * @return Builder
+     */
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()
@@ -43,6 +50,12 @@ class AssessmentRegistrationResource extends Resource
         return $query;
     }
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
@@ -51,73 +64,109 @@ class AssessmentRegistrationResource extends Resource
                     ->tabs([
                         Forms\Components\Tabs\Tab::make('Status & Administrasi')
                             ->schema([
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Select::make('user_id')
-                                            ->relationship('candidate', 'name')
-                                            ->label('Asesi')
-                                            ->disabled(),
-                                        Forms\Components\Select::make('scheme_id')
-                                            ->relationship('scheme', 'name')
-                                            ->label('Skema')
-                                            ->disabled(),
-                                    ]),
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Select::make('assessor_id')
-                                            ->relationship('assessor', 'name', fn(Builder $query) => $query->role(Role::ASESOR->value))
-                                            ->label('Asesor')
-                                            ->searchable()
-                                            ->preload(false)
-                                            ->disabled(fn() => auth()->user()->hasRole('asesor')),
-                                        Forms\Components\Select::make('status_apl01')
-                                            ->options([
-                                                Apl01Status::PENDING->value => Apl01Status::PENDING->getLabel(),
-                                                Apl01Status::APPROVED->value => Apl01Status::APPROVED->getLabel(),
-                                                Apl01Status::REJECTED->value => Apl01Status::REJECTED->getLabel(),
-                                            ])
-                                            ->label('Status APL.01')
-                                            ->required()
-                                            ->hidden(fn() => auth()->user()->hasRole('asesor')),
-                                    ]),
-                                Forms\Components\Textarea::make('admin_notes')
-                                    ->label('Catatan Admin')
-                                    ->placeholder('Tambahkan catatan admin di sini...')
-                                    ->rows(3)
-                                    ->columnSpanFull()
-                                    ->hidden(fn() => auth()->user()->hasRole('asesor')),
 
+                                // =====================================================
+                                // SECTION APL.01 — hanya Admin/Superadmin yang bisa edit
+                                // Asesor: semua field di sini read-only (disabled)
+                                // =====================================================
+                                Forms\Components\Section::make('Biodata Asesi (APL.01)')
+                                    ->schema([
+                                        Forms\Components\Grid::make(2)
+                                            ->schema([
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
+                                                Forms\Components\Select::make('user_id')
+                                                    ->relationship('candidate', 'name')
+                                                    ->label('Asesi')
+                                                    ->disabled(),
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
+                                                Forms\Components\Select::make('scheme_id')
+                                                    ->relationship('scheme', 'name')
+                                                    ->label('Skema')
+                                                    ->disabled(),
+                                            ]),
+                                        Forms\Components\Grid::make(2)
+                                            ->schema([
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
+                                                Forms\Components\Select::make('assessor_id')
+                                                    ->relationship('assessor', 'name', fn(Builder $query) => $query->role(Role::ASESOR->value))
+                                                    ->label('Asesor')
+                                                    ->searchable()
+                                                    ->preload(false)
+                                                    // Hanya Superadmin (Manager Sertifikasi) yang bisa edit assessor_id
+                                                    ->disabled(fn() => !auth()->user()->hasRole('superadmin')),
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
+                                                Forms\Components\Select::make('status_apl01')
+                                                    ->options([
+                                                        Apl01Status::PENDING->value  => Apl01Status::PENDING->getLabel(),
+                                                        Apl01Status::APPROVED->value => Apl01Status::APPROVED->getLabel(),
+                                                        Apl01Status::REJECTED->value => Apl01Status::REJECTED->getLabel(),
+                                                    ])
+                                                    ->label('Status APL.01')
+                                                    ->required()
+                                                    // Asesor: read-only (disabled), Admin: editable
+                                                    ->disabled(fn() => auth()->user()->hasRole('asesor')),
+                                            ]),
+                                        Forms\Components\Textarea::make('admin_notes')
+                                            ->label('Catatan Admin')
+                                            ->placeholder('Tambahkan catatan admin di sini...')
+                                            ->rows(3)
+                                            ->columnSpanFull()
+                                            // Asesor: read-only (disabled), Admin: editable
+                                            ->disabled(fn() => auth()->user()->hasRole('asesor')),
+                                    ])
+                                    ->columns(1),
+
+                                // =====================================================
+                                // SECTION APL.02 — hanya Asesor yang bisa edit
+                                // Admin/Superadmin: semua field di sini read-only (disabled)
+                                // =====================================================
                                 Forms\Components\Section::make('Validasi Evaluasi Mandiri (APL.02)')
                                     ->schema([
                                         Forms\Components\Placeholder::make('apl02_warning')
                                             ->label('')
                                             ->content(new \Illuminate\Support\HtmlString('<div style="color: #b45309; background-color: #fffbeb; padding: 12px; border-radius: 8px; border: 1px solid #fde68a;">Asesi belum mengisi Form Asesmen Mandiri (APL.02). Status tidak dapat diubah.</div>'))
                                             ->visible(fn($record) => !$record || $record->selfAssessments->isEmpty())
-                                            ->hidden(fn() => auth()->user()->hasRole('asesor'))
                                             ->columnSpanFull(),
-                                        Forms\Components\Select::make('status_apl02')
-                                            ->options(Apl02Status::class)
-                                            ->label('Status APL.02')
-                                            ->required(fn() => !auth()->user()->hasRole(['admin', 'superadmin']))
-                                            ->visible(fn($record) => $record && $record->status_apl02 !== null),
+
+                                        // Hidden field to persist status_apl02 — set automatically by the radio button below
+                                        Forms\Components\Hidden::make('status_apl02'),
 
                                         Forms\Components\Grid::make(2)
                                             ->schema([
                                                 Forms\Components\Radio::make('is_apl02_continuable')
                                                     ->label('Asesmen dapat dilanjutkan?')
                                                     ->options([
-                                                        true => 'Dapat dilanjutkan',
+                                                        true  => 'Dapat dilanjutkan',
                                                         false => 'Tidak dapat dilanjutkan',
                                                     ])
                                                     ->inline()
-                                                    ->required(fn() => !auth()->user()->hasRole(['admin', 'superadmin'])),
+                                                    ->live()
+                                                    ->afterStateUpdated(function ($state, callable $set) {
+                                                        $continuable = filter_var($state, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+                                                        if ($continuable === true) {
+                                                            $set('status_apl02', Apl02Status::APPROVED->value);
+                                                        } elseif ($continuable === false) {
+                                                            $set('status_apl02', Apl02Status::REJECTED->value);
+                                                        }
+                                                    })
+                                                    // Hanya Asesor yang bisa edit; Admin read-only
+                                                    ->disabled(fn() => auth()->user()->hasRole(['admin', 'superadmin']))
+                                                    ->required(fn() => auth()->user()->hasRole('asesor')),
+
                                                 Forms\Components\TextInput::make('apl02_approach')
                                                     ->label('Melalui Pendekatan')
                                                     ->placeholder('Contoh: Asesmen Mandiri / Verifikasi Portofolio')
-                                                    ->required(fn() => !auth()->user()->hasRole(['admin', 'superadmin'])),
+                                                    // Hanya Asesor yang bisa edit; Admin read-only
+                                                    ->disabled(fn() => auth()->user()->hasRole(['admin', 'superadmin']))
+                                                    ->required(false),
                                             ])->visible(fn($record) => $record && $record->status_apl02 !== null),
                                     ])->columns(1),
 
+                                // =====================================================
+                                // SECTION PENERBITAN SERTIFIKAT — hanya Admin/Superadmin
+                                // Asesor: section ini tidak ditampilkan (FileUpload hidden)
+                                // =====================================================
                                 Forms\Components\Section::make('Penerbitan Sertifikat')
                                     ->schema([
                                         Forms\Components\FileUpload::make('certificate')
@@ -125,25 +174,29 @@ class AssessmentRegistrationResource extends Resource
                                             ->directory('certificates')
                                             ->acceptedFileTypes(['application/pdf', 'image/*'])
                                             ->maxSize(5120) // 5MB max
-                                            ->visible(fn() => auth()->user()->hasRole(['superadmin', 'admin']))
                                             ->hint('Pastikan semua tahapan asesmen sudah selesai sebelum mengunggah sertifikat.')
-                                            ->columnSpanFull(),
+                                            ->columnSpanFull()
+                                            // Asesor: read-only; Admin/Superadmin: editable
+                                            ->disabled(fn() => auth()->user()->hasRole('asesor')),
                                     ]),
                             ]),
 
                         Forms\Components\Tabs\Tab::make('APL.01')
                             ->schema([
                                 Forms\Components\Grid::make(3)->schema([
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_candidate_name')
                                         ->label('Nama Lengkap')
                                         ->afterStateHydrated(fn(Forms\Components\TextInput $component, $record) => $component->state($record?->candidate?->name))
                                         ->disabled()
                                         ->dehydrated(false),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_candidate_email')
                                         ->label('Email')
                                         ->afterStateHydrated(fn(Forms\Components\TextInput $component, $record) => $component->state($record?->candidate?->email ?? '-'))
                                         ->disabled()
                                         ->dehydrated(false),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_candidate_registration_number')
                                         ->label('No. Registrasi')
                                         ->afterStateHydrated(fn(Forms\Components\TextInput $component, $record) => $component->state($record?->candidate?->registration_number ?: 'Belum ada'))
@@ -151,15 +204,17 @@ class AssessmentRegistrationResource extends Resource
                                         ->dehydrated(false),
                                 ]),
                                 Forms\Components\Grid::make(2)->schema([
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_identity_type')
                                         ->label('Jenis Identitas')
                                         ->afterStateHydrated(fn(Forms\Components\TextInput $component, $record) => $component->state(match ($record?->candidate?->identity_type) {
-                                            'id' => 'KTP',
+                                            'id'       => 'KTP',
                                             'passport' => 'Passport',
-                                            default => $record?->candidate?->identity_type ?? '-',
+                                            default    => $record?->candidate?->identity_type ?? '-',
                                         }))
                                         ->disabled()
                                         ->dehydrated(false),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_identity_number')
                                         ->label('No. KTP / Paspor')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->identity_number ?? $record?->candidate?->identity_number ?? '-')
@@ -167,24 +222,29 @@ class AssessmentRegistrationResource extends Resource
                                         ->helperText('Nomor identitas yang diisi pada formulir APL.01'),
                                 ]),
                                 Forms\Components\Grid::make(3)->schema([
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_gender')
                                         ->label('Jenis Kelamin')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->gender?->getLabel() ?? '-')
                                         ->disabled(),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_place_of_birth')
                                         ->label('Tempat Lahir')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->place_of_birth)
                                         ->disabled(),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_date_of_birth')
                                         ->label('Tanggal Lahir')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->date_of_birth?->format('d/m/Y'))
                                         ->disabled(),
                                 ]),
                                 Forms\Components\Grid::make(2)->schema([
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_phone_number')
                                         ->label('No. Telepon')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->phone_number)
                                         ->disabled(),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_education')
                                         ->label('Pendidikan Terakhir')
                                         ->formatStateUsing(function ($record) {
@@ -207,6 +267,7 @@ class AssessmentRegistrationResource extends Resource
                                         ->label('Alamat Rumah')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->address)
                                         ->disabled(),
+                                    // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                     Forms\Components\TextInput::make('apl_home_postal_code')
                                         ->label('Kode Pos Rumah')
                                         ->formatStateUsing(fn($record) => $record?->aplData?->home_postal_code)
@@ -214,26 +275,32 @@ class AssessmentRegistrationResource extends Resource
                                 ]),
                                 Forms\Components\Fieldset::make('Pekerjaan/Perusahaan')
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_company_name')
                                             ->label('Nama Perusahaan')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->company_name)
                                             ->disabled(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_job_title')
                                             ->label('Jabatan')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->job_title)
                                             ->disabled(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_company_contact')
                                             ->label('No. Telepon Kantor')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->company_contact)
                                             ->disabled(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_company_fax')
                                             ->label('Fax Perusahaan')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->company_fax ?? '-')
                                             ->disabled(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_company_email')
                                             ->label('Email Perusahaan')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->company_email ?? '-')
                                             ->disabled(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('apl_company_postal_code')
                                             ->label('Kode Pos Perusahaan')
                                             ->formatStateUsing(fn($record) => $record?->aplData?->company_postal_code)
@@ -272,6 +339,7 @@ class AssessmentRegistrationResource extends Resource
                                                     ->content(fn($record) => $record->documentList?->title ?? 'Dokumen Tanpa Judul')
                                                     ->columnSpan(6),
 
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('status')
                                                     ->label('Status Verifikasi')
                                                     ->formatStateUsing(fn($state) => $state instanceof \App\Enums\EvidenceStatus ? $state->getLabel() : ($state ?? '-'))
@@ -525,32 +593,44 @@ class AssessmentRegistrationResource extends Resource
 
 
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->deferLoading()
             ->defaultPaginationPageOption(10)
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('id')
                     ->label('Registration ID')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Skema')
                     ->searchable()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('admin_notes')
                     ->label('Catatan Admin')
                     ->limit(50)
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
                     ->sortable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Daftar')
                     ->dateTime()
@@ -569,15 +649,92 @@ class AssessmentRegistrationResource extends Resource
                     ->label('Verifikasi')
                     ->icon('heroicon-o-check-badge')
                     ->color('primary'),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('wa_kekurangan_bukti')
+                        ->label('WA Kekurangan Bukti')
+                        ->icon('heroicon-o-chat-bubble-left-ellipsis')
+                        ->color('warning')
+                        ->url(function ($record) {
+                            $phone = $record->aplData?->phone_number ?? $record->candidate?->profile?->phone_number;
+                            if (!$phone) return '#';
+                            $phone = preg_replace('/[^\d]/', '', $phone);
+                            if (str_starts_with($phone, '0')) $phone = '62' . substr($phone, 1);
+                            $msg = "Halo {$record->candidate->name}, pendaftaran sertifikasi untuk skema {$record->scheme->name} mengalami kekurangan pada bukti administratif. Mohon segera melengkapi data Anda.";
+                            return "https://wa.me/{$phone}?text=" . urlencode($msg);
+                        })
+                        ->openUrlInNewTab(),
+                        
+                    Tables\Actions\Action::make('wa_invoice')
+                        ->label('WA Invoice Tagihan')
+                        ->icon('heroicon-o-currency-dollar')
+                        ->color('success')
+                        ->visible(fn ($record) => $record->asesi_type === 'pribadi')
+                        ->url(function ($record) {
+                            $phone = $record->aplData?->phone_number ?? $record->candidate?->profile?->phone_number;
+                            if (!$phone) return '#';
+                            $phone = preg_replace('/[^\d]/', '', $phone);
+                            if (str_starts_with($phone, '0')) $phone = '62' . substr($phone, 1);
+                            $msg = "Halo {$record->candidate->name}, berikut adalah pengingat pembayaran invoice untuk pendaftaran sertifikasi skema {$record->scheme->name}. Silakan cek aplikasi untuk detail tagihan dan lakukan pembayaran agar proses dapat dilanjutkan.";
+                            return "https://wa.me/{$phone}?text=" . urlencode($msg);
+                        })
+                        ->openUrlInNewTab(),
+                        
+                    Tables\Actions\Action::make('wa_hasil')
+                        ->label('WA Hasil Sertifikasi')
+                        ->icon('heroicon-o-academic-cap')
+                        ->color('primary')
+                        ->visible(fn ($record) => $record->status && $record->status->value === \App\Enums\AssessmentStatus::APL02_APPROVED->value)
+                        ->url(function ($record) {
+                            $phone = $record->aplData?->phone_number ?? $record->candidate?->profile?->phone_number;
+                            if (!$phone) return '#';
+                            $phone = preg_replace('/[^\d]/', '', $phone);
+                            if (str_starts_with($phone, '0')) $phone = '62' . substr($phone, 1);
+                            $msg = "Halo {$record->candidate->name}, selamat! Proses asesmen untuk skema {$record->scheme->name} telah selesai. Silakan cek aplikasi untuk melihat hasil akhir sertifikasi Anda.";
+                            return "https://wa.me/{$phone}?text=" . urlencode($msg);
+                        })
+                        ->openUrlInNewTab(),
+                ])
+                ->label('Hubungi WA')
+                ->icon('heroicon-m-chat-bubble-bottom-center-text'),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('export_blanko_asesi')
+                        ->label('Export Blanko Asesi (.xlsx)')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->form([
+                            Forms\Components\TextInput::make('filename')
+                                ->label('Nama File (Opsional)')
+                                ->placeholder('PERMOHONAN BLANKO')
+                                ->helperText('Kosongkan untuk menggunakan nama default "PERMOHONAN BLANKO". Ekstensi .xlsx akan ditambahkan otomatis.')
+                                ->maxLength(100),
+                        ])
+                        ->modalHeading('Export Blanko Asesi ke Excel')
+                        ->modalDescription('File Excel (.xlsx) blanko asesi akan didownload untuk asesi yang dipilih. Kolom Kompeten/Belum Kompeten dibiarkan kosong untuk diisi manual.')
+                        ->modalSubmitActionLabel('Export Sekarang')
+                        ->action(function (Collection $records, array $data): \Symfony\Component\HttpFoundation\StreamedResponse {
+                            $filename = filled($data['filename'] ?? null)
+                                ? trim($data['filename'])
+                                : 'PERMOHONAN BLANKO';
+
+                            return app(AsesiBlankoExport::class)->download(
+                                $records->pluck('id')->toArray(),
+                                $filename
+                            );
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
+    /**
+     * Mendapatkan relasi getRelations.
+     *
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -588,11 +745,16 @@ class AssessmentRegistrationResource extends Resource
         ];
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListAssessmentRegistrations::route('/'),
-            'edit' => Pages\EditAssessmentRegistration::route('/{record}/edit'),
+            'edit'  => Pages\EditAssessmentRegistration::route('/{record}/edit'),
         ];
     }
 }

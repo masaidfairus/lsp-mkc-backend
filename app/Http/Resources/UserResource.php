@@ -14,6 +14,12 @@ class UserResource extends JsonResource
      * @return array<string, mixed>
      */
     public static $wrap = 'response';
+    /**
+     * To array.
+     *
+     * @param  Request  $request
+     * @return array
+     */
     public function toArray(Request $request): array
     {
         return [
@@ -27,9 +33,16 @@ class UserResource extends JsonResource
             'role' => 'asesi',
             'is_verified' => $this->email_verified_at !== null,
             'joined_at' => $this->created_at->format('d-M-Y'),
+            'signature' => $this->userSignature ? $this->userSignature->signature_image : null,
         ];
     }
 
+    /**
+     * With.
+     *
+     * @param  Request  $request
+     * @return mixed
+     */
     public function with(Request $request)
     {
         return [

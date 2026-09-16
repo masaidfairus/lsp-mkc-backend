@@ -55,41 +55,81 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    /**
+     * Mendapatkan relasi profile.
+     *
+     * @return mixed
+     */
     public function profile()
     {
         return $this->hasOne(Profile::class);
     }
 
+    /**
+     * Mendapatkan relasi userSignature.
+     *
+     * @return mixed
+     */
     public function userSignature()
     {
         return $this->hasOne(UserSignature::class);
     }
 
+    /**
+     * Mendapatkan relasi asesiPassword.
+     *
+     * @return mixed
+     */
     public function asesiPassword()
     {
         return $this->hasOne(AsesiPassword::class, 'user_id', 'id');
     }
 
+    /**
+     * Mendapatkan relasi activationTokens.
+     *
+     * @return mixed
+     */
     public function activationTokens()
     {
         return $this->hasMany(ActivationTokens::class);
     }
 
+    /**
+     * Mendapatkan relasi registrations.
+     *
+     * @return mixed
+     */
     public function registrations()
     {
         return $this->hasMany(AssessmentRegistration::class, 'user_id', 'id');
     }
 
+    /**
+     * Mendapatkan relasi assignments.
+     *
+     * @return mixed
+     */
     public function assignments()
     {
         return $this->hasMany(AssessmentRegistration::class, 'assessor_id', 'id');
     }
 
+    /**
+     * Mendapatkan relasi userFile.
+     *
+     * @return mixed
+     */
     public function userFile()
     {
         return $this->hasMany(FileProfile::class, 'user_id', 'id');
     }
 
+    /**
+     * Mendapatkan relasi adminFileValidation.
+     *
+     * @return mixed
+     */
     public function adminFileValidation()
     {
         return $this->hasMany(FileProfile::class, 'verified_by', 'id');

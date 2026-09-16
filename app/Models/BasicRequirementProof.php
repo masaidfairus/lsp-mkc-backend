@@ -17,11 +17,21 @@ class BasicRequirementProof extends Model
         'is_mandatory' => 'boolean',
     ];
 
+    /**
+     * Mendapatkan relasi scheme.
+     *
+     * @return mixed
+     */
     public function scheme()
     {
         return $this->belongsTo(Scheme::class);
     }
 
+    /**
+     * Mendapatkan relasi documentList.
+     *
+     * @return mixed
+     */
     public function documentList()
     {
         return $this->belongsTo(DocumentList::class, 'list_id');

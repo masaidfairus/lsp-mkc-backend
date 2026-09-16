@@ -27,27 +27,25 @@ class FrIa07Resource extends Resource
     protected static ?string $pluralModelLabel = 'FR.IA.07';
     protected static ?int $navigationSort = 7;
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('FR.IA.07 - Daftar Pertanyaan Lisan (DPL)')
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
-                                    ->options(function () {
-                                        $registrations = AssessmentRegistration::with(['candidate', 'scheme'])->get();
-                                        $occurrences = [];
-                                        return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
-                                            $key = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
-                                            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
-                                            $candidate = $reg->candidate?->name ?? 'Unknown';
-                                            $scheme = $reg->scheme?->name ?? 'Tanpa Skema';
-                                            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
-                                        });
-                                    })
+                                    ->options(fn (?\Illuminate\Database\Eloquent\Model $record) => static::getFilteredRegistrationOptionsByMapaMethod($record, ['DPL']))
                                     ->required()
                                     ->searchable()
                                     ->preload()
@@ -70,23 +68,32 @@ class FrIa07Resource extends Resource
                             ->statePath('main_data')
                             ->schema([
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Header Dokumen')
                                     ->statePath('header')
                                     ->columns(3)
                                     ->schema([
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('certification_scheme')->label('Skema Sertifikasi')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('scheme_number')->label('Nomor Skema')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('tuk')->label('TUK')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('assessor_name')->label('Nama Asesor')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('assessee_name')->label('Nama Asesi')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('assessment_date')->label('Tanggal')->disabled()->dehydrated(),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Kelompok Pekerjaan')
                                     ->schema([
                                         Forms\Components\Repeater::make('work_group_mapping')
                                             ->label('')
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('group_name')
                                                     ->label('Kelompok Pekerjaan')
                                                     ->disabled()
@@ -95,8 +102,11 @@ class FrIa07Resource extends Resource
                                                 Forms\Components\Repeater::make('units')
                                                     ->label('Unit Kompetensi')
                                                     ->schema([
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('no')->label('No')->disabled()->numeric()->dehydrated(),
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('unit_code')->label('Kode Unit')->disabled()->dehydrated(),
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('unit_title')->label('Judul Unit')->disabled()->dehydrated(),
                                                     ])
                                                     ->columns(3)
@@ -110,11 +120,13 @@ class FrIa07Resource extends Resource
                                             ->itemLabel(fn(array $state): ?string => $state['group_name'] ?? 'Kelompok'),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Daftar Pertanyaan Lisan')
                                     ->schema([
                                         Forms\Components\Repeater::make('oral_questions')
                                             ->label('')
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('no')
                                                     ->label('No')
                                                     ->numeric()
@@ -142,6 +154,7 @@ class FrIa07Resource extends Resource
                                             ->addActionLabel('Tambah Pertanyaan'),
                                     ]),
 
+                                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                                 Forms\Components\Section::make('Umpan Balik')
                                     ->statePath('feedback_section')
                                     ->schema([
@@ -155,6 +168,7 @@ class FrIa07Resource extends Resource
                                 self::standardDocumentControlBlock('document_control'),
                             ]),
 
+                        // BAGIAN FORM: Grup bidang form berbingkai (Section)
                         Forms\Components\Section::make('Tanda Tangan')
                             ->schema([
                                 self::standardAsesiDisclaimer(),
@@ -164,6 +178,15 @@ class FrIa07Resource extends Resource
             ]);
     }
 
+    /**
+     * Populate ia07 data.
+     *
+     * @param  mixed  $state
+     * @param  callable  $set
+     * @param  callable  $get
+     * @param  bool  $isUpdate
+     * @return mixed
+     */
     protected static function populateIa07Data($state, callable $set, callable $get = null, bool $isUpdate = false)
     {
         $reg = AssessmentRegistration::with([
@@ -209,20 +232,35 @@ class FrIa07Resource extends Resource
         }
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn($query) => $query->where('document_type', 'FR.IA.07'))
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')->label('Registration ID')->sortable()->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.candidate.name')->label('Asesi')->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.scheme.name')->label('Skema')->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')->label('Dibuat')->dateTime()->sortable(),
             ])
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

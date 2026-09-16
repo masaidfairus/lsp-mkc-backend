@@ -10,6 +10,11 @@ class ListMapa02s extends ListRecords
 {
     protected static string $resource = Mapa02Resource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

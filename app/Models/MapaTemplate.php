@@ -15,6 +15,11 @@ class MapaTemplate extends Model
         'data' => 'array',
     ];
 
+    /**
+     * Mendapatkan relasi scheme.
+     *
+     * @return mixed
+     */
     public function scheme()
     {
         return $this->belongsTo(Scheme::class);

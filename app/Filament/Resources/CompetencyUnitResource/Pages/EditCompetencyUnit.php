@@ -10,6 +10,11 @@ class EditCompetencyUnit extends EditRecord
 {
     protected static string $resource = CompetencyUnitResource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

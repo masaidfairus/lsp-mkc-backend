@@ -26,6 +26,11 @@ class Ak02Resource extends Resource
     protected static ?string $pluralModelLabel = 'AK.02';
     protected static ?int $navigationSort = 2;
     
+    /**
+     * Mengambil eloquent query.
+     *
+     * @return Builder
+     */
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
@@ -39,6 +44,12 @@ class Ak02Resource extends Resource
         return $query;
     }
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
@@ -49,19 +60,10 @@ class Ak02Resource extends Resource
                         // ── Registration Selector ──────────────────────────────
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
-                                    ->options(function () {
-                                        $registrations = AssessmentRegistration::with(['candidate', 'scheme'])->get();
-                                        $occurrences   = [];
-                                        return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
-                                            $key               = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
-                                            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
-                                            $candidate         = $reg->candidate?->name ?? 'Unknown';
-                                            $scheme            = $reg->scheme?->name ?? 'Tanpa Skema';
-                                            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
-                                        });
-                                    })
+                                    ->options(fn (?\Illuminate\Database\Eloquent\Model $record) => static::getFilteredRegistrationOptions($record))
                                     ->required()
                                     ->searchable()
                                     ->preload()
@@ -119,10 +121,12 @@ class Ak02Resource extends Resource
                                     ->schema([
                                         Forms\Components\Grid::make(2)
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('certification_scheme')
                                                     ->label('Skema Sertifikasi')
                                                     ->disabled()
                                                     ->dehydrated(),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('scheme_code')
                                                     ->label('Kode Skema')
                                                     ->disabled()
@@ -130,14 +134,17 @@ class Ak02Resource extends Resource
                                             ]),
                                         Forms\Components\Grid::make(3)
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('tuk')
                                                     ->label('TUK')
                                                     ->disabled()
                                                     ->dehydrated(),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('assessor_name')
                                                     ->label('Nama Asesor')
                                                     ->disabled()
                                                     ->dehydrated(),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('assessee_name')
                                                     ->label('Nama Asesi')
                                                     ->disabled()
@@ -162,11 +169,13 @@ class Ak02Resource extends Resource
                                             ->schema([
                                                 Forms\Components\Grid::make(12)
                                                     ->schema([
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('unit_sequence')
                                                             ->label('No.')
                                                             ->disabled()
                                                             ->dehydrated()
                                                             ->columnSpan(1),
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('unit_title')
                                                             ->label('Judul Unit Kompetensi')
                                                             ->disabled()
@@ -265,21 +274,31 @@ class Ak02Resource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')
                     ->label('Reg. ID')
                     ->sortable()
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Skema')
                     ->searchable()
                     ->limit(35),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d/m/Y H:i')
@@ -289,6 +308,30 @@ class Ak02Resource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('wa_banding_ak04')
+                    ->label('WA Hak Banding AK.04')
+                    ->icon('heroicon-o-chat-bubble-left-ellipsis')
+                    ->color('warning')
+                    ->tooltip('Kirim notifikasi WA kepada Asesi tentang hak banding AK.04')
+                    ->visible(function ($record) {
+                        // Tampil hanya jika hasil AK.02 = Belum Kompeten
+                        $mainData = is_array($record->main_data)
+                            ? $record->main_data
+                            : json_decode($record->main_data ?? '{}', true);
+                        $isCompetent = data_get($mainData, 'assessment_summary.is_competent');
+                        return $isCompetent !== null && !filter_var($isCompetent, FILTER_VALIDATE_BOOLEAN);
+                    })
+                    ->url(function ($record) {
+                        $phone = $record->registration?->aplData?->phone_number ?? $record->candidate?->profile?->phone_number;
+                        if (!$phone) return '#';
+                        $phone = preg_replace('/[\D]/', '', $phone);
+                        if (str_starts_with($phone, '0')) $phone = '62' . substr($phone, 1);
+                        $name  = $record->candidate?->name ?? 'Asesi';
+                        $skema = $record->scheme?->name ?? 'Skema';
+                        $msg   = "Halo {$name}, berdasarkan hasil asesmen untuk skema {$skema}, Anda dinyatakan Belum Kompeten. Anda memiliki hak untuk mengajukan banding melalui Form AK.04 di aplikasi kami. Silakan buka aplikasi dan ajukan banding jika Anda merasa keberatan dengan hasil tersebut.";
+                        return "https://wa.me/{$phone}?text=" . urlencode($msg);
+                    })
+                    ->openUrlInNewTab(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -298,6 +341,11 @@ class Ak02Resource extends Resource
             ]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

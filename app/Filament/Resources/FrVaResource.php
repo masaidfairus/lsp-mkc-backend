@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FrVaResource\Pages;
+use App\Filament\Traits\HasStandardIaForm;
 use App\Models\AssessmentValidation;
 use App\Models\PeerValidation;
 use App\Models\AssessmentRegistration;
@@ -14,6 +15,7 @@ use Filament\Tables\Table;
 
 class FrVaResource extends Resource
 {
+    use HasStandardIaForm;
     protected static ?string $model = AssessmentValidation::class;
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
     protected static ?string $navigationGroup = 'MKVA';
@@ -22,25 +24,25 @@ class FrVaResource extends Resource
     protected static ?string $pluralModelLabel = 'FR.VA';
     protected static ?int $navigationSort = 1;
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('FR.VA - Memberikan Kontribusi dalam Validasi Asesmen')
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Pilih Registrasi')
-                                    ->options(function () {
-                                        $regs = AssessmentRegistration::with(['candidate', 'scheme'])->get();
-                                        $occ = [];
-                                        return $regs->mapWithKeys(function ($reg) use (&$occ) {
-                                            $key = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
-                                            $occ[$key] = ($occ[$key] ?? 0) + 1;
-                                            return [$reg->id => ($reg->candidate?->name ?? '-') . ' — ' . ($reg->scheme?->name ?? '-') . " #{$occ[$key]}"];
-                                        });
-                                    })
+                                    ->options(fn (?\Illuminate\Database\Eloquent\Model $record) => static::getFilteredRegistrationOptions($record))
                                     ->required()
                                     ->searchable()
                                     ->preload()
@@ -74,6 +76,7 @@ class FrVaResource extends Resource
                                     ->schema([
                                         Forms\Components\TagsInput::make('header.validation_team')->label('Tim Validasi'),
                                         Forms\Components\DatePicker::make('header.day_date')->label('Hari / Tanggal')->native(false),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('header.location')->label('Tempat'),
                                         Forms\Components\CheckboxList::make('header.period')
                                             ->label('Periode Validasi')
@@ -83,16 +86,20 @@ class FrVaResource extends Resource
                                                 'after_assessment'  => 'Setelah Asesmen',
                                             ])
                                             ->columns(3),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('header.scheme_name')->label('Nama Skema')->disabled()->dehydrated(),
+                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                         Forms\Components\TextInput::make('header.scheme_number')->label('Nomor Skema')->disabled()->dehydrated(),
                                         
                                         Forms\Components\Group::make()
                                             ->schema([
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                                 Forms\Components\Select::make('header.validator_id')
                                                     ->label('Pilih Validator')
                                                     ->options(\App\Models\User::role(['asesor', 'admin'])->pluck('name', 'id'))
                                                     ->searchable()
                                                     ->preload(),
+                                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                                 Forms\Components\Select::make('header.lead_assessor_id')
                                                     ->label('Pilih Lead Assessor')
                                                     ->options(\App\Models\User::role(['asesor', 'admin'])->pluck('name', 'id'))
@@ -210,6 +217,7 @@ class FrVaResource extends Resource
                                                 ['no' => 3, 'aspect' => 'Mengevaluasi Hasil Asesmen', 'rules_of_evidence' => [], 'principles_of_assessment' => []],
                                             ])
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('no')->numeric()->disabled()->dehydrated(),
                                                 Forms\Components\Textarea::make('aspect')->label('Aspek'),
                                                 Forms\Components\CheckboxList::make('rules_of_evidence')
@@ -246,6 +254,7 @@ class FrVaResource extends Resource
                                             ->schema([
                                                 Forms\Components\Textarea::make('activity')->label('Kegiatan Perbaikan')->rows(2),
                                                 Forms\Components\DatePicker::make('completion_time')->label('Waktu Penyelesaian')->native(false),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('person_in_charge')->label('Penanggung Jawab'),
                                             ])
                                             ->columns(3)
@@ -256,18 +265,33 @@ class FrVaResource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.candidate.name')->label('Asesi')->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.scheme.name')->label('Skema')->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration.assessor.name')->label('Asesor')->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')->label('Dibuat')->dateTime()->sortable(),
             ])
             ->actions([Tables\Actions\EditAction::make()]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

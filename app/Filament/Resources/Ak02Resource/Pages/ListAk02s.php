@@ -10,6 +10,11 @@ class ListAk02s extends ListRecords
 {
     protected static string $resource = Ak02Resource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [

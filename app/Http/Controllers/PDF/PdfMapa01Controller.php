@@ -10,6 +10,13 @@ use Illuminate\Http\Request;
 
 class PdfMapa01Controller extends Controller
 {
+    /**
+     * Menampilkan detail dari resource yang ditentukan.
+     *
+     * @param  Request  $request
+     * @param  AssessmentRegistration  $registration
+     * @return mixed
+     */
     public function show(Request $request, AssessmentRegistration $registration)
     {
         $user = $request->user();
@@ -36,11 +43,16 @@ class PdfMapa01Controller extends Controller
         foreach ($sections as $section) {
             $groupName = $section['work_group'] ?? '';
             $unitMap[$groupName][] = [
-                'kode' => $section['unit_code'] ?? '',
-                'judul' => $section['unit_title'] ?? '',
-                'evidence' => $section['evidence'] ?? '',
-                'evidence_type' => $section['evidence_type'] ?? [],
-                'assessment_methods' => $section['assessment_methods'] ?? [],
+                'kode'              => $section['unit_code'] ?? '',
+                'judul'             => $section['unit_title'] ?? '',
+                'evidence'          => $section['evidence'] ?? '',
+                'bukti'             => $section['evidence'] ?? '',          // blade uses $unit['bukti']
+                'evidence_type'     => $section['evidence_type'] ?? [],
+                'jenis_bukti_select'=> is_array($section['evidence_type'] ?? null)
+                                        ? implode('/', $section['evidence_type'])
+                                        : ($section['evidence_type'] ?? ''), // blade uses $unit['jenis_bukti_select']
+                'assessment_methods'=> $section['assessment_methods'] ?? [],
+                'metode'            => $section['assessment_methods'] ?? [], // blade uses $unit['metode']
             ];
         }
 
@@ -128,28 +140,44 @@ class PdfMapa01Controller extends Controller
             ];
         }
 
+        $empty_person = ['user_id' => null, 'name' => '', 'date' => '', 'signature' => null];
+        $lsp_manager_data         = $relevantConfirmation['lsp_manager'] ?? $empty_person;
+        $master_assessor_data     = $relevantConfirmation['master_assessor'] ?? $empty_person;
+        $training_manager_data    = $relevantConfirmation['training_manager'] ?? $empty_person;
+        $workplace_supervisor_data = $relevantConfirmation['workplace_supervisor'] ?? $empty_person;
+
         $data = [
-            'nama_skema' => $mainData['header']['certification_scheme'] ?? '',
-            'kode_skema' => $mainData['header']['scheme_code'] ?? '',
-            'tuk' => $mainData['header']['tuk'] ?? '',
+            'nama_skema'   => $mainData['header']['certification_scheme'] ?? '',
+            'kode_skema'   => $mainData['header']['scheme_code'] ?? '',
+            'tuk'          => $mainData['header']['tuk'] ?? '',
             'tujuan_asesmen' => $tujuanAsesmen,
-            'asesi_options' => $asesiOptions,
-            'lingkungan' => $lingkungan,
-            'peluang_bukti' => $peluangBukti,
-            'hubungan' => $hubungan,
-            'pelaku' => $pelaku,
+            'asesi_options'  => $asesiOptions,
+            'asesi_option'   => is_array($asesiOptions) ? implode(' ', $asesiOptions) : (string)($asesiOptions ?? ''),
+            'lingkungan'     => $lingkungan,
+            'peluang_bukti'  => $peluangBukti,
+            'peluang'        => $peluangBukti,
+            'hubungan'       => $hubungan,
+            'pelaku'         => $pelaku,
+            'pelaku_asesmen' => $pelaku,
             'benchmark_standards' => $benchmarkStandards,
-            'kelompok_pekerjaan' => $kelompokPekerjaan,
-            
-            'karakteristik_khusus' => $karakteristik,
+            'kelompok_pekerjaan'  => $kelompokPekerjaan,
+
+            'karakteristik_khusus'       => $karakteristik,
             'kebutuhan_kontekstualisasi' => $kontekstualisasi,
-            'saran' => $saran,
-            'penyesuaian_perangkat' => $penyesuaian,
-            'peluang_terintegrasi' => $peluangTerintegrasi,
-            
+            'saran'                      => $saran,
+            'saran_pelatihan'            => $saran,
+            'penyesuaian_perangkat'      => $penyesuaian,
+            'peluang_terintegrasi'       => $peluangTerintegrasi,
+
+            // Individual keys the blade accesses directly
+            'lsp_manager'          => $lsp_manager_data,
+            'master_assessor'      => $master_assessor_data,
+            'training_manager'     => $training_manager_data,
+            'workplace_supervisor' => $workplace_supervisor_data,
+
             'orang_relevan' => $orangRelevan,
-            'penyusun' => $penyusun,
-            'validator' => $validator,
+            'penyusun'      => $penyusun,
+            'validator'     => $validator,
         ];
 
         // --- Inject Signatures for Compilers & Validators ---

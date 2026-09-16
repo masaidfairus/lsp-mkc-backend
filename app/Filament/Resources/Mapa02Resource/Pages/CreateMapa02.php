@@ -14,11 +14,22 @@ class CreateMapa02 extends CreateRecord
 
     protected static string $resource = Mapa02Resource::class;
 
+    /**
+     * Mengambil document label.
+     *
+     * @return string
+     */
     protected function getDocumentLabel(): string
     {
         return 'MAPA.02';
     }
 
+    /**
+     * Extract signer mappings.
+     *
+     * @param  mixed  $record
+     * @return array
+     */
     protected function extractSignerMappings($record): array
     {
         $data = $record->mapa02_data ?? [];
@@ -41,11 +52,22 @@ class CreateMapa02 extends CreateRecord
         return $mappings;
     }
 
+    /**
+     * Mengambil redirect url.
+     *
+     * @return string
+     */
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
     }
     
+    /**
+     * Menangani record creation.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Database\Eloquent\Model
+     */
     protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
     {
         return static::getModel()::updateOrCreate(
@@ -54,11 +76,17 @@ class CreateMapa02 extends CreateRecord
         );
     }
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [
             $this->getSaveTemplateAction(),
             $this->getLoadTemplateAction(),
+            $this->getDeleteTemplateAction(),
         ];
     }
 }

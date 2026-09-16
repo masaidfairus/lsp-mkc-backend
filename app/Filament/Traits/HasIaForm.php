@@ -11,8 +11,14 @@ use Illuminate\Support\HtmlString;
 
 trait HasIaForm
 {
+    /**
+     * Registration select.
+     *
+     * @return Forms\Components\Select
+     */
     protected static function registrationSelect(): Forms\Components\Select
     {
+        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
         return Forms\Components\Select::make('registration_id')
             ->label('Nama Asesi (ID Pendaftaran)')
             ->options(function () {
@@ -45,11 +51,20 @@ trait HasIaForm
             });
     }
 
+    /**
+     * Assessor signature block.
+     *
+     * @param  string  $key
+     * @param  string  $label
+     * @return Forms\Components\Section
+     */
     protected static function assessorSignatureBlock(string $key, string $label): Forms\Components\Section
     {
+        // BAGIAN FORM: Grup bidang form berbingkai (Section)
         return Forms\Components\Section::make($label)
             ->statePath("validation_data.signatures.{$key}")
             ->schema([
+                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                 Forms\Components\Select::make('user_id')
                     ->label("Pilih {$label}")
                     ->options(User::role('asesor')->pluck('name', 'id'))
@@ -84,6 +99,12 @@ trait HasIaForm
             ]);
     }
 
+    /**
+     * Resolve signature url.
+     *
+     * @param  ?string  $path
+     * @return ?string
+     */
     protected static function resolveSignatureUrl(?string $path): ?string
     {
         if (!$path) return null;
@@ -92,6 +113,12 @@ trait HasIaForm
         return Storage::url($normalized);
     }
 
+    /**
+     * Render signature preview.
+     *
+     * @param  mixed  $get
+     * @return HtmlString
+     */
     protected static function renderSignaturePreview($get): HtmlString
     {
         $name = $get('name') ?? '';

@@ -9,6 +9,12 @@ use Filament\Tables\Table;
 
 class Apl01DataTable
 {
+    /**
+     * Configure.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function configure(Table $table): Table
     {
         return $table

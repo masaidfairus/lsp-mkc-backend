@@ -15,11 +15,22 @@ class EditMapa02 extends EditRecord
 
     protected static string $resource = Mapa02Resource::class;
 
+    /**
+     * Mengambil document label.
+     *
+     * @return string
+     */
     protected function getDocumentLabel(): string
     {
         return 'MAPA.02';
     }
 
+    /**
+     * Extract signer mappings.
+     *
+     * @param  mixed  $record
+     * @return array
+     */
     protected function extractSignerMappings($record): array
     {
         $data = $record->mapa02_data ?? [];
@@ -42,15 +53,26 @@ class EditMapa02 extends EditRecord
         return $mappings;
     }
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [
             $this->getSaveTemplateAction(),
             $this->getLoadTemplateAction(),
+            $this->getDeleteTemplateAction(),
             Actions\DeleteAction::make(),
         ];
     }
 
+    /**
+     * Mengambil redirect url.
+     *
+     * @return string
+     */
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

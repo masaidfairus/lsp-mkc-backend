@@ -15,7 +15,7 @@ class UserSignaturePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_user::signature');
+        return $user->can('view_any_user::signature') || $user->hasRole('asesor');
     }
 
     /**
@@ -23,7 +23,7 @@ class UserSignaturePolicy
      */
     public function view(User $user, UserSignature $userSignature): bool
     {
-        return $user->can('view_user::signature');
+        return $user->can('view_user::signature') || ($user->hasRole('asesor') && ($userSignature->user_id === $user->id || $userSignature->name === $user->name));
     }
 
     /**
@@ -31,7 +31,7 @@ class UserSignaturePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_user::signature');
+        return $user->can('create_user::signature') || $user->hasRole('asesor');
     }
 
     /**
@@ -39,7 +39,7 @@ class UserSignaturePolicy
      */
     public function update(User $user, UserSignature $userSignature): bool
     {
-        return $user->can('update_user::signature');
+        return $user->can('update_user::signature') || ($user->hasRole('asesor') && ($userSignature->user_id === $user->id || $userSignature->name === $user->name));
     }
 
     /**
@@ -47,7 +47,7 @@ class UserSignaturePolicy
      */
     public function delete(User $user, UserSignature $userSignature): bool
     {
-        return $user->can('delete_user::signature');
+        return $user->can('delete_user::signature') || ($user->hasRole('asesor') && ($userSignature->user_id === $user->id || $userSignature->name === $user->name));
     }
 
     /**

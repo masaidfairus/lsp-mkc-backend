@@ -23,6 +23,12 @@ class Ak05Resource extends Resource
     protected static ?string $modelLabel = 'AK.05';
     protected static ?string $pluralModelLabel = 'AK.05';
     protected static ?int $navigationSort = 5;
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
@@ -33,19 +39,10 @@ class Ak05Resource extends Resource
                         // ── Registration Selector ──────────────────────────────
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                 Forms\Components\Select::make('registration_id')
                                     ->label('Nama Asesi (ID Pendaftaran)')
-                                    ->options(function () {
-                                        $registrations = AssessmentRegistration::with(['candidate', 'scheme'])->get();
-                                        $occurrences   = [];
-                                        return $registrations->mapWithKeys(function ($reg) use (&$occurrences) {
-                                            $key               = ($reg->user_id ?? 0) . '-' . ($reg->scheme_id ?? 0);
-                                            $occurrences[$key] = ($occurrences[$key] ?? 0) + 1;
-                                            $candidate         = $reg->candidate?->name ?? 'Unknown';
-                                            $scheme            = $reg->scheme?->name ?? 'Tanpa Skema';
-                                            return [$reg->id => "{$candidate} — {$scheme} #{$occurrences[$key]}"];
-                                        });
-                                    })
+                                    ->options(fn (?\Illuminate\Database\Eloquent\Model $record) => static::getFilteredRegistrationOptions($record))
                                     ->required()
                                     ->searchable()
                                     ->preload()
@@ -89,10 +86,12 @@ class Ak05Resource extends Resource
                                     ->schema([
                                         Forms\Components\Grid::make(2)
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('certification_scheme')
                                                     ->label('Skema Sertifikasi')
                                                     ->disabled()
                                                     ->dehydrated(),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('scheme_code')
                                                     ->label('Kode Skema')
                                                     ->disabled()
@@ -100,10 +99,12 @@ class Ak05Resource extends Resource
                                             ]),
                                         Forms\Components\Grid::make(3)
                                             ->schema([
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('tuk')
                                                     ->label('TUK')
                                                     ->disabled()
                                                     ->dehydrated(),
+                                                // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                 Forms\Components\TextInput::make('assessor_name')
                                                     ->label('Nama Asesor')
                                                     ->disabled()
@@ -123,15 +124,18 @@ class Ak05Resource extends Resource
                                             ->schema([
                                                 Forms\Components\Grid::make(12)
                                                     ->schema([
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('no')
                                                             ->label('No.')
                                                             ->numeric()
                                                             ->columnSpan(1),
 
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('assessee_name')
                                                             ->label('Nama Asesi')
                                                             ->columnSpan(5),
 
+                                                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                                         Forms\Components\Select::make('recommendation')
                                                             ->label('Rekomendasi')
                                                             ->options([
@@ -141,6 +145,7 @@ class Ak05Resource extends Resource
                                                             ->native(false)
                                                             ->columnSpan(3),
 
+                                                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                                                         Forms\Components\TextInput::make('description')
                                                             ->label('Keterangan (Kode/Judul Unit jika BK)')
                                                             ->columnSpan(3),
@@ -185,21 +190,31 @@ class Ak05Resource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('registration_id')
                     ->label('Reg. ID')
                     ->sortable()
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('candidate.name')
                     ->label('Asesi')
                     ->searchable(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('scheme.name')
                     ->label('Skema')
                     ->searchable()
                     ->limit(35),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d/m/Y H:i')
@@ -217,6 +232,11 @@ class Ak05Resource extends Resource
             ]);
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

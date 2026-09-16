@@ -21,6 +21,7 @@ class Apl01Data extends Model
         'education_id',
         'company_name',
         'job_title',
+        'job_code',
         'company_address',
         'company_postal_code',
         'company_fax',
@@ -37,11 +38,21 @@ class Apl01Data extends Model
         'asesi_signature_date' => 'datetime',
     ];
 
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return mixed
+     */
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class);
     }
 
+    /**
+     * Mendapatkan relasi education.
+     *
+     * @return mixed
+     */
     public function education()
     {
         return $this->belongsTo(MasterEducation::class, 'education_id');

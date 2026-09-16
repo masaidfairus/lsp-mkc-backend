@@ -24,11 +24,21 @@ class SelfAssessment extends Model
         'is_verified_by_assessor' => false,
     ];
     
+    /**
+     * Mendapatkan relasi element.
+     *
+     * @return mixed
+     */
     public function element()
     {
         return $this->belongsTo(CompetencyElement::class);
     }
 
+    /**
+     * Mendapatkan relasi registration.
+     *
+     * @return mixed
+     */
     public function registration()
     {
         return $this->belongsTo(AssessmentRegistration::class);

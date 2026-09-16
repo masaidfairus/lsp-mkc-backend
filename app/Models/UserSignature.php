@@ -15,6 +15,11 @@ class UserSignature extends Model
         'qr_code',
     ];
 
+    /**
+     * Mendapatkan relasi user.
+     *
+     * @return BelongsTo
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

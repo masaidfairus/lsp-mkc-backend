@@ -20,6 +20,7 @@ class Profile extends Model
         'company_fax',
         'company_email',
         'job_title',
+        'job_code',
         'company_address',
         'company_contact',
         'asesi_type',
@@ -30,11 +31,21 @@ class Profile extends Model
         'date_of_birth' => 'date',
     ];
 
+    /**
+     * Mendapatkan relasi user.
+     *
+     * @return mixed
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Mendapatkan relasi education.
+     *
+     * @return mixed
+     */
     public function education()
     {
         return $this->belongsTo(MasterEducation::class, 'education_id');

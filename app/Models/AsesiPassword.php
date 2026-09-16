@@ -11,6 +11,11 @@ class AsesiPassword extends Model
         'asesi_password'
     ];
 
+    /**
+     * Mendapatkan relasi user.
+     *
+     * @return mixed
+     */
     public function user()
     {
         return $this->belongsTo(User::class);

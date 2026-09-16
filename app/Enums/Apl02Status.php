@@ -12,6 +12,11 @@ enum Apl02Status: string implements HasLabel, HasColor
     case APPROVED = 'approved';
     case REJECTED = 'rejected';
  
+    /**
+     * Mengambil label.
+     *
+     * @return ?string
+     */
     public function getLabel(): ?string
     {
         return match ($this) {
@@ -22,6 +27,11 @@ enum Apl02Status: string implements HasLabel, HasColor
         };
     }
  
+    /**
+     * Mengambil color.
+     *
+     * @return string|array|null
+     */
     public function getColor(): string|array|null
     {
         return match ($this) {
@@ -32,6 +42,11 @@ enum Apl02Status: string implements HasLabel, HasColor
         };
     }
 
+    /**
+     * Is approved.
+     *
+     * @return bool
+     */
     public function isApproved(): bool
     {
         return $this === self::APPROVED;

@@ -24,18 +24,27 @@ class CompetencyElementResource extends Resource
     protected static ?string $pluralModelLabel = 'Elemen Kompetensi';
     protected static ?int $navigationSort = 3;
 
+    /**
+     * Form.
+     *
+     * @param  Form  $form
+     * @return Form
+     */
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                // BAGIAN FORM: Grup bidang form berbingkai (Section)
                 Forms\Components\Section::make('Data Elemen Kompetensi')
                     ->schema([
+                        // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                         Forms\Components\Select::make('competency_unit_id')
                             ->relationship('competencyUnit', 'unit_title')
                             ->label('Unit Kompetensi')
                             ->searchable()
                             ->preload()
                             ->required(),
+                        // KOLOM INPUT FORM: Bidang input teks (Text Input)
                         Forms\Components\TextInput::make('title')
                             ->label('Judul Elemen')
                             ->required()
@@ -44,20 +53,29 @@ class CompetencyElementResource extends Resource
             ]);
     }
 
+    /**
+     * Table.
+     *
+     * @param  Table  $table
+     * @return Table
+     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('competencyUnit.unit_title')
                     ->label('Unit Kompetensi')
                     ->searchable()
                     ->sortable()
                     ->wrap(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('title')
                     ->label('Judul Elemen')
                     ->searchable()
                     ->sortable()
                     ->wrap(),
+                // KOLOM TABEL: Menampilkan kolom data berupa teks (Text Column)
                 Tables\Columns\TextColumn::make('performance_criteria_count')
                     ->label('KUK')
                     ->counts('performanceCriteria')
@@ -76,6 +94,11 @@ class CompetencyElementResource extends Resource
             ]);
     }
 
+    /**
+     * Mendapatkan relasi getRelations.
+     *
+     * @return array
+     */
     public static function getRelations(): array
     {
         return [
@@ -83,6 +106,11 @@ class CompetencyElementResource extends Resource
         ];
     }
 
+    /**
+     * Mengambil pages.
+     *
+     * @return array
+     */
     public static function getPages(): array
     {
         return [

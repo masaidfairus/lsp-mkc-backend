@@ -9,6 +9,11 @@ enum PaymentStatus: string
     case PAID = 'paid';
     case REJECTED = 'rejected';
 
+    /**
+     * Mengambil label.
+     *
+     * @return ?string
+     */
     public function getLabel(): ?string
     {
         return match ($this) {

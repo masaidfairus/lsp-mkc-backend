@@ -226,8 +226,8 @@
                 @foreach ($feedback_items as $item)
                     <tr class="komponen-row">
                         <td class="col-komponen">{{ $item['component'] ?? '-' }}</td>
-                        <td class="col-ya"><span style="font-size: 13pt;">{!! !empty($item['result_yes']) ? '☑' : '☐' !!}</span></td>
-                        <td class="col-tidak"><span style="font-size: 13pt;">{!! !empty($item['result_no']) ? '☑' : '☐' !!}</span></td>
+                        <td class="col-ya"><span style="font-size: 13pt;">{!! !empty($item['result_yes']) ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>' !!}</span></td>
+                        <td class="col-tidak"><span style="font-size: 13pt;">{!! !empty($item['result_no']) ? '<span style="font-family: DejaVu Sans, sans-serif;">☑</span>' : '<span style="font-family: DejaVu Sans, sans-serif;">☐</span>' !!}</span></td>
                         <td class="col-catatan">{{ $item['assessee_note'] ?? '' }}</td>
                     </tr>
                 @endforeach

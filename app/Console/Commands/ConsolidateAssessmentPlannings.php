@@ -11,6 +11,11 @@ class ConsolidateAssessmentPlannings extends Command
     protected $signature = 'app:consolidate-plannings';
     protected $description = 'Consolidate multiple assessment_plannings rows for the same registration_id';
 
+    /**
+     * Menangani.
+     *
+     * @return mixed
+     */
     public function handle()
     {
         $duplicateIds = DB::table('assessment_plannings')

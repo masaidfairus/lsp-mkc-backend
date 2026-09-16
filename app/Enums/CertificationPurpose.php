@@ -9,6 +9,11 @@ enum CertificationPurpose: string
     case RPL = 'rekognisi_pembelajaran_lampau';
     case LAINNYA = 'lainnya';
 
+    /**
+     * Mengambil label.
+     *
+     * @return ?string
+     */
     public function getLabel(): ?string
     {
         return match ($this) {

@@ -12,11 +12,17 @@ class CreateAk03 extends CreateRecord
     use HasFormTemplates;
     protected static string $resource = Ak03Resource::class;
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [
             $this->getSaveTemplateAction(),
             $this->getLoadTemplateAction(),
+            $this->getDeleteTemplateAction(),
         ];
     }
 }

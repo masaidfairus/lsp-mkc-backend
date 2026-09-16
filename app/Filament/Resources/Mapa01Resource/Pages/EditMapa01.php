@@ -15,11 +15,22 @@ class EditMapa01 extends EditRecord
 
     protected static string $resource = Mapa01Resource::class;
 
+    /**
+     * Mengambil document label.
+     *
+     * @return string
+     */
     protected function getDocumentLabel(): string
     {
         return 'MAPA.01';
     }
 
+    /**
+     * Extract signer mappings.
+     *
+     * @param  mixed  $record
+     * @return array
+     */
     protected function extractSignerMappings($record): array
     {
         $data = $record->mapa01_data ?? [];
@@ -35,6 +46,11 @@ class EditMapa01 extends EditRecord
         return $mappings;
     }
 
+    /**
+     * After save.
+     *
+     * @return void
+     */
     protected function afterSave(): void
     {
         // Sync MAPA template
@@ -51,11 +67,17 @@ class EditMapa01 extends EditRecord
         $this->syncSignatureRequests($this->getRecord());
     }
 
+    /**
+     * Mengambil header actions.
+     *
+     * @return array
+     */
     protected function getHeaderActions(): array
     {
         return [
             $this->getSaveTemplateAction(),
             $this->getLoadTemplateAction(),
+            $this->getDeleteTemplateAction(),
             Actions\DeleteAction::make(),
         ];
     }
