@@ -1,0 +1,94 @@
+{
+    "fria08_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_number": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri*",
+            "assessor_name": "", // Dinamis
+            "assessee_name": "", // Dinamis
+            "date": "" // Dinamis
+        },
+        "portfolio_verification": [
+            // LOOPING 1: Daftar Bukti Portofolio dan Aturan Bukti
+            {
+                "no": 1, //
+                "portfolio_evidence_name": "", // Nama bukti portofolio
+                "rules": {
+                    // Aturan Bukti
+                    "valid": { "is_yes": false, "is_no": false },
+                    "authentic": { "is_yes": false, "is_no": false },
+                    "current": { "is_yes": false, "is_no": false },
+                    "sufficient": { "is_yes": false, "is_no": false }
+                }
+            }
+        ],
+        "follow_up_verification": [
+            // LOOPING 2: Tindak lanjut hasil verifikasi bukti
+            {
+                "is_checked": false, // Cek List
+                "unit_code": "M.74100.001.02", // No. Unit Kompetensi
+                "element_no": "", // No. Elemen
+                "interview_substance": "" // Materi/substansi wawancara
+            }
+            // Dst. mulai dari unit M.74100.001.02 sampai M.74100.013.02
+        ],
+        "additional_evidence_details": "", // Bukti tambahan diperlukan
+        "assessor_recommendation": {
+            // Rekomendasi Asesor
+            "is_competent": false, // Rekomendasi KOMPETEN
+            "is_direct_observation": false, // Rekomendasi OBSERVASI LANGSUNG
+            "observation_details": {
+                // Detail jika observasi langsung diperlukan
+                "work_group": "",
+                "unit": "",
+                "element": "",
+                "kuk": ""
+            }
+        },
+        "signatures": {
+            //
+            "assessee": {
+                "name": "",
+                "signature_and_date": ""
+            },
+            "assessor": {
+                "name": "",
+                "reg_number": "",
+                "signature_and_date": ""
+            }
+        },
+        "document_control": {
+            // Struktur konsisten dengan formulir lainnya
+            "compilers": [
+                // LOOPING 3: Data Penyusun
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                },
+                {
+                    "no": 2,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ],
+            "validators": [
+                // LOOPING 4: Data Validator
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                },
+                {
+                    "no": 2,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ]
+        }
+    }
+}

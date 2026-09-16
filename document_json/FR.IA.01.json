@@ -1,0 +1,171 @@
+{
+    "mapa02_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_code": "SUK-SKS-REV1-L007",
+            "assessment_date": "15-04-2026"
+        },
+        "assessment_instruments_section": [
+            {
+                "work_group": "Menerapkan Pengetahuan Desain", // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                "competency_units": [ // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                    {
+                        "unit_code": "M.74100.001.02", // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                        "unit_title": "Mengaplikasikan Prinsip Dasar Desain" // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                    },
+                    {
+                        "unit_code": "M.74100.001.02", // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                        "unit_title": "Mengaplikasikan Prinsip Dasar Desain" // LOOPING SESUAI WORK GROUP YANG ADA DI TABLE
+                    }
+                ],
+                "assessment_instruments": [
+                    {
+                        "method": "FR.IA.01.  CL - Ceklis Observasi Aktivitas Di Tempat Kerja atau Tempat Kerja Simulasi",
+                        "answer": 1
+                    },
+                    {
+                        "method": "FR.IA.02.  TPD - Tugas Praktik Demonstrasi",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.03. PMO - Pertanyaan Untuk Mendukung Observasi",
+                        "answer": 4
+                    },
+                    {
+                        "method": "FR.IA.04A. DIT - Daftar Instruksi Terstruktur (Penjelasan Singkat Proyek Terkait Pekerjaan/Kegiatan Terstruktur Lainnya)",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.04B. DIT – Penilaian Proyek Singkat atau Kegiatan Terstruktur Lainnya",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.05. DPT - Daftar Pertanyaan Tertulis Pilihan Ganda",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.06. DPT – Daftar Pertanyaan Tertulis Pilihan Esai",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.07. DPL – Daftar Pertanyaan Lisan",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.08. CVP - Ceklis Verifikasi Portofolio",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.09. PW - Pertanyaan Wawancara",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.10. VPK - Verifikasi Pihak Ketiga",
+                        "answer": null
+                    },
+                    {
+                        "method": "FR.IA.11. CRP - Ceklis Reviu Produk",
+                        "answer": null
+                    }
+                ]
+            }
+        ],
+        "compiler_and_validator": {
+            "compiler": [
+                {
+                    "name": "Budi Santoso, ST.",
+                    "reg_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                },
+                {
+                    "name": "Budi Santoso, ST.",
+                    "reg_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                }
+            ],
+            "validator": [
+                {
+                    "name": "Budi Santoso, ST.",
+                    "reg_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                },
+                {
+                    "name": "Budi Santoso, ST.",
+                    "reg_number": "MET.000.001234",
+                    "date": "14-04-2026",
+                    "signature": "data:image/png;base64,..."
+                }
+            ]
+        }
+    }
+}
+
+
+{
+  "fria01_data": {
+    "header": {
+      "certification_scheme": "AHLI DESAIN GRAFIS",
+      "scheme_code": "SUK-SKS-REV1-L007",
+      "tuk": "Sewaktu/Tempat Kerja/Mandiri", 
+      "assessor_name": "", // Input dinamis
+      "assessee_name": "", // Input dinamis
+      "assessment_date": "15-04-2026" // Input dinamis
+    },
+    "work_groups": [ // LOOPING 1: Mulai looping berdasarkan "Kelompok Pekerjaan"
+      {
+        "group_name": "Menerapkan pengetahuan tentang desain", // Dinamis sesuai nama kelompok pekerjaan
+        "units": [ // LOOPING 2: Looping "Unit Kompetensi" di dalam Kelompok Pekerjaan tersebut
+          {
+            "unit_code": "M.74100.001.02", // Dinamis
+            "unit_title": "Mengaplikasikan Prinsip Dasar Desain", // Dinamis
+            "elements": [ // LOOPING 3: Looping "Elemen" di dalam Unit Kompetensi
+              {
+                "element_name": "Menerapkan materi informasi yang berkaitan dengan pengetahuan dasar desain", // Dinamis
+                "performance_criteria": [ // LOOPING 4: Looping "Kriteria Unjuk Kerja (KUK)" di dalam Elemen
+                  {
+                    "kuk_description": "Sumber informasi ditentukan agar keabsahan informasi mengenai pengetahuan dasar desain sesuai dengan kebutuhan.", // Dinamis
+                    "industry_standard": "", // Input dinamis (teks) dari Asesor
+                    "achievement_is_competent": true, // Input dinamis (boolean): true untuk "Ya", false untuk "Tidak", null jika belum diisi
+                    "further_assessment_notes": "" // Input dinamis (teks) jika ada catatan Penilaian Lanjut
+                  }
+                  // KUK berikutnya di-looping di sini...
+                ]
+              }
+              // Elemen berikutnya di-looping di sini...
+            ]
+          }
+          // Unit berikutnya di-looping di sini...
+        ]
+      }
+      // Kelompok pekerjaan berikutnya di-looping di sini...
+    ],
+    "feedback_section": {
+      "assessee_feedback": "" // Input dinamis (teks): Umpan balik dari/bagi asesi
+    },
+    "recommendation_section": {
+      "is_competent": true, // Input dinamis (boolean): true jika "KOMPETEN", false jika "BELUM KOMPETEN"
+      "not_competent_details": { // Diisi dinamis HANYA JIKA is_competent bernilai false
+        "work_group": "",
+        "unit": "",
+        "element": "",
+        "kuk": ""
+      }
+    },
+    "signatures": {
+      "assessee": {
+        "name": "", // Input dinamis
+        "date": "", // Input dinamis
+        "signature": "data:image/png;base64,..." // Input dinamis (base64 image atau URL)
+      },
+      "assessor": {
+        "name": "", // Input dinamis
+        "reg_number": "", // Input dinamis
+        "date": "", // Input dinamis
+        "signature": "data:image/png;base64,..." // Input dinamis (base64 image atau URL)
+      }
+    }
+  }
+}

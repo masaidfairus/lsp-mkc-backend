@@ -1,0 +1,71 @@
+{
+    "fria06c_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS", //
+            "scheme_number": "SUK-SKS-REV1-L007", //
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri*", //
+            "assessor_name": "", // Input dinamis
+            "assessee_name": "", // Input dinamis
+            "date": "", // Input dinamis
+            "time": "" // Input dinamis
+        },
+        "answer_sheet": [
+            // LOOPING UTAMA: Baris jawaban esai dan penilaian
+            {
+                "no": 1, //
+                "answer_text": "", // Jawaban tertulis dari asesi
+                "achievement": {
+                    // Status pencapaian
+                    "is_yes": false, // Centang 'Ya'
+                    "is_no": false // Centang 'Tidak'
+                }
+            },
+            {
+                "no": 2,
+                "answer_text": "",
+                "achievement": {
+                    "is_yes": false,
+                    "is_no": false
+                }
+            }
+            // Dst sesuai jumlah soal (1-5 dalam gambar)
+        ],
+        "feedback_section": {
+            "assessee_feedback": "", // Umpan balik untuk asesi
+            "knowledge_aspect_status": "", // Pilihan "tercapai" atau "belum tercapai"
+            "unachieved_details": "" // Catatan unit/elemen/KUK jika belum tercapai
+        },
+        "signatures": {
+            "assessee": {
+                "name": "", //
+                "signature_date": "" // Tanda tangan/Tanggal
+            },
+            "assessor": {
+                "name": "", //
+                "reg_number": "", // No. Reg
+                "signature_date": "" // Tanda tangan/Tanggal
+            }
+        },
+        "document_control": {
+            // Konsisten dengan form FR.IA.05A/B/06B
+            "compilers": [
+                // LOOPING KEDUA: Data Penyusun
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ],
+            "validators": [
+                // LOOPING KETIGA: Data Validator
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,92 @@
+{
+    "fria10_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_number": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri*",
+            "assessor_name": "", // Input dinamis
+            "assessee_name": "", // Input dinamis
+            "date": "" // Input dinamis
+        },
+        "work_groups": [
+            // LOOPING 1: Pemetaan Kelompok Pekerjaan dan Unit
+            {
+                "group_name": "Menerapkan pengetahuan tentang desain", //
+                "units": [
+                    {
+                        "no": 1,
+                        "unit_code": "M.74100.001.02",
+                        "unit_title": "Mengaplikasikan Prinsip Dasar Desain"
+                    },
+                    {
+                        "no": 2,
+                        "unit_code": "M.74100.002.02",
+                        "unit_title": "Menerapkan Prinsip Dasar Komunikasi"
+                    },
+                    {
+                        "no": 3,
+                        "unit_code": "M.74100.003.02",
+                        "unit_title": "Menerapkan Pengetahuan Dasar Desain"
+                    }
+                ]
+            },
+            {
+                "group_name": "Menentukan obyektif dari program desain", //
+                "units": [
+                    {
+                        "no": 4,
+                        "unit_code": "M.74100.004.02",
+                        "unit_title": "Menerapkan Project Brief"
+                    },
+                    {
+                        "no": 5,
+                        "unit_code": "M.74100.005.02",
+                        "unit_title": "Menerapkan Design Brief"
+                    },
+                    {
+                        "no": 6,
+                        "unit_code": "M.74100.006.01",
+                        "unit_title": "Mengorganisasikan Informasi Terkait Proyek Desain"
+                    }
+                ]
+            }
+            // Looping berlanjut untuk grup lainnya
+        ],
+        "third_party_details": {
+            //
+            "name": "", // Nama Pengawas/atasan
+            "workplace": "", // Tempat kerja
+            "address": "", // Alamat
+            "phone": "" // Telepon
+        },
+        "verification_questions": [
+            // LOOPING 2: Tabel pertanyaan Ya/Tidak
+            {
+                "question": "Apakah asesi bekerja dengan mempertimbangkan Kesehatan, Keamanan dan Keselamatan Kerja?", //
+                "is_yes": false,
+                "is_no": false
+            },
+            {
+                "question": "Apakah asesi berinteraksi dengan harmonis didalam kelompoknya?",
+                "is_yes": false,
+                "is_no": false
+            }
+            // Dst sesuai tabel pertanyaan di image_c28e3d.png
+        ],
+        "narrative_assessment": {
+            // Bagian isian teks
+            "relationship_with_assessee": "", // Apa hubungan Anda dengan asesi?
+            "work_duration": "", // Berapa lama Anda bekerja dengan asesi?
+            "proximity_in_assessed_area": "", // Seberapa dekat Anda bekerja dengan asesi?
+            "technical_experience_qualification": "" // Apa pengalaman teknis / kualifikasi Anda?
+        },
+        "overall_conclusion": {
+            // Kesimpulan akhir
+            "is_consistent_with_standards": "", // Secara keseluruhan, apakah asesi yakin...
+            "further_training_needs": "", // Identifikasi kebutuhan pelatihan lebih lanjut
+            "other_comments": "", // Ada komentar lain
+            "assessor_signature": "",
+            "date": ""
+        }
+    }
+}

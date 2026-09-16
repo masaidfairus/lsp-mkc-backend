@@ -1,0 +1,264 @@
+<?php
+
+namespace App\Http\Controllers\PDF;
+
+use App\Http\Controllers\Controller;
+use App\Models\AssessmentValidation;
+use App\Models\AssessmentRegistration;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+
+class PdfVaController extends Controller
+{
+    public function show(Request $request, AssessmentRegistration $registration)
+    {
+        $user = $request->user();
+        $isAuthorized = $this->isAuthorizedReviewer($user, $registration) || ($user && $user->id === $registration->user_id);
+        
+        if (!$isAuthorized) {
+            return response()->json(['message' => 'Forbidden.'], 403);
+        }
+
+        $validation = AssessmentValidation::where('registration_id', $registration->id)->first();
+
+        // If the instrument is not generated yet, fallback
+        if (!$validation || empty($validation->validation_data)) {
+            return app(\App\Http\Controllers\PdfFallbackController::class)->show($registration, 'Dokumen FR.VA Belum Siap', 'Dokumen FR.VA belum dapat dicetak karena data belum lengkap atau belum diisi oleh Asesor/Admin.');
+        }
+
+        $registration->load(['scheme', 'candidate', 'assessor']);
+
+        $valData = $validation->validation_data ?? [];
+        $header = $valData['header'] ?? [];
+        $references = $valData['references'] ?? [];
+        $prep = $valData['preparation'] ?? [];
+        $contributions = $valData['contributions'] ?? [];
+        
+        $timValidasi = $header['validation_team'] ?? [];
+        if (is_string($timValidasi)) {
+            $timValidasi = explode(',', $timValidasi);
+        }
+
+        // Mapping helper for lists
+        $mapToLabel = function($items) {
+            if (!is_array($items)) return [];
+            return array_map(fn($v) => ['label' => $v], $items);
+        };
+
+        $tujuanFokusOpts = [
+            'Bagian dari Proses Penjaminan Mutu Organisasi', 'Mengantisipasi Risiko', 'Memenuhi Persyaratan BNSP',
+            'Memastikan Kesesuaian Bukti', 'Meningkatkan Kualitas Asesmen', 'Mengevaluasi Kualitas Perangkat Asesmen'
+        ];
+        $konteksOpts = [
+            'Karakteristik Asesi', 'Lingkungan', 'Kebijakan / SOP', 'Bahan dan Alat Pendukung', 'Persyaratan Khusus', 'Lainnya'
+        ];
+        $pendekatanOpts = [
+            'Asesmen Berbasis Kompetensi', 'Asesmen Portofolio', 'Asesmen RPL', 'Observasi Langsung', 'Pendekatan Tertulis/Lisan'
+        ];
+        $acuanOpts = [
+            'Standar Kompetensi (SKKNI/SKK/SKI)', 'Skema Sertifikasi', 'SOP/IK', 'Manual Instruction / Book Manual', 'Standar Kinerja'
+        ];
+        $dokumenOpts = [
+            'Perangkat Asesmen', 'Peraturan / Pedoman', 'Bukti-bukti hasil asesmen'
+        ];
+
+        $mapWithOptions = function($selected, $options) {
+            $selected = is_array($selected) ? $selected : [];
+            
+            // Legacy keys map
+            $legacyMap = [
+                'quality_assurance' => 'Bagian dari Proses Penjaminan Mutu Organisasi',
+                'risk_anticipation' => 'Mengantisipasi Risiko',
+                'bnsp_requirements' => 'Memenuhi Persyaratan BNSP',
+                'evidence_consistency' => 'Memastikan Kesesuaian Bukti',
+                'assessment_quality_improvement' => 'Meningkatkan Kualitas Asesmen',
+                'evaluate_instrument_quality' => 'Mengevaluasi Kualitas Perangkat Asesmen',
+                'competency_standards' => 'Standar Kompetensi (SKKNI/SKK/SKI)',
+                'certification_scheme' => 'Skema Sertifikasi',
+                'sop_ik' => 'SOP/IK',
+                'manual_instruction' => 'Manual Instruction / Book Manual',
+                'performance_standard' => 'Standar Kinerja',
+                'assessment_instruments' => 'Perangkat Asesmen',
+                'regulations_guidelines' => 'Peraturan / Pedoman',
+                'assessment_results_evidence' => 'Bukti-bukti hasil asesmen',
+            ];
+
+            // Convert legacy keys to values if they exist
+            $normalizedSelected = array_map(fn($v) => $legacyMap[$v] ?? $v, $selected);
+
+            $result = [];
+            foreach ($options as $opt) {
+                $result[] = [
+                    'label' => $opt,
+                    'is_checked' => in_array($opt, $normalizedSelected)
+                ];
+            }
+            return $result;
+        };
+
+        $tujuanFokus = $mapWithOptions($prep['focus_and_purpose'] ?? [], $tujuanFokusOpts);
+        $konteks = $mapWithOptions($prep['validation_context'] ?? [], $konteksOpts);
+        $pendekatan = $mapWithOptions($prep['validation_approach'] ?? [], $pendekatanOpts);
+        
+        $acuan = $mapWithOptions($references['benchmarks'] ?? [], $acuanOpts);
+        $dokumen = $mapWithOptions($references['materials'] ?? [], $dokumenOpts);
+        
+        // Komunikasi skills usually just lists what is selected, but if we need a list:
+        $komunikasiMap = [
+            'proactive' => 'PRO AKTIF',
+            'active_listening' => 'ACTIVE LISTENING',
+            'empathy' => 'Empati'
+        ];
+        $komunikasi = [];
+        foreach ($valData['communication_skills'] ?? [] as $k) {
+            $komunikasi[] = ['label' => $komunikasiMap[$k] ?? $k];
+        }
+
+        $aspekValidasi = [];
+        $matrix = $valData['validation_matrix'] ?? [];
+        foreach ($matrix as $idx => $row) {
+            $rules = (array) ($row['rules_of_evidence'] ?? []);
+            $principles = (array) ($row['principles_of_assessment'] ?? []);
+            
+            $aspekValidasi[] = [
+                'no' => $row['no'] ?? ($idx + 1),
+                'label' => $row['aspect'] ?? '',
+                'v' => in_array('v', $rules),
+                'a' => in_array('a', $rules),
+                't' => in_array('t', $rules),
+                'm' => in_array('m', $rules),
+                'pv' => in_array('v', $principles),
+                'pr' => in_array('r', $principles),
+                'pf' => in_array('f', $principles),
+                'pa' => in_array('a', $principles),
+            ];
+        }
+
+        $temuanRekomendasi = [];
+        $temuan = $contributions['findings_list'] ?? [];
+        $rekom = $contributions['recommendations_list'] ?? [];
+        $maxTemuan = max(count($temuan), count($rekom));
+        for ($i = 0; $i < $maxTemuan; $i++) {
+            $temuanRekomendasi[] = [
+                'no' => $i + 1,
+                'temuan' => $temuan[$i]['finding'] ?? '',
+                'rekomendasi' => $rekom[$i]['recommendation'] ?? '',
+            ];
+        }
+
+        $rencanaImpl = [];
+        foreach ($valData['implementation_plan'] ?? [] as $idx => $impl) {
+            $rencanaImpl[] = [
+                'no' => $idx + 1,
+                'kegiatan' => $impl['activity'] ?? '',
+                'waktu' => $impl['completion_time'] ?? '',
+                'penanggung_jawab' => $impl['person_in_charge'] ?? '',
+            ];
+        }
+
+        // Map Orang Relevan - Show all options but check selected
+        $roleOptions = [
+            'Asesor Kompetensi (wajib)', 'Lead Asesor [Ketua TUK]', 'Manager, Supervisor',
+            'Tenaga Ahli di bidangnya', 'Koordinator Pelatihan', 'Anggota Asosiasi Industry Profesi'
+        ];
+        
+        $orangRelevan = [];
+        $selectedRoles = $prep['relevant_roles'] ?? [];
+        
+        // Normalize selected roles to match new options
+        $roleMapping = [
+            'Manajer Sertifikasi' => 'Manager, Supervisor',
+            'Lead Assessor' => 'Lead Asesor [Ketua TUK]',
+            'Asesor' => 'Asesor Kompetensi (wajib)',
+            'Validator' => 'Asesor Kompetensi (wajib)',
+        ];
+        $normalizedSelected = array_map(fn($r) => $roleMapping[$r] ?? $r, $selectedRoles);
+        
+        $confResult = $prep['confirmation_result'] ?? '';
+        
+        $relevantNamesRaw = $prep['relevant_names_combined'] ?? '';
+        $relevantNamesFormatted = '';
+        
+        if (!empty($relevantNamesRaw)) {
+            $names = [];
+            if (is_array($relevantNamesRaw)) {
+                $names = $relevantNamesRaw;
+            } else {
+                // Legacy support for string
+                $names = preg_split('/[,\n\r]+/', $relevantNamesRaw, -1, PREG_SPLIT_NO_EMPTY);
+            }
+            
+            $names = array_map('trim', $names);
+            $formatted = [];
+            foreach ($names as $idx => $name) {
+                $formatted[] = ($idx + 1) . ". " . $name;
+            }
+            $relevantNamesFormatted = implode("\n", $formatted);
+        }
+
+        foreach ($roleOptions as $role) {
+            $orangRelevan[] = [
+                'label' => $role,
+                'is_checked' => in_array($role, $normalizedSelected),
+                'nama' => $relevantNamesFormatted,
+                'hasil' => $confResult,
+            ];
+        }
+
+        // Fetch Validator and Lead Assessor
+        $validator = null;
+        if (!empty($header['validator_id'])) {
+            $validator = \App\Models\User::with('userSignature')->find($header['validator_id']);
+        }
+        
+        $leadAssessor = null;
+        if (!empty($header['lead_assessor_id'])) {
+            $leadAssessor = \App\Models\User::with('userSignature')->find($header['lead_assessor_id']);
+        }
+
+        $data = [
+            'validator' => $validator,
+            'leadAssessor' => $leadAssessor,
+            'tim_validasi' => $timValidasi,
+            'hari_tanggal' => $header['day_date'] ?? now()->format('d-m-Y'),
+            'tempat' => $header['location'] ?? 'TUK ' . ($registration->tuk ?? ''),
+            'periode' => $header['period'] ?? [],
+            'nama_skema' => $header['scheme_name'] ?? $registration->scheme?->name ?? '',
+            'nomor_skema' => $header['scheme_number'] ?? $registration->scheme?->code ?? '',
+            'tujuan_fokus' => $tujuanFokus,
+            'konteks_validasi' => $konteks,
+            'pendekatan_validasi' => $pendekatan,
+            'orang_relevan' => $orangRelevan,
+            'acuan_pembanding' => $acuan,
+            'dokumen_terkait' => $dokumen,
+            'komunikasi' => $komunikasi,
+            'aspek_validasi' => $aspekValidasi,
+            'temuan_rekomendasi' => $temuanRekomendasi,
+            'rencana_implementasi' => $rencanaImpl,
+            'assessor' => $registration->assessor,
+            'candidate' => $registration->candidate,
+        ];
+
+        // --- Inject Signatures for Compilers & Validators ---
+        // (Assuming $data['penyusun'] and $data['validator'] might be objects or arrays)
+        // If they are single objects, we can handle them directly
+        if ($validator) {
+            $sig = $this->getUserSignature($validator->id, $registration->id, 'Validator');
+            $data['validator_qr_code'] = $sig['qr_code'];
+            $data['validator_date']    = $sig['is_signed'] ? $this->convertDateToLocalTime($sig['signed_at'] ?? now()) : '';
+        }
+
+        // Add assessor signature too for consistency
+        $assessorSig = $this->getUserSignature($registration->assessor?->id, $registration->id, 'Asesor');
+        $data['assessor_qr_code'] = $assessorSig['qr_code'];
+        $data['assessor_date']    = $assessorSig['is_signed'] ? $this->convertDateToLocalTime($assessorSig['signed_at'] ?? $registration->updated_at) : '';
+        // ----------------------------------------------------
+
+        $pdf = Pdf::loadView('forms.mkva', $data)
+            ->setPaper('a4', 'portrait')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true);
+
+        return $pdf->stream('FR_VA_' . ($registration->candidate?->name ?? '') . '.pdf');
+    }
+}

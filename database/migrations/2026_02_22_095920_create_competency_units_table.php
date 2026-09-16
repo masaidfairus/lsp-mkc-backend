@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('competency_units', function (Blueprint $table) {
             $table->id();
             $table->foreignId('scheme_id')->constrained('schemes')->cascadeOnDelete();
-            $table->string('unit_code')->unique();
+            $table->foreignId('work_group_id')->nullable()->constrained('work_groups')->nullOnDelete();
+            $table->string('unit_code');
             $table->string('unit_title');
             $table->timestamps();
         });

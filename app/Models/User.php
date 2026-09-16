@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 use App\Models\ActivationTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'status',
+        'registration_number',
     ];
 
     /**
@@ -54,14 +55,19 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function profiles()
+    public function profile()
     {
         return $this->hasOne(Profile::class);
     }
 
-    public function workData()
+    public function userSignature()
     {
-        return $this->hasOne(WorkData::class);
+        return $this->hasOne(UserSignature::class);
+    }
+
+    public function asesiPassword()
+    {
+        return $this->hasOne(AsesiPassword::class, 'user_id', 'id');
     }
 
     public function activationTokens()
@@ -79,18 +85,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(AssessmentRegistration::class, 'assessor_id', 'id');
     }
 
-    public function mainAssessorValidations()
+    public function userFile()
     {
-        return $this->hasMany(PeerValidation::class, 'main_assessor_id', 'id');
+        return $this->hasMany(FileProfile::class, 'user_id', 'id');
     }
 
-    public function peerAssessorValidations()
+    public function adminFileValidation()
     {
-        return $this->hasMany(PeerValidation::class, 'peer_assessor_id', 'id');
-    }
-
-    public function evidence()
-    {
-        return $this->hasMany(Apl01Evidence::class);
+        return $this->hasMany(FileProfile::class, 'verified_by', 'id');
     }
 }

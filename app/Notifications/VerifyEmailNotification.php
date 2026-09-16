@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -36,6 +37,9 @@ class VerifyEmailNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $notifiable->loadMissing('asesiPassword');
+        $asesiPassword = $notifiable->asesiPassword->asesi_password ?? 'Password belum diatur';
+
         return (new MailMessage)
             ->subject('Aktivasi Akun LSP MKC')
             // ->line('Terima kasih telah mendaftar. Silakan klik tombol di bawah untuk memverifikasi email Anda.')
@@ -43,7 +47,8 @@ class VerifyEmailNotification extends Notification
             // ->line('Link ini hanya berlaku selama 10 menit.');
             ->markdown('vendor.notifications.email', [
                 'url' => $this->url,
-                'user' => $notifiable
+                'user' => $notifiable,
+                'password' => $asesiPassword,
             ]);
     }
 

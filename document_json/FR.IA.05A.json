@@ -1,0 +1,47 @@
+{
+    "fria05a_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_code": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri*",
+            "assessor_name": "", // Input dinamis
+            "assessee_name": "", // Input dinamis
+            "assessment_date": "", // Input dinamis
+            "assessment_time": "" // Input dinamis
+        },
+        "questions_list": [
+            // LOOPING UTAMA: Untuk setiap butir pertanyaan
+            {
+                "question_no": 1,
+                "question_text": "", // Teks pertanyaan dinamis
+                "options": [
+                    // LOOPING KEDUA: Untuk pilihan jawaban (a, b, c, d)
+                    { "label": "a", "option_text": "" },
+                    { "label": "b", "option_text": "" },
+                    { "label": "c", "option_text": "" },
+                    { "label": "d", "option_text": "" }
+                ]
+            }
+        ],
+        "document_control": {
+            "compilers": [
+                // LOOPING KETIGA: Baris data untuk Penyusun
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ],
+            "validators": [
+                // LOOPING KEEMPAT: Baris data untuk Validator
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ]
+        }
+    }
+}

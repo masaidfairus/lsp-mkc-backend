@@ -1,0 +1,141 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\UserResource\Pages;
+use App\Models\User;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Hash;
+use Filament\Pages\Page;
+use Filament\Resources\Pages\CreateRecord;
+
+class UserResource extends Resource
+{
+    protected static ?string $model = User::class;
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationGroup = 'Admin';
+    protected static ?int $navigationSort = 3;
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Section::make('Informasi Dasar')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->unique(ignoreRecord: true)
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('password')
+                            ->password()
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                            ->required(fn (Page $livewire) => ($livewire instanceof CreateRecord))
+                            ->maxLength(255),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Identitas & Peran')
+                    ->description('Opsional: Isi informasi identitas jika diperlukan.')
+                    ->schema([
+                        Forms\Components\Select::make('identity_type')
+                            ->options([
+                                'KTP' => 'KTP',
+                                'SIM' => 'SIM',
+                                'Paspor' => 'Paspor',
+                            ])
+                            ->nullable(),
+                        Forms\Components\TextInput::make('identity_number')
+                            ->maxLength(20)
+                            ->nullable(),
+                        Forms\Components\Select::make('roles')
+                            ->multiple()
+                            ->relationship('roles', 'name')
+                            ->preload()
+                            ->required(),
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'active' => 'Active',
+                                'inactive' => 'Inactive',
+                            ])
+                            ->required()
+                            ->default('active'),
+                    ])->columns(2),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('email')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->badge()
+                    ->label('Roles')
+                    ->color(fn (string $state): string => match ($state) {
+                        'super_admin' => 'danger',
+                        'admin' => 'warning',
+                        'asesor' => 'success',
+                        'penyusun' => 'info',
+                        'validator' => 'primary',
+                        default => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('identity_number')
+                    ->label('ID Number')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'active' => 'success',
+                        'inactive' => 'danger',
+                        default => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListUsers::route('/'),
+            'create' => Pages\CreateUser::route('/create'),
+            'edit' => Pages\EditUser::route('/{record}/edit'),
+        ];
+    }
+}

@@ -8,22 +8,12 @@ class PerformanceCriterion extends Model
 {
     protected $fillable = [
         'element_id',
+        'name',
         'description',
-        'sort_order',
     ];
 
     public function element()
     {
         return $this->belongsTo(CompetencyElement::class);
-    }
-
-    public function evaluations()
-    {
-        return $this->hasMany(AssessorEvaluation::class);
-    }
-
-    public function selfAssessments()
-    {
-        return $this->hasMany(SelfAssessment::class);
     }
 }

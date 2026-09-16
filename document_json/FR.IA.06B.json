@@ -1,0 +1,67 @@
+{
+    "fria06b_data": {
+        "header": {
+            "certification_scheme": "AHLI DESAIN GRAFIS",
+            "scheme_number": "SUK-SKS-REV1-L007",
+            "tuk": "Sewaktu/Tempat Kerja/Mandiri*",
+            "assessor_name": "", // Input dinamis
+            "assessee_name": "", // Input dinamis
+            "assessment_date": "" // Input dinamis
+        },
+        "answer_keys": [
+            // LOOPING UTAMA: Untuk daftar kunci jawaban esai
+            {
+                "no": 1,
+                "key_answer_text": "" // Teks kunci jawaban dinamis
+            },
+            {
+                "no": 2,
+                "key_answer_text": ""
+            },
+            {
+                "no": 3,
+                "key_answer_text": ""
+            },
+            {
+                "no": 4,
+                "key_answer_text": ""
+            },
+            {
+                "no": 5,
+                "key_answer_text": ""
+            }
+        ],
+        "document_control": {
+            "compilers": [
+                // LOOPING KEDUA: Baris data untuk Penyusun
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                },
+                {
+                    "no": 2,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ],
+            "validators": [
+                // LOOPING KETIGA: Baris data untuk Validator
+                {
+                    "no": 1,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                },
+                {
+                    "no": 2,
+                    "name": "",
+                    "met_number": "",
+                    "signature_and_date": ""
+                }
+            ]
+        }
+    }
+}

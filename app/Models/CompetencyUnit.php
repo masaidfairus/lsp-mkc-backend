@@ -8,6 +8,7 @@ class CompetencyUnit extends Model
 {
     protected $fillable = [
         'scheme_id',
+        'work_group_id',
         'unit_code',
         'unit_title',
     ];
@@ -17,8 +18,13 @@ class CompetencyUnit extends Model
         return $this->belongsTo(Scheme::class);
     }
 
+    public function workGroup()
+    {
+        return $this->belongsTo(WorkGroup::class);
+    }
+
     public function competencyElements()
     {
-        return $this->hasMany(CompetencyElement::class);
+        return $this->hasMany(CompetencyElement::class, 'competency_unit_id');
     }
 }
