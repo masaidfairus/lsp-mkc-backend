@@ -69,4 +69,14 @@ class Scheme extends Model
     {
         return $this->hasMany(PortfolioScheme::class);
     }
+
+    /**
+     * Mendapatkan relasi workGroups.
+     *
+     * @return mixed
+     */
+    public function workGroups()
+    {
+        return $this->hasMany(WorkGroup::class);
+    }
 }

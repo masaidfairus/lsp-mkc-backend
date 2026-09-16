@@ -308,6 +308,30 @@ class Ak02Resource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('wa_banding_ak04')
+                    ->label('WA Hak Banding AK.04')
+                    ->icon('heroicon-o-chat-bubble-left-ellipsis')
+                    ->color('warning')
+                    ->tooltip('Kirim notifikasi WA kepada Asesi tentang hak banding AK.04')
+                    ->visible(function ($record) {
+                        // Tampil hanya jika hasil AK.02 = Belum Kompeten
+                        $mainData = is_array($record->main_data)
+                            ? $record->main_data
+                            : json_decode($record->main_data ?? '{}', true);
+                        $isCompetent = data_get($mainData, 'assessment_summary.is_competent');
+                        return $isCompetent !== null && !filter_var($isCompetent, FILTER_VALIDATE_BOOLEAN);
+                    })
+                    ->url(function ($record) {
+                        $phone = $record->registration?->aplData?->phone_number ?? $record->candidate?->profile?->phone_number;
+                        if (!$phone) return '#';
+                        $phone = preg_replace('/[\D]/', '', $phone);
+                        if (str_starts_with($phone, '0')) $phone = '62' . substr($phone, 1);
+                        $name  = $record->candidate?->name ?? 'Asesi';
+                        $skema = $record->scheme?->name ?? 'Skema';
+                        $msg   = "Halo {$name}, berdasarkan hasil asesmen untuk skema {$skema}, Anda dinyatakan Belum Kompeten. Anda memiliki hak untuk mengajukan banding melalui Form AK.04 di aplikasi kami. Silakan buka aplikasi dan ajukan banding jika Anda merasa keberatan dengan hasil tersebut.";
+                        return "https://wa.me/{$phone}?text=" . urlencode($msg);
+                    })
+                    ->openUrlInNewTab(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

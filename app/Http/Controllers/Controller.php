@@ -82,6 +82,18 @@ abstract class Controller
     {
         $sig = null;
 
+        // Otomatis Bypass (Auto-Sign) untuk Asesor pada semua form KECUALI AK.04 & AK.06
+        if ($userId) {
+            $userForBypass = \App\Models\User::find($userId);
+            if ($userForBypass && ($userForBypass->hasRole('asesor') || $userForBypass->role === 'asesor')) {
+                // Normalisasi nama form untuk perbandingan (bisa "FR.AK.04" atau "AK.04")
+                $cleanDocLabel = str_replace('FR.', '', $docLabel ?? '');
+                if (!in_array($cleanDocLabel, ['AK.04', 'AK.06'])) {
+                    $requireSigned = false;
+                }
+            }
+        }
+
         // Coba cari signature request yang sudah di-sign
         if ($registrationId && $docLabel) {
             // Dukung pencarian dengan atau tanpa prefix "FR." untuk kompatibilitas penuh

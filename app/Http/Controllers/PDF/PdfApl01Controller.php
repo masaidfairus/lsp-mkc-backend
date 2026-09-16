@@ -80,19 +80,33 @@ class PdfApl01Controller extends Controller
             'aplData.education',
             'scheme',
             'scheme.competencyUnits',
-            'filteredAplUserFiles.documentList.basicRequirementProofs',
-            'filteredAplUserFiles.documentList.administrativeProofs',
             'aplPortfolio.fileProfile.documentList',
         ]);
 
         $aplData = $registration->aplData;
         $candidate = $registration->candidate;
         $scheme = $registration->scheme;
-        $files = $registration->filteredAplUserFiles;
 
-        if (!$aplData || !$candidate || !$scheme || !$files) {
+        if (!$aplData || !$candidate || !$scheme) {
             return response()->json(['message' => 'Data registrasi tidak lengkap.'], 422);
         }
+
+        // ── Ambil dokumen persyaratan dasar (spesifik per skema) ────────────────
+        $basicReqListIds = \App\Models\BasicRequirementProof::where('scheme_id', $scheme->id)
+            ->pluck('list_id');
+
+        $basicReqFiles = \App\Models\FileProfile::where('user_id', $registration->user_id)
+            ->whereIn('list_id', $basicReqListIds)
+            ->with('documentList')
+            ->get();
+
+        // ── Ambil dokumen administratif (global, tidak per skema) ───────────────
+        $adminListIds = \App\Models\AdministrativeProof::pluck('list_id');
+
+        $adminFiles = \App\Models\FileProfile::where('user_id', $registration->user_id)
+            ->whereIn('list_id', $adminListIds)
+            ->with('documentList')
+            ->get();
 
         $data = [
             'nama' => strtoupper($candidate->name),
@@ -104,7 +118,7 @@ class PdfApl01Controller extends Controller
             'no_telp' => $aplData->phone_number,
             'pendidikan' => $aplData->education?->title ?? '-',
             'alamat' => $aplData->address,
-            'rt_rw' => null, // Belum ada di skema database apl01_data
+            'rt_rw' => null,
             'kelurahan' => '',
             'kecamatan' => '',
             'kabupaten' => '',
@@ -129,22 +143,16 @@ class PdfApl01Controller extends Controller
                     'judul' => $unit->unit_title,
                 ])
                 ->toArray(),
-            'persyaratan_dasar' => $files->filter(function ($file) use ($scheme) {
-                return $file->documentList && $file->documentList->basicRequirementProofs
-                    ->where('scheme_id', $scheme->id)
-                    ->isNotEmpty();
-            })->map(fn($file) => [
-                    'nama' => $file->documentList->title,
-                    'status' => $file->status,
-                    'validation_result' => $file->validation_result,
-                ])->values()->toArray(),
-            'bukti_administratif' => $files->filter(function ($file) {
-                return $file->documentList && $file->documentList->administrativeProofs->isNotEmpty();
-            })->map(fn($file) => [
-                    'nama' => $file->documentList->title,
-                    'status' => $file->status,
-                    'validation_result' => $file->validation_result,
-                ])->values()->toArray(),
+            'persyaratan_dasar' => $basicReqFiles->map(fn($file) => [
+                'nama' => $file->documentList?->title ?? 'Dokumen',
+                'status' => $file->status,
+                'validation_result' => $file->validation_result,
+            ])->values()->toArray(),
+            'bukti_administratif' => $adminFiles->map(fn($file) => [
+                'nama' => $file->documentList?->title ?? 'Dokumen',
+                'status' => $file->status,
+                'validation_result' => $file->validation_result,
+            ])->values()->toArray(),
             'admin_notes' => $registration->admin_notes ?? '',
             'status_terima' => match (true) {
                 $registration->status === AssessmentStatus::APL01_APPROVED,
@@ -158,7 +166,7 @@ class PdfApl01Controller extends Controller
             'asesor_sign_date' => $signatureData['is_signed'] && $signatureData['signed_at'] ? $this->convertDateToLocalTime($signatureData['signed_at']) : ($registration->status->isApl01Complete() ? $this->convertDateToLocalTime($registration->updated_at) : ''),
             'asesi_qr_code' => $aplData->asesi_qr_code ?? '',
             'asesi_sign_date' => $aplData->asesi_signature_date ? $this->convertDateToLocalTime($aplData->asesi_signature_date) : '',
-            // ── Portfolio Dokumen Asesi ────────────────────────────────────────
+            // ── Portfolio Dokumen Asesi ─────────────────────────────────────────
             'portfolio_documents' => $registration->aplPortfolio->map(fn($p) => [
                 'title' => $p->fileProfile->documentList->title ?? 'Dokumen Tanpa Nama',
                 'is_uploaded' => true,

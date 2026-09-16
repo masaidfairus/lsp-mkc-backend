@@ -6,6 +6,8 @@ use App\Enums\AssessmentStatus;
 use App\Models\AssessmentRegistration;
 use Filament\Widgets\Widget;
 use Livewire\WithPagination;
+use Filament\Notifications\Notification;
+use App\Exports\AsesiBlankoExport;
 
 class AsesiTypeReportWidget extends Widget
 {
@@ -23,6 +25,13 @@ class AsesiTypeReportWidget extends Widget
     public string $filterAsesiType = 'all';
     public string $filterPeriod = 'all';
     public string $filterStatus = 'all';
+    public ?string $filterDateFrom = null;
+    public ?string $filterDateTo = null;
+
+    // Export properties
+    public array $selectedAsesi = [];
+    public string $exportFilename = '';
+    public bool $selectAll = false;
 
     /**
      * Only allow Admin and Superadmin to view this business intelligence report.
@@ -44,11 +53,74 @@ class AsesiTypeReportWidget extends Widget
     public function updatedFilterPeriod()
     {
         $this->resetPage();
+        $this->selectedAsesi = [];
+        $this->selectAll = false;
+
+        // Reset date range when switching away from 'custom'
+        if ($this->filterPeriod !== 'custom') {
+            $this->filterDateFrom = null;
+            $this->filterDateTo = null;
+        }
+    }
+
+    public function updatedFilterDateFrom()
+    {
+        $this->resetPage();
+        $this->selectedAsesi = [];
+        $this->selectAll = false;
+    }
+
+    public function updatedFilterDateTo()
+    {
+        $this->resetPage();
+        $this->selectedAsesi = [];
+        $this->selectAll = false;
     }
 
     public function updatedFilterStatus()
     {
         $this->resetPage();
+        $this->selectedAsesi = [];
+        $this->selectAll = false;
+    }
+
+    public function updatedPage()
+    {
+        $this->selectedAsesi = [];
+        $this->selectAll = false;
+    }
+
+    public function toggleSelectAll()
+    {
+        if ($this->selectAll) {
+            $this->selectedAsesi = [];
+            $this->selectAll = false;
+        } else {
+            $data = $this->getReportData();
+            $this->selectedAsesi = $data['registrations']->pluck('id')->map(fn($id) => (string) $id)->toArray();
+            $this->selectAll = true;
+        }
+    }
+
+    public function exportSelectedBlanko()
+    {
+        if (empty($this->selectedAsesi)) {
+            Notification::make()
+                ->warning()
+                ->title('Pilih asesi')
+                ->body('Silakan centang minimal 1 asesi untuk diexport.')
+                ->send();
+            return;
+        }
+
+        $filename = filled($this->exportFilename) 
+            ? trim($this->exportFilename) 
+            : 'PERMOHONAN BLANKO';
+
+        return app(AsesiBlankoExport::class)->download(
+            $this->selectedAsesi,
+            $filename
+        );
     }
 
     /**
@@ -59,11 +131,8 @@ class AsesiTypeReportWidget extends Widget
      */
     protected function applyFilters($query)
     {
-        // Restrict to assessor's own assigned assessments if the logged-in user is an assessor
-        $user = auth()->user();
-        if ($user && ($user->hasRole('asesor') || $user->role === 'asesor')) {
-            $query->where('assessor_id', $user->id);
-        }
+        // User request: tunjukkan saja semua nama Asesi walaupun Asesor tidak dipilih atas asesi tersebut
+        // The restriction has been removed to show all data in the report.
 
         // 1. Tipe Asesi
         if ($this->filterAsesiType !== 'all') {
@@ -79,6 +148,13 @@ class AsesiTypeReportWidget extends Widget
                       ->whereYear('created_at', now()->year);
             } elseif ($this->filterPeriod === 'year') {
                 $query->whereYear('created_at', now()->year);
+            } elseif ($this->filterPeriod === 'custom') {
+                if ($this->filterDateFrom) {
+                    $query->whereDate('created_at', '>=', $this->filterDateFrom);
+                }
+                if ($this->filterDateTo) {
+                    $query->whereDate('created_at', '<=', $this->filterDateTo);
+                }
             }
         }
 

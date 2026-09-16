@@ -127,6 +127,13 @@ class SchemeResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('export_peta_excel')
+                    ->label('Export Peta Excel')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('success')
+                    ->action(function (\App\Models\Scheme $record) {
+                        return (new \App\Services\WorkGroupExcelExportService())->export($record);
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

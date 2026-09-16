@@ -515,17 +515,27 @@
         <tbody>
             @if(!empty($persyaratan_dasar))
                 @foreach($persyaratan_dasar as $i => $syarat)
+                    @php
+                        $statusVal = $syarat['status']?->value ?? null;
+                        $validationVal = $syarat['validation_result']?->value ?? null;
+                        $isUploaded = $statusVal !== null; // ada file berarti sudah diupload
+                        $isValid = $statusVal === 'valid';
+                        $isMS = $isValid && $validationVal === 'ms';
+                        $isTMS = $isValid && $validationVal === 'tms';
+                        // Jika belum diverifikasi admin tapi sudah ada (pending), anggap memenuhi syarat sementara
+                        $isPending = $isUploaded && !$isValid && $validationVal === null;
+                    @endphp
                     <tr>
                         <td class="center">{{ $i + 1 }}.</td>
                         <td>{{ $syarat['nama'] }}</td>
                         <td class="center">
-                            <span class="{{ $syarat['status']->value === 'valid' && $syarat['validation_result']?->value === 'ms' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ ($isMS || $isPending) ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                         <td class="center">
-                            <span class="{{ $syarat['status']->value === 'valid' && $syarat['validation_result']?->value === 'tms' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ $isTMS ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                         <td class="center">
-                            <span class="{{ $syarat['status']->value !== 'valid' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ !$isUploaded ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                     </tr>
                 @endforeach
@@ -567,17 +577,26 @@
         <tbody>
             @if(!empty($bukti_administratif))
                 @foreach($bukti_administratif as $i => $bukti)
+                    @php
+                        $bStatusVal = $bukti['status']?->value ?? null;
+                        $bValidationVal = $bukti['validation_result']?->value ?? null;
+                        $bIsUploaded = $bStatusVal !== null;
+                        $bIsValid = $bStatusVal === 'valid';
+                        $bIsMS = $bIsValid && $bValidationVal === 'ms';
+                        $bIsTMS = $bIsValid && $bValidationVal === 'tms';
+                        $bIsPending = $bIsUploaded && !$bIsValid && $bValidationVal === null;
+                    @endphp
                     <tr>
                         <td class="center">{{ $i + 1 }}.</td>
                         <td>{{ $bukti['nama'] }}</td>
                         <td class="center">
-                            <span class="{{ $bukti['status']->value === 'valid' && $bukti['validation_result']?->value === 'ms' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ ($bIsMS || $bIsPending) ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                         <td class="center">
-                            <span class="{{ $bukti['status']->value === 'valid' && $bukti['validation_result']?->value === 'tms' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ $bIsTMS ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                         <td class="center">
-                            <span class="{{ $bukti['status']->value !== 'valid' ? 'checkbox-checked' : 'checkbox' }}"></span>
+                            <span class="{{ !$bIsUploaded ? 'checkbox-checked' : 'checkbox' }}"></span>
                         </td>
                     </tr>
                 @endforeach

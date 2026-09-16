@@ -10,8 +10,8 @@
 
 return [
 
-    'E1001' => 'User tidak ditemukan',
-    'E1002' => 'Password salah',
+    'E1001' => 'Email atau password salah',
+    'E1002' => 'Email atau password salah',
     'E1003' => 'Akun belum diaktivasi',
     'E1004' => 'Akun admin tidak terdaftar',
     'E1005' => 'Tidak Sah',

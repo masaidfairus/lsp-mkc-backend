@@ -22,7 +22,8 @@ class PdfAk05Controller extends Controller
             'candidate',
             'assessor',
             'scheme',
-            'reports'
+            'reports',
+            'results'
         ]);
 
         $ak05Report = $registration->reports->where('document_type', 'FR.AK.05')->first();
@@ -59,6 +60,62 @@ class PdfAk05Controller extends Controller
             'qr_preview' => $signatureData['qr_code'],
         ];
 
+        // ── Ambil seluruh asesi dalam 1 kurun waktu, TUK, dan Asesor yang sama ──────────
+        $assessedDate = $registration->assessed_at ? \Carbon\Carbon::parse($registration->assessed_at)->format('Y-m-d') : null;
+
+        $relatedRegistrationsQuery = AssessmentRegistration::with(['candidate', 'results', 'reports'])
+            ->where('scheme_id', $registration->scheme_id)
+            ->where('assessor_id', $registration->assessor_id);
+            
+        if ($registration->tuk) {
+            $relatedRegistrationsQuery->where('tuk', $registration->tuk);
+        } else {
+            $relatedRegistrationsQuery->where(function($q) {
+                $q->whereNull('tuk')->orWhere('tuk', '');
+            });
+        }
+
+        if ($assessedDate) {
+            $relatedRegistrationsQuery->whereDate('assessed_at', $assessedDate);
+        } else {
+            $relatedRegistrationsQuery->whereNull('assessed_at');
+        }
+
+        $relatedRegistrations = $relatedRegistrationsQuery->orderBy('id', 'asc')->get();
+
+        $assessmentResults = [];
+        foreach ($relatedRegistrations as $relReg) {
+            // Ambil K/BK dari AK.02
+            $relAk02Report = $relReg->results->where('document_type', 'FR.AK.02')->sortByDesc('id')->first();
+            $relIsCompetent = null;
+            if ($relAk02Report) {
+                $relAk02Data = $relAk02Report->main_data ?? [];
+                $isComp = $relAk02Data['assessment_summary']['is_competent'] ?? false;
+                $relIsCompetent = $isComp ? 'K' : 'BK';
+            } elseif ($relReg->final_result) {
+                $relIsCompetent = ($relReg->final_result === 'kompeten') ? 'K' : 'BK';
+            }
+            
+            // Ambil Keterangan dari AK.05 asesi tersebut
+            $relAk05 = $relReg->reports->where('document_type', 'FR.AK.05')->first();
+            $description = '';
+            if ($relAk05 && !empty($relAk05->main_data['assessment_results'])) {
+                $description = $relAk05->main_data['assessment_results'][0]['description'] ?? '';
+            }
+            
+            $assesseeName = $relReg->candidate?->name ?? '';
+            if (empty($assesseeName) && $relAk05 && !empty($relAk05->main_data['assessment_results'])) {
+                $assesseeName = $relAk05->main_data['assessment_results'][0]['assessee_name'] ?? '-';
+            }
+            
+            $assessmentResults[] = [
+                'assessee_name' => strtoupper($assesseeName),
+                'recommendation' => $relIsCompetent,
+                'description' => $description,
+            ];
+        }
+        // ────────────────────────────────────────────────────────────────────
+
         $data = [
             'scheme_name' => $scheme?->name ?? '-',
             'scheme_code' => $scheme?->code ?? '-',
@@ -67,7 +124,7 @@ class PdfAk05Controller extends Controller
             'asesor_name' => $assessor?->name ?? '-',
             'asesor_reg' => $signatureData['reg_number'],
             'asesor_qr_code' => $signatureData['qr_code'],
-            'assessment_results' => $ak05Data['assessment_results'] ?? [],
+            'assessment_results' => $assessmentResults,
             'evaluations' => $ak05Data['evaluation_section'] ?? [],
             'assessor_signature' => $assessorSignature,
         ];

@@ -6,6 +6,7 @@ use App\Enums\Apl01Status;
 use App\Enums\Apl02Status;
 use App\Enums\Role;
 use App\Enums\AssessmentStatus;
+use App\Exports\AsesiBlankoExport;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\PortfolioFilesRelationManager;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\SelfAssessmentRelationManager;
 use App\Filament\Resources\AssessmentRegistrationResource\RelationManagers\EvidenceRelationManager;
@@ -18,6 +19,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class AssessmentRegistrationResource extends Resource
 {
@@ -90,8 +92,8 @@ class AssessmentRegistrationResource extends Resource
                                                     ->label('Asesor')
                                                     ->searchable()
                                                     ->preload(false)
-                                                    // Admin bisa edit assessor_id, Asesor tidak bisa
-                                                    ->disabled(fn() => auth()->user()->hasRole('asesor')),
+                                                    // Hanya Superadmin (Manager Sertifikasi) yang bisa edit assessor_id
+                                                    ->disabled(fn() => !auth()->user()->hasRole('superadmin')),
                                                 // PILIHAN FORM: Menu dropdown pilihan (Dropdown Select)
                                                 Forms\Components\Select::make('status_apl01')
                                                     ->options([
@@ -647,10 +649,82 @@ class AssessmentRegistrationResource extends Resource
                     ->label('Verifikasi')
                     ->icon('heroicon-o-check-badge')
                     ->color('primary'),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('wa_kekurangan_bukti')
+                        ->label('WA Kekurangan Bukti')
+                        ->icon('heroicon-o-chat-bubble-left-ellipsis')
+                        ->color('warning')
+                        ->url(function ($record) {
+                            $phone = $record->aplData?->phone_number ?? $record->candidate?->profile?->phone_number;
+                            if (!$phone) return '#';
+                            $phone = preg_replace('/[^\d]/', '', $phone);
+                            if (str_starts_with($phone, '0')) $phone = '62' . substr($phone, 1);
+                            $msg = "Halo {$record->candidate->name}, pendaftaran sertifikasi untuk skema {$record->scheme->name} mengalami kekurangan pada bukti administratif. Mohon segera melengkapi data Anda.";
+                            return "https://wa.me/{$phone}?text=" . urlencode($msg);
+                        })
+                        ->openUrlInNewTab(),
+                        
+                    Tables\Actions\Action::make('wa_invoice')
+                        ->label('WA Invoice Tagihan')
+                        ->icon('heroicon-o-currency-dollar')
+                        ->color('success')
+                        ->visible(fn ($record) => $record->asesi_type === 'pribadi')
+                        ->url(function ($record) {
+                            $phone = $record->aplData?->phone_number ?? $record->candidate?->profile?->phone_number;
+                            if (!$phone) return '#';
+                            $phone = preg_replace('/[^\d]/', '', $phone);
+                            if (str_starts_with($phone, '0')) $phone = '62' . substr($phone, 1);
+                            $msg = "Halo {$record->candidate->name}, berikut adalah pengingat pembayaran invoice untuk pendaftaran sertifikasi skema {$record->scheme->name}. Silakan cek aplikasi untuk detail tagihan dan lakukan pembayaran agar proses dapat dilanjutkan.";
+                            return "https://wa.me/{$phone}?text=" . urlencode($msg);
+                        })
+                        ->openUrlInNewTab(),
+                        
+                    Tables\Actions\Action::make('wa_hasil')
+                        ->label('WA Hasil Sertifikasi')
+                        ->icon('heroicon-o-academic-cap')
+                        ->color('primary')
+                        ->visible(fn ($record) => $record->status && $record->status->value === \App\Enums\AssessmentStatus::APL02_APPROVED->value)
+                        ->url(function ($record) {
+                            $phone = $record->aplData?->phone_number ?? $record->candidate?->profile?->phone_number;
+                            if (!$phone) return '#';
+                            $phone = preg_replace('/[^\d]/', '', $phone);
+                            if (str_starts_with($phone, '0')) $phone = '62' . substr($phone, 1);
+                            $msg = "Halo {$record->candidate->name}, selamat! Proses asesmen untuk skema {$record->scheme->name} telah selesai. Silakan cek aplikasi untuk melihat hasil akhir sertifikasi Anda.";
+                            return "https://wa.me/{$phone}?text=" . urlencode($msg);
+                        })
+                        ->openUrlInNewTab(),
+                ])
+                ->label('Hubungi WA')
+                ->icon('heroicon-m-chat-bubble-bottom-center-text'),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('export_blanko_asesi')
+                        ->label('Export Blanko Asesi (.xlsx)')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->form([
+                            Forms\Components\TextInput::make('filename')
+                                ->label('Nama File (Opsional)')
+                                ->placeholder('PERMOHONAN BLANKO')
+                                ->helperText('Kosongkan untuk menggunakan nama default "PERMOHONAN BLANKO". Ekstensi .xlsx akan ditambahkan otomatis.')
+                                ->maxLength(100),
+                        ])
+                        ->modalHeading('Export Blanko Asesi ke Excel')
+                        ->modalDescription('File Excel (.xlsx) blanko asesi akan didownload untuk asesi yang dipilih. Kolom Kompeten/Belum Kompeten dibiarkan kosong untuk diisi manual.')
+                        ->modalSubmitActionLabel('Export Sekarang')
+                        ->action(function (Collection $records, array $data): \Symfony\Component\HttpFoundation\StreamedResponse {
+                            $filename = filled($data['filename'] ?? null)
+                                ? trim($data['filename'])
+                                : 'PERMOHONAN BLANKO';
+
+                            return app(AsesiBlankoExport::class)->download(
+                                $records->pluck('id')->toArray(),
+                                $filename
+                            );
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

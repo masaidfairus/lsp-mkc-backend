@@ -635,52 +635,59 @@ $validator = $validator ?? [['nama' => '', 'met_number' => ''], ['nama' => '', '
             </tr>
 
             @foreach($kp['unit'] as $i => $unit)
+                @php
+                    $bukti = $unit['bukti'] ?? ($unit['evidence'] ?? '');
+                    $jbRaw = $unit['jenis_bukti_select'] ?? ($unit['evidence_type'] ?? '');
+                    $jb = is_array($jbRaw) ? implode('/', $jbRaw) : (string)$jbRaw;
+                    $metode = $unit['metode'] ?? ($unit['assessment_methods'] ?? []);
+                    if (!is_array($metode)) $metode = [];
+                @endphp
                 <tr>
-                    <td colspan="2" class="left" style="font-size: 7.5pt; padding: 4px;">{{ $unit['judul'] }}</td>
-                    <td colspan="2" style="text-align: left; font-size: 7.5pt; padding: 4px;">{{ $unit['bukti'] }}</td>
-                    <td style="text-align: center;">{{ $unit['jenis_bukti_select'] === 'L' ? 'L' : '' }}</td>
-                    <td style="text-align: center;">{{ $unit['jenis_bukti_select'] === 'TL' ? 'TL' : '' }}</td>
-                    <td style="text-align: center;">{{ $unit['jenis_bukti_select'] === 'T' ? 'T' : '' }}</td>
+                    <td colspan="2" class="left" style="font-size: 6pt; padding: 3px; line-height:1.2;">{{ $unit['judul'] ?? '' }}</td>
+                    <td colspan="2" style="text-align: left; font-size: 6pt; padding: 3px; line-height:1.2;">{{ $bukti }}</td>
+                    <td style="text-align: center;">{{ $jb === 'L' ? 'L' : '' }}</td>
+                    <td style="text-align: center;">{{ $jb === 'TL' ? 'TL' : '' }}</td>
+                    <td style="text-align: center;">{{ $jb === 'T' ? 'T' : '' }}</td>
 
                     {{-- 1. Observasi Langsung --}}
                     <td colspan="2" style="font-size: 7pt; padding: 2px; text-align:center;">
-                        @foreach($unit['metode'] as $m)
-                            @if($m['method'] === 'Observasi langsung' && $m['answer']) {{ $m['answer'] }} @endif
+                        @foreach($metode as $m)
+                            @if(($m['method'] ?? '') === 'Observasi langsung' && ($m['answer'] ?? '')) {{ $m['answer'] }} @endif
                         @endforeach
                     </td>
 
                     {{-- 2. Kegiatan Terstruktur --}}
                     <td colspan="2" style="font-size: 7pt; padding: 2px; text-align:center;">
-                        @foreach($unit['metode'] as $m)
-                            @if($m['method'] === 'Kegiatan Terstruktur' && $m['answer']) {{ $m['answer'] }} @endif
+                        @foreach($metode as $m)
+                            @if(($m['method'] ?? '') === 'Kegiatan Terstruktur' && ($m['answer'] ?? '')) {{ $m['answer'] }} @endif
                         @endforeach
                     </td>
 
                     {{-- 3. Tanya Jawab --}}
                     <td colspan="2" style="font-size: 7pt; padding: 2px; text-align:center;">
-                        @foreach($unit['metode'] as $m)
-                            @if($m['method'] === 'Tanya Jawab' && $m['answer']) {{ $m['answer'] }} @endif
+                        @foreach($metode as $m)
+                            @if(($m['method'] ?? '') === 'Tanya Jawab' && ($m['answer'] ?? '')) {{ $m['answer'] }} @endif
                         @endforeach
                     </td>
 
                     {{-- 4. Verifikasi Portfolio (CVP) --}}
                     <td colspan="2" style="font-size: 7pt; padding: 2px; text-align:center;">
-                        @foreach($unit['metode'] as $m)
-                            @if($m['method'] === 'Verifikasi Portfolio' && $m['answer']) {{ $m['answer'] }} @endif
+                        @foreach($metode as $m)
+                            @if(($m['method'] ?? '') === 'Verifikasi Portfolio' && ($m['answer'] ?? '')) {{ $m['answer'] }} @endif
                         @endforeach
                     </td>
 
                     {{-- 5. Reviu Produk (CRP) --}}
                     <td colspan="2" style="font-size: 7pt; padding: 2px; text-align:center;">
-                        @foreach($unit['metode'] as $m)
-                            @if($m['method'] === 'Reviu Produk' && $m['answer']) {{ $m['answer'] }} @endif
+                        @foreach($metode as $m)
+                            @if(($m['method'] ?? '') === 'Reviu Produk' && ($m['answer'] ?? '')) {{ $m['answer'] }} @endif
                         @endforeach
                     </td>
 
                     {{-- 6. Verifikasi Pihak Ketiga (VPK) --}}
                     <td colspan="2" style="font-size: 7pt; padding: 2px; text-align:center;">
-                        @foreach($unit['metode'] as $m)
-                            @if($m['method'] === 'Verifikasi Pihak Ketiga' && $m['answer']) {{ $m['answer'] }} @endif
+                        @foreach($metode as $m)
+                            @if(($m['method'] ?? '') === 'Verifikasi Pihak Ketiga' && ($m['answer'] ?? '')) {{ $m['answer'] }} @endif
                         @endforeach
                     </td>
                 </tr>

@@ -1,59 +1,93 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LSP MKC - Backend API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel](https://img.shields.io/badge/Laravel-12.0-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white)
 
-## About Laravel
+Backend API repository for the **LSP MKC (Lembaga Sertifikasi Profesi MKC)** application. This project is built using Laravel 12 and serves as the core backend for handling assessee registrations, certification schemes, document management, and online exams.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Authentication & Security:** Secure JWT-based authentication using Laravel Sanctum, including registration, login, email verification, and password reset.
+- **Admin Dashboard:** Integrated with [Filament](https://filamentphp.com/) and Filament Shield for robust Role-Based Access Control (RBAC) and administrative management.
+- **Assessee (Asesi) Management:** Comprehensive endpoints for profile management, scheme registrations, and education tracking.
+- **Dynamic Form Handling:** Processing and state management for competency assessment forms including APL-01, APL-02, AK-01, AK-03, AK-04, and AK-07.
+- **Document & Portfolio Management:** Upload, validate, and securely stream basic requirements and portfolio documents with AWS S3 storage support.
+- **Online Exams & Signatures:** Dedicated endpoints for exam submissions and digital signature requests.
+- **Payment & Invoices:** Registration payment tracking and simulation.
+- **PDF Generation:** Automated PDF generation for APL-01 and APL-02 forms using `barryvdh/laravel-dompdf`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🛠️ Prerequisites
 
-## Learning Laravel
+Make sure you have the following installed on your local development machine:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- PHP >= 8.2
+- Composer
+- Node.js & NPM
+- MySQL (or preferred supported database)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 📦 Installation & Setup
 
-## Laravel Sponsors
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd lsp-mkc-backend
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+2. **Install PHP Dependencies**
+   ```bash
+   composer install
+   ```
 
-### Premium Partners
+3. **Install Node Dependencies**
+   ```bash
+   npm install
+   ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+4. **Environment Configuration**
+   Copy the example `.env` file and set up your database, mail, and AWS credentials.
+   ```bash
+   cp .env.example .env
+   ```
 
-## Contributing
+5. **Generate Application Key**
+   ```bash
+   php artisan key:generate
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+6. **Run Migrations & Seeders**
+   ```bash
+   php artisan migrate
+   ```
+   *(If you have seeders, run `php artisan migrate --seed`)*
 
-## Code of Conduct
+7. **Create Storage Link**
+   Make the storage directory publicly accessible.
+   ```bash
+   php artisan storage:link
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 💻 Running the Application
 
-## Security Vulnerabilities
+For local development, you can use the built-in Composer script which concurrently runs the PHP server, Vite, and the queue worker:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+composer run dev
+```
 
-## License
+Alternatively, you can run them separately:
+```bash
+php artisan serve
+npm run dev
+php artisan queue:listen
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 📚 API Architecture overview
+
+- All API routes are located in `routes/api.php`
+- Web routes (if any) are in `routes/web.php`
+- Responses are typically formatted using Laravel Eloquent API Resources located in `app/Http/Resources`
+- Controllers are primarily structured around the `Asesi` and `Auth` namespaces.
+
+## 📝 License
+
+This project is licensed under the MIT License.

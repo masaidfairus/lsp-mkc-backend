@@ -80,9 +80,10 @@
                             </svg>
                             <p class="text-slate-600 font-black text-sm">
                                 @php
-                                    $dt = \Carbon\Carbon::parse($sigData['t']);
+                                    // Parse time string assuming it's in UTC, then convert to WIB (Asia/Jakarta)
+                                    $dt = \Carbon\Carbon::parse($sigData['t'], 'UTC')->setTimezone('Asia/Jakarta');
                                 @endphp
-                                {{ $dt->translatedFormat('d F Y') }} 
+                                {{ $dt->translatedFormat('d F Y') }}
                                 <span class="text-slate-400 font-bold ml-1">{{ $dt->format('H:i:s') }} WIB</span>
                             </p>
                         </div>

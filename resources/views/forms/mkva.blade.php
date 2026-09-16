@@ -372,26 +372,26 @@
             </tr>
         </thead>
         <tbody>
-            @for($i=0; $i<max(count($tujuan_fokus), count($konteks_validasi), count($pendekatan_validasi)); $i++)
+            @for($i=0; $i<max(count($tujuanFokus ?? []), count($konteks ?? []), count($pendekatan ?? [])); $i++)
             <tr class="item-row">
                 <td>
-                    @if(isset($tujuan_fokus[$i]))
+                    @if(isset($tujuanFokus[$i]))
                     <div class="cb-item">
-                        <span class="checkbox {!! !empty($tujuan_fokus[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $tujuan_fokus[$i]['label'] }}
+                        <span class="checkbox {!! !empty($tujuanFokus[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $tujuanFokus[$i]['label'] }}
                     </div>
                     @endif
                 </td>
                 <td>
-                    @if(isset($konteks_validasi[$i]))
+                    @if(isset($konteks[$i]))
                     <div class="cb-item">
-                        <span class="checkbox {!! !empty($konteks_validasi[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $konteks_validasi[$i]['label'] }}
+                        <span class="checkbox {!! !empty($konteks[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $konteks[$i]['label'] }}
                     </div>
                     @endif
                 </td>
                 <td>
-                    @if(isset($pendekatan_validasi[$i]))
+                    @if(isset($pendekatan[$i]))
                     <div class="cb-item">
-                        <span class="checkbox {!! !empty($pendekatan_validasi[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $pendekatan_validasi[$i]['label'] }}
+                        <span class="checkbox {!! !empty($pendekatan[$i]['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $pendekatan[$i]['label'] }}
                     </div>
                     @endif
                 </td>
@@ -413,14 +413,14 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($orang_relevan as $index => $o)
+            @foreach ($orang_relevan ?? [] as $index => $o)
             <tr class="data-row">
                 <td><span class="checkbox {!! !empty($o['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $o['label'] }}</td>
                 @if($index === 0)
-                <td rowspan="{{ count($orang_relevan) }}" style="vertical-align:top; text-align:left; padding: 5px 10px;">
-                    {!! nl2br(e($o['nama'])) !!}
+                <td rowspan="{{ count($orang_relevan ?? []) }}" style="vertical-align:top; text-align:left; padding: 5px 10px;">
+                    {!! nl2br(e($o['nama'] ?? '')) !!}
                 </td>
-                <td rowspan="{{ count($orang_relevan) }}" style="vertical-align:top; padding:10px">{!! nl2br(e($o['hasil'])) !!}</td>
+                <td rowspan="{{ count($orang_relevan ?? []) }}" style="vertical-align:top; padding:10px">{!! nl2br(e($o['hasil'] ?? '')) !!}</td>
                 @endif
             </tr>
             @endforeach
@@ -444,7 +444,7 @@
             </tr>
         </thead>
         <tbody>
-            @for($i=0; $i<max(count($acuan_pembanding), count($dokumen_terkait)); $i++)
+            @for($i=0; $i<max(count($acuan_pembanding ?? []), count($dokumen_terkait ?? [])); $i++)
             <tr class="item-row">
                 <td>
                     @if(isset($acuan_pembanding[$i]))
@@ -472,12 +472,12 @@
         <tr>
             <td class="col-label">Keterampilan komunikasi yang digunakan dalam kegiatan validasi :</td>
             <td class="col-opts">
-                @php 
-                    $allKomunikasi = ['PRO AKTIF', 'ACTIVE LISTENING', 'Empati'];
-                    $selectedKomunikasi = array_column($komunikasi, 'label');
+                @php
+                    // Get from controller mapping
+                    $komunikasiList = $komunikasi ?? [];
                 @endphp
-                @foreach ($allKomunikasi as $opt)
-                <span class="checkbox {!! in_array($opt, $selectedKomunikasi) ? 'checkbox-checked' : '' !!}"></span>{{ $opt }}<br>
+                @foreach ($komunikasiList as $k)
+                <span class="checkbox {!! !empty($k['is_checked']) ? 'checkbox-checked' : '' !!}"></span>{{ $k['label'] }}<br>
                 @endforeach
             </td>
         </tr>
@@ -583,39 +583,7 @@
 
 
 
-    {{-- Signature Section --}}
-    <table class="sig-table">
-        <tr>
-            <td>
-                <div class="sig-label">Asesor Kompetensi:</div>
-                <div style="font-weight:bold; margin-bottom:10px;">{{ $assessor->name ?? '' }}</div>
-                <div class="sig-box" style="display: flex; align-items: center; justify-content: center; height: 100px;">
-                    @if($assessor_qr_code)
-                        <img src="{{ $assessor_qr_code }}" style="width:50px; height:50px;">
-                        <div style="margin-left: 10px; font-size: 8pt; text-align: left;">
-                            Telah divalidasi pada:<br>
-                            {{ $assessor_date }}
-                        </div>
-                    @endif
-                </div>
-                <div class="sig-label">Tanda Tangan / Tanggal</div>
-            </td>
-            <td>
-                <div class="sig-label">Validator:</div>
-                <div style="font-weight:bold; margin-bottom:10px;">{{ $validator->name ?? '' }}</div>
-                <div class="sig-box" style="display: flex; align-items: center; justify-content: center; height: 100px;">
-                    @if($validator_qr_code)
-                        <img src="{{ $validator_qr_code }}" style="width:50px; height:50px;">
-                        <div style="margin-left: 10px; font-size: 8pt; text-align: left;">
-                            Telah divalidasi pada:<br>
-                            {{ $validator_date }}
-                        </div>
-                    @endif
-                </div>
-                <div class="sig-label">Tanda Tangan / Tanggal</div>
-            </td>
-        </tr>
-    </table>
+
 
 </body>
 </html>

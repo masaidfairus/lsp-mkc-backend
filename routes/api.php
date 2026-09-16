@@ -116,6 +116,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('registrations/{registration}/ak07', [Ak07Controller::class, 'show']);
     Route::post('registrations/{registration}/ak07', [Ak07Controller::class, 'store']);
 
+    // Ujian IA Forms
+    Route::get('exams', [\App\Http\Controllers\Asesi\ExamController::class, 'index']);
+    Route::get('exams/{id}', [\App\Http\Controllers\Asesi\ExamController::class, 'show']);
+    Route::post('exams/{id}/submit', [\App\Http\Controllers\Asesi\ExamController::class, 'submit']);
+
     // Signature Requests (IA Forms)
     Route::get('signature-requests', [SignatureRequestController::class, 'index']);
     Route::get('signature-requests/{id}', [SignatureRequestController::class, 'show']);

@@ -177,6 +177,7 @@
         .tbl-footer td {
             border: 1px solid #000;
             vertical-align: middle;
+            padding: 6px 10px;
         }
 
         .tbl-footer .lbl {
@@ -290,7 +291,7 @@ $validator = $validator ?? [];
                 <th style="width:25px; padding:2px;">4</th>
                 <th style="width:25px; padding:2px;">5</th>
             </tr>
-            @foreach($kp['instrumen'] as $index => $inst)
+            @foreach($kp['assessment_instruments'] as $index => $inst)
                 <tr>
                     <td style="text-align:center; white-space:nowrap; padding:5px 3px;">{{ $index + 1 }}.</td>
                     <td colspan="3">{{ $inst['method'] ?? '' }}</td>

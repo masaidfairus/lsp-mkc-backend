@@ -38,8 +38,9 @@ class RolePermissionSeeder extends Seeder
                     $adminPermissions->push($name);
                 }
             }
-            // 2. Hak akses update APL.01 (AssessmentRegistration) untuk verifikasi admin
-            if (str_contains($name, 'assessment_registration') && str_starts_with($name, 'update_')) {
+            // 2. Hak akses update & delete APL.01 (AssessmentRegistration) untuk verifikasi admin
+            if ((str_contains($name, 'assessment_registration') || str_contains($name, 'assessment::registration')) &&
+                (str_starts_with($name, 'update_') || str_starts_with($name, 'delete_') || str_starts_with($name, 'delete_any_'))) {
                 $adminPermissions->push($name);
             }
 

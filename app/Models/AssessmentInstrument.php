@@ -38,4 +38,12 @@ class AssessmentInstrument extends Model
     {
         return $this->morphMany(SignatureRequest::class, 'signable');
     }
+
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            // Delete associated signature requests
+            $model->signatureRequests()->delete();
+        });
+    }
 }

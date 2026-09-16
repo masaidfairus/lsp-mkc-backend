@@ -254,6 +254,29 @@ class AssessmentRegistration extends Model
             if ($aplData && $aplData->asesi_signature) {
                 \Illuminate\Support\Facades\Storage::disk('local')->delete($aplData->asesi_signature);
             }
+
+            // Cascade delete AssessmentInstruments related to this registration
+            \App\Models\AssessmentInstrument::where('registration_id', $model->id)->get()->each(function ($instrument) {
+                $instrument->delete(); // Use each()->delete() to trigger AssessmentInstrument's deleting event
+            });
+
+            // Cascade delete AssessmentPlanning related to this registration
+            \App\Models\AssessmentPlanning::where('registration_id', $model->id)->get()->each(function ($planning) {
+                $planning->delete(); // Use each()->delete() to trigger AssessmentPlanning's deleting event
+            });
+
+            // Cascade delete AssessmentResult related to this registration
+            \App\Models\AssessmentResult::where('registration_id', $model->id)->get()->each(function ($result) {
+                $result->delete();
+            });
+
+            // Cascade delete AssessmentReport related to this registration
+            \App\Models\AssessmentReport::where('registration_id', $model->id)->get()->each(function ($report) {
+                $report->delete();
+            });
+
+            // Delete signature requests attached directly to the registration
+            $model->signatureRequests()->delete();
         });
 
         static::saving(function ($model) {
@@ -299,15 +322,14 @@ class AssessmentRegistration extends Model
             if ($shouldHaveApl01) {
                 // Cari admin yang meng-acc APL.01 (dari user login, fallback ke admin pertama)
                 $adminUser = auth()->user();
-                if (!$adminUser || !in_array($adminUser->role, ['admin', 'superadmin'])) {
-                    $adminUser = \App\Models\User::whereIn('role', ['admin', 'superadmin'])->first();
+                if (!$adminUser || !$adminUser->hasRole(['admin', 'superadmin'])) {
+                    $adminUser = \App\Models\User::role(['admin', 'superadmin'])->first();
                 }
                 $adminId = $adminUser?->id;
 
                 if ($adminId) {
                     $existing = \App\Models\SignatureRequest::where([
                         'registration_id' => $model->id,
-                        'user_id' => $adminId,
                         'document_label' => 'APL.01',
                         'role' => 'Admin',
                     ])->first();
@@ -322,6 +344,13 @@ class AssessmentRegistration extends Model
                             'signable_id' => $model->id,
                             'role' => 'Admin',
                         ]);
+                    } else {
+                        // Jika request masih pending dan yang menyimpan adalah admin, update user_id ke admin tersebut
+                        if ($existing->status === 'pending' && auth()->check() && auth()->user()->hasRole(['admin', 'superadmin'])) {
+                            if ($existing->user_id !== auth()->id()) {
+                                $existing->update(['user_id' => auth()->id()]);
+                            }
+                        }
                     }
                 }
             } else {

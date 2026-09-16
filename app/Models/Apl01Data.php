@@ -21,6 +21,7 @@ class Apl01Data extends Model
         'education_id',
         'company_name',
         'job_title',
+        'job_code',
         'company_address',
         'company_postal_code',
         'company_fax',

@@ -35,18 +35,40 @@ trait HasSignatureRequestSpawner
         $mainData = $record->main_data ?? [];
         $mappings = [];
 
-        // Asesor (path bisa 'asesor' atau 'assessor')
-        $asesorId = data_get($mainData, 'signatures.asesor.user_id')
-                 ?? data_get($mainData, 'signatures.assessor.user_id');
+        $label = $this->getDocumentLabel();
 
-        // Fallback: baca langsung dari relasi registration (mencegah cleanup
-        // menghapus SignatureRequest yang dibuat oleh model booted() hook)
-        if (!$asesorId && method_exists($record, 'registration')) {
-            $asesorId = optional($record->registration)->assessor_id;
-        }
+        // Pengecualian: FR.IA.05A dan FR.IA.06A memiliki alur khusus (Asesi kerja -> Asesor TTD Form C -> Asesi TTD)
+        // Jadi kita tidak otomatis men-spawn TTD Asesor & Asesi pada saat form soal (A) ini dibuat.
+        $excludedAutoSpawns = ['FR.IA.05A', 'FR.IA.06A'];
 
-        if ($asesorId) {
-            $mappings[] = ['user_id' => (int) $asesorId, 'role' => 'Asesor'];
+        if (!in_array($label, $excludedAutoSpawns)) {
+            // Asesor (path bisa 'asesor' atau 'assessor')
+            $asesorId = data_get($mainData, 'signatures.asesor.user_id')
+                     ?? data_get($mainData, 'signatures.assessor.user_id');
+
+            // Fallback: baca langsung dari relasi registration
+            if (!$asesorId && method_exists($record, 'registration')) {
+                $asesorId = optional($record->registration)->assessor_id;
+            }
+
+            if ($asesorId) {
+                // Auto-Sign Master Data: Hanya spawn permintaan TTD manual untuk form AK.04 dan AK.06
+                $cleanLabel = str_replace('FR.', '', $label);
+                if (in_array($cleanLabel, ['AK.04', 'AK.06'])) {
+                    $mappings[] = ['user_id' => (int) $asesorId, 'role' => 'Asesor'];
+                }
+            }
+
+            // Asesi (Assessee) - Hanya request manual untuk form AK.02, AK.04, dan AK.06 karena tidak reusable
+            $cleanLabel = str_replace('FR.', '', $label);
+            if (in_array($cleanLabel, ['AK.02', 'AK.04', 'AK.06'])) {
+                if (method_exists($record, 'registration') && $record->registration) {
+                    $asesiId = $record->registration->user_id;
+                    if ($asesiId) {
+                        $mappings[] = ['user_id' => (int) $asesiId, 'role' => 'asesi'];
+                    }
+                }
+            }
         }
 
         // Penyusun (dalam document_control.compilers)
