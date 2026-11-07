@@ -2,20 +2,17 @@
 
 namespace App\Filament\Admin\Resources\Apl01Data\Schemas;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Form;
 
 class Apl01DataForm
 {
     /**
      * Configure.
-     *
-     * @param  Schema  $schema
-     * @return Schema
      */
-    public static function configure(Schema $schema): Schema
+    public static function configure(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Hidden::make('user_id')
                     ->default(auth()->id())

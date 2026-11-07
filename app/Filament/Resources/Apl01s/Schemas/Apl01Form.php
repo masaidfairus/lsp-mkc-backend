@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\Apl01s\Schemas;
 
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 
 class Apl01Form
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 //
             ]);

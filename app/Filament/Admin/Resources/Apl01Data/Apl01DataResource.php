@@ -8,36 +8,28 @@ use App\Filament\Admin\Resources\Apl01Data\Pages\ListApl01Data;
 use App\Filament\Admin\Resources\Apl01Data\Schemas\Apl01DataForm;
 use App\Filament\Admin\Resources\Apl01Data\Tables\Apl01DataTable;
 use App\Models\Apl01Data;
-use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class Apl01DataResource extends Resource
 {
     protected static ?string $model = Apl01Data::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $recordTitleAttribute = 'Apl01Data';
 
     /**
      * Form.
-     *
-     * @param  Schema  $schema
-     * @return Schema
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return Apl01DataForm::configure($schema);
+        return Apl01DataForm::configure($form);
     }
 
     /**
      * Table.
-     *
-     * @param  Table  $table
-     * @return Table
      */
     public static function table(Table $table): Table
     {
@@ -46,8 +38,6 @@ class Apl01DataResource extends Resource
 
     /**
      * Mendapatkan relasi getRelations.
-     *
-     * @return array
      */
     public static function getRelations(): array
     {
@@ -58,8 +48,6 @@ class Apl01DataResource extends Resource
 
     /**
      * Mengambil pages.
-     *
-     * @return array
      */
     public static function getPages(): array
     {
