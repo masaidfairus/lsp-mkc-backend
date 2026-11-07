@@ -258,7 +258,7 @@ class AuthController extends Controller
             return $this->successResponse([], 'Kamu telah keluar dari akun');
         }
 
-        return redirect()->route('login');
+        return redirect()->route('filament.admin.auth.login');
     }
 
     /**
